@@ -67,13 +67,14 @@ With Summoner, building efficient, persistent, and future-ready agent-based appl
 
 ## Documentation Overview
 
-- [Introduction](#introduction)
-  - [Architecture](#architecture)
-  - [Motivations – Mini Summoner SDK](#motivations--mini-summoner-sdk)
-- [Tutorials](#tutorials)
-- [Desktop App User Manual](#desktop-app-user-manual)
-- [Full SDK Doc by Function Names](#full-sdk-doc-by-function-names)
-- [FAQ](#faq)
+- [Introduction](introduction/index.md)
+    - [What makes summoner special](introduction/)
+    - [Architecture](introduction/)
+    - [Motivations – Mini Summoner SDK](introduction/)
+- [Tutorials](tutorials/index.md)
+- [Desktop App User Manual](doc_desktop_app/index.md)
+- [Full SDK Doc by Function Names](doc_sdk/index.md)
+- [FAQ](faq/index.md)
 
 
 <span style="position: relative; top: -4px; font-size: 1.1em;">Content covered </span> ![](https://progress-bar.xyz/100)
