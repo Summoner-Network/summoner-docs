@@ -40,11 +40,11 @@ At its core, Summoner helps you reduce compute time and accelerate development. 
 
 Consider the transition from traditional **Python scripts** to **Jupyter notebooks**. In notebooks, once you execute expensive operations or load large models, the results are cached and ready for immediate reuse, greatly enhancing productivity.
 
-Contrast that with regular Python scripts, which reload everything from scratch with every run. If loading a model like `word2vec` takes 20 seconds, repeatedly running the script quickly becomes time-consuming and inefficient.
+Contrast that with regular Python scripts, which reload everything from scratch with every run. If loading a model like `word2vec` takes 20 seconds, repeatedly running the script quickly becomes time-consuming and inefficient 🫠.
 
-Now scale this up: multiple models, extensive pipelines, and complex architectures... 🫠 The industry moved to **cloud solutions** precisely to maintain persistent services in memory, always ready to serve requests instantly.
+The industry moved to **cloud solutions** precisely to maintain persistent services in memory, always ready to serve requests instantly.
 
-Distributed systems further improve on this model by running services across multiple machines. AI agents represent the next evolutionary step-persistent, intelligent services capable of independent action, interaction, and dynamic responses.
+Distributed systems further improve on this model by running services across multiple machines. AI agents represent the next evolutionary step: persistent, intelligent services capable of independent action, interaction, and dynamic responses.
 
 <p align="center">
 <img width="450px" src="assets/comics/why_summoner.png" />
@@ -59,7 +59,7 @@ Imagine if LLM services like OpenAI or Claude required loading models for each q
 <img width="240px" src="assets/img/upload_time.png" />
 </p>
 
-Summoner offers this efficiency for your own applications, bridging the gap between experimental code and robust distributed systems. It lets you run your agents locally or across a network, keeping them persistently active and communicative without the complexity and cost of full-scale cloud infrastructure.
+Summoner can offer this efficiency for your own applications, bridging the gap between experimental code and robust distributed systems. It lets you run your agents locally or across a network, keeping them persistently active and communicative without the complexity and cost of full-scale cloud infrastructure.
 
 With Summoner, building efficient, persistent, and future-ready agent-based applications becomes straightforward and practical.
 
