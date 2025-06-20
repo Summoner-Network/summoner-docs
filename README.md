@@ -18,10 +18,6 @@ Summoner is a framework for deploying, connecting, and orchestrating multi-agent
 
 Just as the internet connects people, a new layer is emerging: **the internet for AI agents.**
 
-<p align="center">
-<img width="350px" src="assets/img/timeline.png" />
-</p>
-
 Current frameworks for agent-based systems are often limited. Typically, they're built for human-facing frontends and rarely support independent, open-internet interactions. Yet, agents increasingly interact with web interfaces-scraping data, filling forms, and automating workflows, and this trend is accelerating.
 
 While major tech companies experiment with agent-to-agent communication, many solutions still rely on paradigms built around human interaction. Summoner rethinks this architecture from the ground up, enabling direct peer-to-peer communication among intelligent programs and laying the foundation for a genuinely agentic internet.
