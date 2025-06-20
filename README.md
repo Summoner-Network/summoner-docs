@@ -27,7 +27,7 @@ While major tech companies experiment with **agent-to-agent** communication, man
 ## What if I don't care about agents? Is Summoner still relevant? 
 
 
-Yes — and in fact, you probably already care about agents without realizing it.
+Yes. And in fact, you probably already care about agents without realizing it.
 
 <p align="center">
 <img width="250px" src="assets/img/meme_agent_1.jpeg" />
