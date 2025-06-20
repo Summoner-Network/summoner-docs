@@ -19,16 +19,16 @@ The key shift is advanced natural language processing (NLP), allowing machines t
 This self-reference signals a deeper transformation: machines that replicate, improve, and evolve. We may be seeing a new kind of digital being — intelligent, adaptive, continuously learning.
 
 <p align="center">
-<img width="220px" src="../assets/img/human2machine.png" />
+<img width="200px" src="../assets/img/human2machine.png" />
+&nbsp;&nbsp;&nbsp;&nbsp;
+<img width="200px" src="../assets/img/agent_replication.png" />
 </p>
 
 With this comes a key question: *how should we build infrastructure for this future?*
 
 Most current proposals build on the existing TCP protocol, the backbone of today's internet. Some frameworks, like MCP, focus on orchestrating **human-to-machine** interactions. Others, like Google A2A, aim for agent-to-agent communication. But most still depend on a centralized authority (often the tech provider) to coordinate agents.
 
-<p align="center">
-<img width="220px" src="../assets/img/agent_replication.png" />
-</p>
+
 
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/60)
 
