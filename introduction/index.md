@@ -36,7 +36,7 @@ Most current proposals build on the existing TCP protocol, the backbone of today
 
 At Summoner, we believe agents should not be constrained by centralized control. They should move freely, identified by self-assigned, evolving IDs — not static, provider-issued ones. Identity should emerge through learning and interaction — not be dictated externally.
 
-We base agent identity on decentralized trust. Who better to assess a stranger than yourself? This principle shapes agent discovery and interaction, and is central to our design.
+We base agent identity on decentralized trust. _Who better to assess a stranger than yourself?_ 🙃  This principle shapes agent discovery and interaction, and is central to our design.
 
 <p align="center">
 <img width="200px" src="../assets/img/operad_ai_agents.png" />
