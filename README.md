@@ -26,7 +26,7 @@ Current frameworks for agent-based systems are often limited. Typically, they're
 
 While major tech companies experiment with agent-to-agent communication, many solutions still rely on paradigms built around human interaction. Summoner rethinks this architecture from the ground up, enabling direct peer-to-peer communication among intelligent programs and laying the foundation for a genuinely agentic internet.
 
-<span style="position: relative; top: -4px; font-size: 1.1em;">Page Content covered </span> ![](https://progress-bar.xyz/30)
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp;  ![](https://progress-bar.xyz/30)
 
 ## What if I don't care about agents? Is Summoner still relevant? 
 
@@ -59,22 +59,27 @@ Distributed systems further improve on this model by running services across mul
 
 Imagine if LLM services like OpenAI or Claude required loading models for each query: responses would be prohibitively slow. Instead, these services maintain persistent models to provide instant interactions.
 
+<p align="center">
+<img width="240px" src="assets/img/upload_time.png" />
+</p>
+
 Summoner offers this efficiency for your own applications, bridging the gap between experimental code and robust distributed systems. It lets you run your agents locally or across a network, keeping them persistently active and communicative without the complexity and cost of full-scale cloud infrastructure.
 
 With Summoner, building efficient, persistent, and future-ready agent-based applications becomes straightforward and practical.
 
-<span style="position: relative; top: -4px; font-size: 1.1em;">Content covered </span> ![](https://progress-bar.xyz/80)
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/75)
 
 ## Documentation Overview
 
 - [Introduction](introduction/index.md)
-    - [What makes summoner special](introduction/)
-    - [Architecture](introduction/)
-    - [Motivations – Mini Summoner SDK](introduction/)
+    - [Why Summoner specifically?](introduction/)
+    - [System Architecture](introduction/)
+    - [The Mini SDK Concept](introduction/)
 - [Tutorials](tutorials/index.md)
-- [Desktop App User Manual](doc_desktop_app/index.md)
-- [Full SDK Doc by Function Names](doc_sdk/index.md)
+- [Desktop App Guide](doc_desktop_app/index.md)
+- [SDK Reference (by Function)](doc_sdk/index.md)
 - [FAQ](faq/index.md)
 
 
-<span style="position: relative; top: -4px; font-size: 1.1em;">Content covered </span> ![](https://progress-bar.xyz/100)
+
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp;  ![](https://progress-bar.xyz/100)
