@@ -38,11 +38,11 @@ At Summoner, we believe agents should not be constrained by centralized control.
 
 We base agent identity on decentralized trust. Who better to assess a stranger than yourself? This principle shapes agent discovery and interaction, and is central to our design.
 
-We treat agents as stateful, adapting over time. Summoner's protocols evolve with each agent's environment and history. Our SDK makes this adaptability core.
-
 <p align="center">
-<img width="250px" src="../assets/img/operad_ai_agents.png" />
+<img width="200px" src="../assets/img/operad_ai_agents.png" />
 </p>
+
+We treat agents as stateful, adapting over time. Summoner's protocols evolve with each agent's environment and history. Our SDK makes this adaptability core.
 
 While decentralized, Summoner does not require the cloud. You can deploy agents locally or over private WANs. You can also host persistent, distributed endpoints for live services, such as large ML models that are expensive to spin up.
 
