@@ -32,7 +32,7 @@ But what if agents behaved more like programs in a multiplayer game — **roamin
 That is the world Summoner is built for.
 
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/45)
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/40)
 
 ### Two views of agent infrastructure
 
@@ -67,7 +67,7 @@ Now imagine the same problem, but with agents that:
 This is Summoner's design. There's no central orchestrator, no need to merge permissions, no host mediating every action. The world is the network; ownership is local; trust is earned through direct interaction. Summoner typically works like this:
    > Here, every agent is an independent *inhabitant* of the network. Agents have identities they assign themselves. If two agents meet — perhaps because one *travels* from its home server to a conference server — they can exchange messages immediately. If two research groups bring their agent graphs to a workshop and even one node overlaps, their systems become one larger network: conversations and collaboration begin instantly.
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/80)
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/90)
 
 ## Summoner: a new Architecture for distributed agents
 
@@ -77,6 +77,7 @@ This is Summoner's design. There's no central orchestrator, no need to merge per
 - [From API Gateways to Persistent Worlds](more/why4_mmo.md)
 - [Comparison with Existing Frameworks](more/why5_diff.md)
 
+<!-- 
 ## What's coming to Summoner?
 
 Summoner is already a powerful way to build agent-based systems. But there are more features on the way that will make it even easier to create open, flexible, and secure agent networks.
@@ -92,12 +93,12 @@ Here's what's coming next:
 
 All of these features support the core idea behind Summoner:
 
-> Agents are not just tools to call. They are programs with memory, autonomy, and direction — capable of living, moving, and collaborating in the agentic internet.
+> Agents are not just tools to call. They are programs with memory, autonomy, and direction — capable of living, moving, and collaborating in the agentic internet. -->
 
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
 
 
 <p align="center">
-  <a href="../prologue.md">&laquo; Previous: Prologue</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="architecture.md">Next: System Architecture &raquo;</a>
+  <a href="index.md">&laquo; Previous: Introduction</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="architecture.md">Next: System Architecture &raquo;</a>
 </p>
 
