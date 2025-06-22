@@ -8,7 +8,6 @@ Summoner is a framework for deploying, connecting, and orchestrating multi-agent
 <img width="450px" src="assets/img/summoner_user.png" />
 </p>
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp;  ![](https://progress-bar.xyz/20)
 
 ## Why should you care? 
 
@@ -46,6 +45,7 @@ Distributed systems further improve on this model by running services across mul
 <img width="450px" src="assets/comics/why_summoner.png" />
 </p>
 
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp;  ![](https://progress-bar.xyz/75)
 
 ### Where does Summoner fit in? 
 
@@ -62,8 +62,6 @@ With Summoner, building efficient, persistent, and future-ready agent-based appl
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
 
 
-Next >> [Introduction](introduction/index.md)
-
 <p align="center">
-|&nbsp;&nbsp;&nbsp; <a href="introduction/index.md">Next: Introduction &raquo;</a>
+<a href="README.md">&laquo; Previous: Table of Contents</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="introduction/index.md">Next: Introduction &raquo;</a>
 </p>
