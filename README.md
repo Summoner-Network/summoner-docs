@@ -1,7 +1,21 @@
 # Summoner Official Documentation
 
-## What is Summoner and why should you use it?
+## Documentation Overview
 
+- [Introduction](introduction/index.md)
+    * [Why Summoner specifically?](why_summoner.md)
+    * [System Architecture](architecture.md)
+    * [The Mini SDK Concept](mini_sdk.md)
+- [Tutorials](tutorials/index.md)
+- [Desktop App Guide](doc_desktop_app/index.md)
+- [SDK Reference (by Function)](doc_sdk/index.md)
+- [FAQ](faq/index.md)
+
+
+
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp;  ![](https://progress-bar.xyz/25)
+
+## What is Summoner and why should you use it?
 
 ### What is Summoner in simple terms? 
 
@@ -22,7 +36,7 @@ Current frameworks for agent-based systems are often limited. Typically, they ar
 
 While major tech companies experiment with **agent-to-agent** communication, many solutions still rely on paradigms built around human interaction. Summoner rethinks this architecture from the ground up, enabling direct peer-to-peer communication among intelligent programs and laying the foundation for a genuinely agentic internet.
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp;  ![](https://progress-bar.xyz/30)
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp;  ![](https://progress-bar.xyz/55)
 
 ## What if I don't care about agents? Is Summoner still relevant? 
 
@@ -63,19 +77,4 @@ Summoner can offer this efficiency for your own applications, bridging the gap b
 
 With Summoner, building efficient, persistent, and future-ready agent-based applications becomes straightforward and practical.
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/75)
-
-## Documentation Overview
-
-- [Introduction](introduction/index.md)
-    * [Why Summoner specifically?](why_summoner.md)
-    * [System Architecture](architecture.md)
-    * [The Mini SDK Concept](mini_sdk.md)
-- [Tutorials](tutorials/index.md)
-- [Desktop App Guide](doc_desktop_app/index.md)
-- [SDK Reference (by Function)](doc_sdk/index.md)
-- [FAQ](faq/index.md)
-
-
-
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp;  ![](https://progress-bar.xyz/100)
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
