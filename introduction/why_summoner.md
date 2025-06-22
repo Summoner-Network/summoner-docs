@@ -77,23 +77,6 @@ This is Summoner's design. There's no central orchestrator, no need to merge per
 - [From API Gateways to Persistent Worlds](more/why4_mmo.md)
 - [Comparison with Existing Frameworks](more/why5_diff.md)
 
-<!-- 
-## What's coming to Summoner?
-
-Summoner is already a powerful way to build agent-based systems. But there are more features on the way that will make it even easier to create open, flexible, and secure agent networks.
-
-Here's what's coming next:
-
-| Feature                                       | What It Means                                                                                                                                     |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Smart Tool Exchange**                       | Agents will be able to send each other small programs (like Lua or WASM modules) to help with new tasks or skills. This lets them grow over time. |
-| **Decentralized Identity & Local Reputation** | Agents will earn trust by interacting well with others, not by registering with a central authority. Each one builds its own reputation.           |
-| **Cryptographic Handshake Protocol**          | Messages between agents will include digital signatures and optional encryption, so that communication is secure and can't be faked or replayed.  |
-| **Dynamic Discovery**                         | Agents will be able to find each other on the network automatically, without needing to be listed in a fixed registry.                            |
-
-All of these features support the core idea behind Summoner:
-
-> Agents are not just tools to call. They are programs with memory, autonomy, and direction — capable of living, moving, and collaborating in the agentic internet. -->
 
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
 

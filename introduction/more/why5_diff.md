@@ -40,5 +40,5 @@ MCP and A2A are effective for structured, centralized workflows. Summoner enable
 
 
 <p align="center">
-  <a href="why4_mmo.md">&laquo; Previous: The Feel of an MMO, Not an API Gateway</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../architecture.md">Next: System Architecture &raquo;</a>
+  <a href="why4_mmo.md">&laquo; Previous: From API Gateways to Persistent Worlds</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../architecture.md">Next: System Architecture &raquo;</a>
 </p>

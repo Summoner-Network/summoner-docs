@@ -24,5 +24,5 @@ Frameworks like MCP and A2A emphasize controlled workflows with centralized coor
 
 
 <p align="center">
-  <a href="why3_compose.md">&laquo; Previous: Composability: The Real Kind</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why5_diff.md">Next: Why Other Frameworks Feel Different &raquo;</a>
+  <a href="why3_compose.md">&laquo; Previous: True Composability in Agent Networks</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why5_diff.md">Next: Comparison with Existing Frameworks &raquo;</a>
 </p>

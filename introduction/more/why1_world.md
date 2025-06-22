@@ -26,5 +26,5 @@ This approach gives developers greater control and better aligns with intuitive 
 
 
 <p align="center">
-  <a href="../index.md">&laquo; Previous: Introduction</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why2_self.md">Next: Roaming and Ownership &raquo;</a>
+  <a href="../index.md">&laquo; Previous: What makes Summoner different?</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why2_self.md">Next: Mobility and Ownership in Distributed Systems &raquo;</a>
 </p>

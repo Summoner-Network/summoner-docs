@@ -20,5 +20,5 @@ Trust boundaries are defined by agent behavior, not origin. Identity is portable
 
 
 <p align="center">
-  <a href="why1_world.md">&laquo; Previous: Agents as Programs in a World, Not Just Tools on a Menu</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why3_compose.md">Next: Composability: The Real Kind &raquo;</a>
+  <a href="why1_world.md">&laquo; Previous: Agents as Programs in a Shared World</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why3_compose.md">Next: True Composability in Agent Networks &raquo;</a>
 </p>
