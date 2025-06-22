@@ -37,3 +37,8 @@ This enables **bottom-up growth** and **agent autonomy**. You can start a local 
 MCP and A2A are effective for structured, centralized workflows. Summoner enables a different vision: an internet of **autonomous, persistent, collaborative agents**.
 
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+
+
+<p align="center">
+  <a href="why4_mmo.md">&laquo; Previous: The Feel of an MMO, Not an API Gateway</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../architecture.md">Next: System Architecture &raquo;</a>
+</p>

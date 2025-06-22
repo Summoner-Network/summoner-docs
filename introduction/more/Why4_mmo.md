@@ -21,3 +21,8 @@ This architecture supports:
 Frameworks like MCP and A2A emphasize controlled workflows with centralized coordination. Summoner supports open-ended interaction among autonomous agents.
 
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+
+
+<p align="center">
+  <a href="why3_compose.md">&laquo; Previous: Composability: The Real Kind</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why5_diff.md">Next: Why Other Frameworks Feel Different &raquo;</a>
+</p>

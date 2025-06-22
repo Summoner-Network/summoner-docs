@@ -15,3 +15,7 @@ In Summoner, composition is seamless. If two networks share a node, they merge. 
 This model supports organic, bottom-up growth. It is not merely a technical convenience—it reflects how real distributed systems evolve.
 
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+
+<p align="center">
+  <a href="why2_self.md">&laquo; Previous: Roaming and Ownership</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why4_mmo.md">Next: The Feel of an MMO, Not an API Gateway &raquo;</a>
+</p>

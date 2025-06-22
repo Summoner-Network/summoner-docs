@@ -23,3 +23,8 @@ Trust is developed locally through direct interaction, not assigned by certifica
 This approach gives developers greater control and better aligns with intuitive principles for designing autonomous, distributed systems.
 
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+
+
+<p align="center">
+  <a href="../index.md">&laquo; Previous: Introduction</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why2_self.md">Next: Roaming and Ownership &raquo;</a>
+</p>

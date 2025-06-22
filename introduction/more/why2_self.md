@@ -17,3 +17,8 @@ This implies that **ownership is local and persistent**:
 Trust boundaries are defined by agent behavior, not origin. Identity is portable, persistent, and under the agent's own control.
 
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+
+
+<p align="center">
+  <a href="why1_world.md">&laquo; Previous: Agents as Programs in a World, Not Just Tools on a Menu</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why3_compose.md">Next: Composability: The Real Kind &raquo;</a>
+</p>

@@ -95,3 +95,9 @@ All of these features support the core idea behind Summoner:
 > Agents are not just tools to call. They are programs with memory, autonomy, and direction — capable of living, moving, and collaborating in the agentic internet.
 
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+
+
+<p align="center">
+  <a href="../prologue.md">&laquo; Previous: Prologue</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="architecture.md">Next: System Architecture &raquo;</a>
+</p>
+
