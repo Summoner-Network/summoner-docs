@@ -1,6 +1,6 @@
 # Composability: The Real Kind
 
-Many frameworks claim composability, but what they mean is the ability to plug multiple APIs into a single orchestrator. This is coordination—not true composition.
+Many agent frameworks claim composability, but what they mean is the ability to plug multiple APIs into a single orchestrator. This is coordination — not true composition.
 
 Summoner treats composability as a **graph-level property**. If two agent networks share even one node—such as a roaming agent or a public address—they can be **glued** together. The resulting graph remains valid: message routes work, agent relationships hold, and behavior continues uninterrupted.
 

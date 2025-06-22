@@ -1,6 +1,9 @@
 # What makes Summoner different?
 
+
 ## Is it about new capabilities?
+
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/20)
 
 It is not _just_ about capabilities — **Summoner** starts from a different vision. 
 
@@ -17,6 +20,9 @@ It's a fair question. Many frameworks today offer support for **multi-agent syst
 In other words, **Summoner** is a blueprint for building **agentic worlds** — environments where your AI agents can move, interact, and form persistent relationships, all without a central authority.
 
 ### Understanding the landscape
+
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/40)
+
 In the past year, dozens of frameworks have emerged to support agentic communication and orchestration. Some help agents call APIs, others route conversations between tools. Yet few address the question that matters most:
 
 > What kind of internet should agents inhabit?
@@ -31,10 +37,9 @@ But what if agents behaved more like programs in a multiplayer game — **roamin
 
 That is the world Summoner is built for.
 
-
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/40)
-
 ### Two views of agent infrastructure
+
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/90)
 
 <p align="center" style="display: flex; align-items: center; justify-content: center; gap: 20px; text-align: center;">
   <img width="250px" src="../assets/img/centralized_orch_rounded.png" />
@@ -67,9 +72,11 @@ Now imagine the same problem, but with agents that:
 This is Summoner's design. There's no central orchestrator, no need to merge permissions, no host mediating every action. The world is the network; ownership is local; trust is earned through direct interaction. Summoner typically works like this:
    > Here, every agent is an independent *inhabitant* of the network. Agents have identities they assign themselves. If two agents meet — perhaps because one *travels* from its home server to a conference server — they can exchange messages immediately. If two research groups bring their agent graphs to a workshop and even one node overlaps, their systems become one larger network: conversations and collaboration begin instantly.
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/90)
 
 ## Summoner: a new Architecture for distributed agents
+
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+
 
 - [Agents as Programs in a Shared World](more/why1_world.md)
 - [Mobility and Ownership in Distributed Systems](more/why2_self.md)
@@ -78,10 +85,7 @@ This is Summoner's design. There's no central orchestrator, no need to merge per
 - [Comparison with Existing Frameworks](more/why5_diff.md)
 
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
-
-
 <p align="center">
-  <a href="index.md">&laquo; Previous: Introduction</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="architecture.md">Next: System Architecture &raquo;</a>
+  <a href="index.md">&laquo; Previous: Introduction</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="more/why1_world.md">Next: Agents as Programs in a Shared World &raquo;</a>
 </p>
 
