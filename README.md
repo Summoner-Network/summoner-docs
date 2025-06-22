@@ -68,9 +68,9 @@ With Summoner, building efficient, persistent, and future-ready agent-based appl
 ## Documentation Overview
 
 - [Introduction](introduction/index.md)
-    - [Why Summoner specifically?](introduction/)
-    - [System Architecture](introduction/)
-    - [The Mini SDK Concept](introduction/)
+    * [Why Summoner specifically?](why_summoner.md)
+    * [System Architecture](architecture.md)
+    * [The Mini SDK Concept](mini_sdk.md)
 - [Tutorials](tutorials/index.md)
 - [Desktop App Guide](doc_desktop_app/index.md)
 - [SDK Reference (by Function)](doc_sdk/index.md)
