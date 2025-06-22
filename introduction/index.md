@@ -50,9 +50,9 @@ While decentralized, Summoner does not require the cloud. You can deploy agents 
 
 ## Table of Contents
 
-* [Why Summoner specifically?](introduction/)
-* [System Architecture](introduction/)
-* [The Mini SDK Concept](introduction/)
+* [Why Summoner specifically?](why_summoner.md)
+* [System Architecture](architecture.md)
+* [The Mini SDK Concept](mini_sdk.md)
 
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>   ![](https://progress-bar.xyz/100)
 
