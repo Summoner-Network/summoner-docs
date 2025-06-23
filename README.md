@@ -16,7 +16,7 @@
         - [Composability in agent networks](introduction/more/why3_compose.md)
         - [Summoner: the basis for a persistent world](introduction/more/why4_mmo.md)
         - [Comparison with existing frameworks](introduction/more/why5_diff.md)
-    - [The mini SDK concept](mini_sdk.md)
+    - [The mini SDK concept](introduction/mini_sdk.md)
 - [Tutorials](tutorials/index.md)
 - [Desktop app guide](doc_desktop_app/index.md)
 - [SDK documentation](doc_sdk/index.md)
