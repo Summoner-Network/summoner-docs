@@ -271,35 +271,7 @@ sequenceDiagram
 
 You can find the full script [here](minisdk/scripts/script2.py).
 
-Next, we will explore additional concepts, in particular multi-party conversations (more than two agents).
-
-
-
-<!-- - mini sdk: Introduction to Summoner SDK
-    * **Creating Your First Agent**
-    * Defining agent behaviors
-    * Message sending and receiving
-    * **Creating Your First Server**
-    * How to launch a simple local server
-    * **Interactive Demo**
-    * Short code snippets with immediate feedback
-    * Meme to celebrate "It worked!"
-
-    - function
-        - decorator
-    - multifunctoin
-    - signal based: receive(), send()
-        - hardcoded
-        - autonomous
-
-    - Why use Network:
-        - loading a model (word2vec) can take time - loading it once and having it available as an api call is great to work on this
-        - Summoner: open to any other context
-            - loading model
-            - two computers: one with GPUs
-
-
-- taking care of multiple other agents requires states -->
+Next, we will explore multi-party conversations involving more than two agents, along with the necessary infrastructure to support such communication.
 
 
 <p align="center">
