@@ -95,7 +95,7 @@ First, we replace the old single-decorator approach with two decorator factories
 
 ```python
 class Agent:
-    def __init__(self, name):
+    def __init__(self):
         self.send_behavior = None
         self.receive_behavior = None
 
@@ -123,7 +123,7 @@ With this in place, calling `agent.send_behavior()` or `agent.receive_behavior(m
    We’ll keep its memory in a separate variable so you can see it explicitly.
 
    ```python
-   agent1 = Agent("agent1")
+   agent1 = Agent()
    agent1_memory = None
    ```
 
@@ -169,7 +169,7 @@ With this in place, calling `agent.send_behavior()` or `agent.receive_behavior(m
 
    ```python
    import random
-   agent2 = Agent("agent2")
+   agent2 = Agent()
    agent2_memory = []
    ```
 
