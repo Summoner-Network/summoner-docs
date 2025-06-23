@@ -15,7 +15,7 @@
 
   </div>
 
-  <div style="flex: 0 0 auto; text-align: left;">
+  <div style="flex: 0 0 auto; text-align: center;">
     <img src="../../assets/img/orch_no_comp_rounded.png" alt="Orchestration diagram" width="300px" />
   </div>
 
@@ -31,7 +31,7 @@ If two agents (or entire networks) share a common node — represented by the sa
 
 <div style="display: flex; align-items: center; gap: 20px;">
 
-  <div style="flex: 0 0 auto; text-align: left;">
+  <div style="flex: 0 0 auto; text-align: center;">
     <img src="../../assets/img/agent_comp2_rounded.png" alt="Composition diagram" width="220px" />
   </div>
 
