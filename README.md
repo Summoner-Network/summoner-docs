@@ -1,5 +1,13 @@
 # Summoner Official Documentation
 
+## 📝 Recent updates
+
+- [ ] no updates
+
+
+
+## 📚 Documentation Overview
+
 - [Prologue](prologue.md)
 - [Introduction](introduction/index.md)
     - [Why Summoner specifically?](introduction/why_summoner.md)
@@ -11,5 +19,5 @@
     - [The mini SDK concept](mini_sdk.md)
 - [Tutorials](tutorials/index.md)
 - [Desktop app guide](doc_desktop_app/index.md)
-- [SDK Documentation](doc_sdk/index.md)
+- [SDK documentation](doc_sdk/index.md)
 - [FAQ](faq/index.md)
