@@ -1,5 +1,7 @@
 # Introduction
 
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/25)
+
 Computers and the internet have transformed the world. They have shifted the social contract from human-to-human to **human-to-machine**, and increasingly **machine-to-machine** communication, powering modern apps and protocols. Until now, these interactions were rigidly **hard-coded**. But with AI, especially large language models, these interactions are becoming more flexible and adaptive.
 
 <p align="center">
@@ -10,9 +12,9 @@ In short, we can spend less time designing fixed protocols, and more time enabli
 
 The future internet of AI agents is not just about connecting machines. It is about enabling automated services that interact dynamically, without predefined formats.
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/25)
-
 ## Automation isn't new, so what's different today?
+
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/60)
 
 The key shift is advanced natural language processing (NLP), allowing machines to understand and generate human text. This is a leap in information processing, but more deeply, it means code (*the machine*) can understand its own representation (*text*).
 
@@ -29,10 +31,9 @@ With this comes a key question: *how should we build infrastructure for this fut
 Most current proposals build on the existing TCP protocol, the backbone of today's internet. Some frameworks, like MCP, focus on orchestrating **human-to-machine** interactions. Others, like Google A2A, aim for agent-to-agent communication. But most still depend on a centralized authority (often the tech provider) to coordinate agents.
 
 
-
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/60)
-
 ## What should I expect from Summoner?
+
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/90)
 
 At Summoner, we believe agents should not be constrained by centralized control. They should move freely, identified by self-assigned, evolving IDs — not static, provider-issued ones. Identity should emerge through learning and interaction — not be dictated externally.
 
@@ -46,15 +47,14 @@ We treat agents as stateful, adapting over time. Summoner's protocols evolve wit
 
 While decentralized, Summoner does not require the cloud. You can deploy agents locally or over private WANs. You can also host persistent, distributed endpoints for live services, such as large ML models that are expensive to spin up.
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/90)
-
 ## More about Summoner
+
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>   ![](https://progress-bar.xyz/100)
 
 * [Why Summoner specifically?](why_summoner.md)
 * [System Architecture](architecture.md)
 * [The Mini SDK Concept](mini_sdk.md)
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>   ![](https://progress-bar.xyz/100)
 
 <p align="center">
   <a href="../prologue.md">&laquo; Previous: Prologue</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why_summoner.md">Next: Why Summoner specifically? &raquo;</a>

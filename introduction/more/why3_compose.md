@@ -1,21 +1,54 @@
-# Composability: The Real Kind
+## True Composability: Building Graphs, Not Pipelines
 
-Many agent frameworks claim composability, but what they mean is the ability to plug multiple APIs into a single orchestrator. This is coordination — not true composition.
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
 
-Summoner treats composability as a **graph-level property**. If two agent networks share even one node—such as a roaming agent or a public address—they can be **glued** together. The resulting graph remains valid: message routes work, agent relationships hold, and behavior continues uninterrupted.
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
 
-This is not a metaphor. Like in topology, the graph can grow locally and organically. An agent might arrive on a USB stick or via QR code. As long as the identity is preserved, the graph remains intact.
+  <div style="flex: 1;">
+    <p>
+    Many frameworks claim <strong>composability</strong>. But what they usually mean is the ability to plug multiple APIs into one orchestrator. That is what one should call coordination: everything still flows through a central hub.
+    </p>
+    <p>
+    Traditional systems cannot do this. Each orchestrator controls its own domain, defining which agents exist, how they communicate, and under what permissions. To connect two such systems, you must build explicit bridges, align schemas, and manage identities manually. <br>
+    This process is brittle, slow to evolve, and often requires centralized approval or configuration changes. It reflects coordination, not true structural integration.
+    </p>
 
-Traditional systems cannot do this. Each orchestrator manages its own domain. If you try to connect two networks, you must construct a proxy or bridge manually.
+  </div>
 
-In Summoner, composition is seamless. If two networks share a node, they merge. No re-registration. No synchronization step. No orchestration.
+  <div style="flex: 0 0 auto; text-align: left;">
+    <img src="../../assets/img/orch_no_comp_rounded.png" alt="Orchestration diagram" width="300px" />
+  </div>
 
-*Example:* Two distributed research labs each maintain an agent network. At a joint workshop, one roaming agent logs into both systems. Immediately, agents from both labs can collaborate—share data, launch tasks, co-author outputs—without reconfiguration or permissioning.
+</div>
+<span style="display: block; height: 0.5em;"></span>
 
-This model supports organic, bottom-up growth. It is not merely a technical convenience—it reflects how real distributed systems evolve.
+**Summoner** takes a different approach. Here, composability is a <strong>graph-level behavior</strong>. Each agent is made of smaller parts — internal states or subagents — connected like nodes in a graph. And graphs can merge.
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+If two agents (or entire networks) share a common node — represented by the same _route_ endpoint — the graphs **glue together** along that node. Messages keep flowing. Interactions continue without interruption. There's no orchestrator coordinating it, just a shared structure that now extends across both systems.
+
+**Example**  
+> Two research labs each run their own agent networks. At a joint workshop, they realize one of their agents overlaps — a shared node that handles data classification. Instead of linking through an API, they simply connect the graphs at that node. Instantly, all other agents can interact, share tools, and co-author outputs — no reconfig, no manual bridge.
+
+<div style="display: flex; align-items: center; gap: 20px;">
+
+  <div style="flex: 0 0 auto; text-align: left;">
+    <img src="../../assets/img/agent_comp2_rounded.png" alt="Composition diagram" width="220px" />
+  </div>
+
+  <div style="flex: 1; text-align: left;">
+    <p>
+    Summoner's model of composition is not merely a technical mechanism. It reflects a broader vision of agents as <strong>self-contained entities</strong> with their own structure and behavior. This allows networks to grow <em>organically</em>. 
+    </p>
+    <p>
+    When collaboration arises, there is no need for permission or rewiring — the graphs simply extend. This bottom-up, permissionless model mirrors how real systems collaborate in practice: through shared structure and mutual context.
+    </p>
+  </div>
+
+</div>
+<span style="display: block; height: 0.5em;"></span>
+
+
 
 <p align="center">
-  <a href="why2_self.md">&laquo; Previous: Mobility and Ownership in Distributed Systems </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why3_mmo.md">Next: From API Gateways to Persistent Worlds &raquo;</a>
+  <a href="why2_self.md">&laquo; Previous: Mobility and Ownership in Distributed Systems</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why4_mmo.md">Next: From API Gateways to Persistent Worlds &raquo;</a>
 </p>

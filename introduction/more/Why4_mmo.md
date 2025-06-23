@@ -1,28 +1,31 @@
 # The Feel of an MMO, Not an API Gateway
 
-Summoner is TCP-native and stream-first. Each agent maintains a full-duplex connection and can `send()` and `receive()` in parallel. Agents are not constrained by HTTP’s single-request semantics. They support multiple conversations, real-time streams, and binary payloads by default.
+<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
 
-This makes the system feel more like a multiplayer world than a menu of functions. Agents move, interact, and coordinate continuously. There is no need to route messages through a central orchestrator. No single host owns the session.
+Summoner is TCP-native and stream-first. Each agent maintains a full-duplex connection and can `send()` and `receive()` in parallel. Conversations are open-ended. Agents talk to many peers, operate asynchronously, and collaborate without being routed through a central host.
 
-Most frameworks resemble API gateways. You issue a function call, get a response, and repeat. To do two things at once, you must manage batches or multiple channels.
+<p align="center">
+<img width="400px" src="../../assets/img/summoner_graph_rounded.png" />
+</p>
+
+The result is a system that feels more like a **multiplayer environment** than a service mesh. Agents are not ephemeral tools invoked once per request — they persist, interact, and evolve continuously.
+
+In contrast, most agent frameworks feel like API gateways. You call a tool, get a response, and repeat. Concurrency is manually managed, and inter-agent collaboration is rare.
+
+<p align="center">
+<img width="300px" src="../../assets/img/other_frameworks_rounded.png" />
+</p>
 
 Summoner changes that. With TCP streams and optional shared memory, agents:
 
 * Communicate in parallel with many peers
-* Share updates and data in real time
+* React to and broadcast events in real time
+* Share tools and memory across ongoing sessions
 * Collaborate at low latency across networks
 
-This architecture supports:
-
-* Presence broadcasting
-* Live tool exchange
-* Real-time group behavior (e.g., for simulations or co-processing)
-
-Frameworks like MCP and A2A emphasize controlled workflows with centralized coordination. Summoner supports open-ended interaction among autonomous agents.
-
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Page content covered</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
-
+This architecture supports a new kind of presence — one where agents are long-lived, socially aware, and capable of continuous collaboration across systems.
 
 <p align="center">
   <a href="why3_compose.md">&laquo; Previous: True Composability in Agent Networks</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why5_diff.md">Next: Comparison with Existing Frameworks &raquo;</a>
 </p>
+

@@ -1,4 +1,4 @@
-# Roaming and Ownership
+# Roaming and Ownership in Agentic Worlds
 
 <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
 

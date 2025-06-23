@@ -56,8 +56,8 @@ Imagine you want to build a team of AI agents to assist researchers across labs,
 
 This is the architecture used by:
 
-* **Anthropic's MCP**, where a “host” LLM orchestrates tools via `@mcp.tool()` decorators.
-* **Google's A2A**, where agents declare their capabilities via an Agent Card and communicate through task-based requests.
+* **Anthropic's MCP**, where a _host LLM_ orchestrates tools via `@mcp.tool()` decorators.
+* **Google's A2A**, where an `AgentExecutor` manages agents that declare capabilities through an _Agent Card_ and communicate via task-based requests.
 
 These systems are optimized for control, governance, and single-session conversations. Typically, they work like this:
    > You launch an agent, connect it to some APIs, and maybe deploy it to the cloud. All requests flow through a single orchestrator or *host*. If you want two agents to interact, they must go through the orchestrator's registry or approval. Want to add a third team's network? Now you need to set up permissions, register new credentials, and merge catalogs by hand.

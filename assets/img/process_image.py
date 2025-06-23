@@ -32,4 +32,4 @@ def round_corners_with_border(input_path, output_path, radius=50, border_size=10
     bordered_img.save(output_path, format="PNG")
 
 # Usage
-round_corners_with_border("assets/img/summoner_in_worlds.png", "assets/img/summoner_in_worlds_rounded.png", radius=150, border_size=4)
+round_corners_with_border("assets/img/summoner_graph.png", "assets/img/summoner_graph_rounded.png", radius=100, border_size=4)
