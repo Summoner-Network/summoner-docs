@@ -17,5 +17,5 @@ In contrast, frameworks such as MCP and A2A lack the notion of agent mobility en
 This shift — from tools to inhabitants — reframes how we think about interaction, lifecycle, and architecture in distributed systems.
 
 <p align="center">
-  <a href="../index.md">&laquo; Previous: What makes Summoner different?</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why2_self.md">Next: Mobility and Ownership in Distributed Systems &raquo;</a>
+  <a href="../why_summoner.md">&laquo; Previous: What makes Summoner different?</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why2_self.md">Next: Mobility and Ownership in Distributed Systems &raquo;</a>
 </p>
