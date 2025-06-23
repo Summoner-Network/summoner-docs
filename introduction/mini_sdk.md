@@ -1,16 +1,22 @@
 # The Mini SDK Concept
 
-This section illustrates how Summoner works by mimicking its core mechanisms using a minimal version of the code — let's call it **miniSummoner**.
+This section shows how Summoner’s core ideas can be captured in just a few lines of Python. We call this stripped-down prototype miniSummoner. It distills agent communication down to its essence — decorators, memory, and message passing — so you can see exactly what happens under the hood.
 
 ## Defining an Agent
 
+
 We begin by defining what an agent should look like in **miniSummoner**. At a minimum, it must be able to **receive** and **send** messages, and it should be customizable by the user.
+
+<p align="center">
+<img width="180px" src="../assets/img/mini_sdk_intro_alone_rounded.png" />
+</p>
+
 
 Here is a simple `Agent` class. It supports:
 
-* `code()` — used to upload a user-defined function into memory (see our [decorator recap](minisdk/decorators.md))
-* `receive()` — stores an incoming message
-* `send()` — applies the uploaded function to the stored message and returns the result
+* `code()`: used to upload a user-defined function into memory (see our [decorator recap](minisdk/decorators.md))
+* `receive()`: stores an incoming message
+* `send()`: applies the uploaded function to the stored message and returns the result
 
 ```python
 class Agent:
@@ -77,13 +83,15 @@ In the previous section, we introduced a minimal `Agent` class with a single beh
 * The behavior for sending and receiving messages was fixed.
 * Memory was managed “behind the scenes,” not visible to the user.
 
-In many real-world scenarios, send and receive logic differ substantially, and you might want to receive multiple messages before replying—or process data differently on each side. To support this flexibility, we now refactor the `Agent` class to let **you** define custom behavior for both `send()` and `receive()` independently, via decorators.
+In many real-world scenarios, send and receive logic differ substantially, and you might want to receive multiple messages before replying, or process data differently on each side. To support this flexibility, we now refactor the `Agent` class to let **you** define custom behavior for both `send()` and `receive()` independently, via decorators.
+
+<p align="center"> <img width="200px" src="../assets/img/mini_sdk_intro_rounded.png" /> </p>
 
 This design offers **more power** (you control both sides of the conversation) at the cost of **manual memory management**. Let’s see how it works step by step.
 
 ### Defining the new `Agent` scaffold
 
-First, we replace the old single-decorator approach with two decorator factories—one for `send` and one for `receive`. Each simply registers your function but does not execute it yet.
+First, we replace the old single-decorator approach with two decorator factories: one for `send` and one for `receive`. Each simply registers your function but does not execute it yet.
 
 ```python
 class Agent:
@@ -188,7 +196,11 @@ With this in place, calling `agent.send_behavior()` or `agent.receive_behavior(m
        return {"for": for_value, "data": ["banana", "apple", "cherry"]}
    ```
 
-### Running the conversation
+### Simulating a server-like envrionment
+
+<p align="center">
+<img width="180px" src="../assets/img/mini_sdk_intro_async_rounded.png" />
+</p>
 
 Now we interleave calls to `send_behavior` and `receive_behavior` to simulate asynchronous rounds. Each round has:
 
@@ -221,10 +233,18 @@ agent1.receive_behavior(msg2)
 agent2.receive_behavior(msg1)
 ```
 
-You can find the full script [here](minisdk/scripts/script2.py).
+This handcrafted protocol simulates a very simple “server” in which:
 
+* Agent 2 constantly issues sorting requests.
+* Agent 1 holds those requests in memory, processes them, and returns results.
+* There is no central coordinator — each side simply sends what it has and processes what it receives.
 
-### Sequence Diagram
+With this design, we are simulating:
+
+* **Distributed control**: each agent defines and manages its own memory and behavior.
+* **Decorator-driven registration**: using `@agent.send()` and `@agent.receive()` you attach logic without modifying the core class.
+* **Explicit state handling**: you decide when and where to store or clear memory.
+* **Loose synchrony**: sends and receives are decoupled, so agents can buffer or delay actions.
 
 ```mermaid
 sequenceDiagram
@@ -232,33 +252,26 @@ sequenceDiagram
     participant Agent2
 
     Note over Agent1,Agent2: Round 1
-    Agent1->>Agent2: send1() → None
-    Agent2->>Agent1: send2() → {"for":"sort_length",data=[...]}
+    Agent1->>Agent2: None
+    Agent2->>Agent1: {"for":"sort_length",data=[...]}
 
     Note over Agent1,Agent2: Round 2
-    Agent1-->>Agent1: recv1(msg) → store task
-    Agent2-->>Agent2: recv2(None) → no effect
+    Agent1-->>Agent1: store task
+    Agent2-->>Agent2: no effect
 
     Note over Agent1,Agent2: Round 3
-    Agent1->>Agent2: send1() → sorted list
-    Agent2->>Agent1: send2() → {"for":"sort_length",data=[...]}
+    Agent1->>Agent2: sorted list
+    Agent2->>Agent1: {"for":"sort_length",data=[...]}
 
     Note over Agent1,Agent2: Round 4
-    Agent1-->>Agent1: recv1(msg) → store new task
-    Agent2-->>Agent2: recv2(sorted) → store result
+    Agent1-->>Agent1: store new task
+    Agent2-->>Agent2: store result
     %% and so on for further rounds
 ```
 
+You can find the full script [here](minisdk/scripts/script2.py).
 
-### Key Takeaways
-
-* **Distributed control**: Each agent manages its own memory and behavior.
-* **Decorator-driven**: `@agent.send()` and `@agent.receive()` register your logic transparently.
-* **Manual memory**: You decide how and where to store state.
-* **Asynchrony**: Sends and receives are decoupled—agents can buffer or delay as needed.
-
-This structure scales naturally: you could add more agents, introduce relays, or swap in new behaviors at runtime—without touching the core `Agent` class.
-
+Next, we will explore additional concepts, in particular multi-party conversations (more than two agents).
 
 
 
