@@ -2,9 +2,7 @@
 
 ## 📝 Recent updates
 
-- [ ] no updates
-
-
+- [ ] This documentation is actively being worked on
 
 ## 📚 Documentation Overview
 
