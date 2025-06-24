@@ -55,7 +55,7 @@ def behavior(msg):
 def behavior():
     for_value = random.choice(["sort_alpha", "sort_length"])
     print(f"Agent 2 requests: {for_value}")
-    return {"for": for_value, "data": ["banana", "apple", "cherry"]}
+    return {"for": for_value, "data": ["banana", "apple", "kiwi"]}
 
 # Round 1
 print("\n-> Agent 1 sends None and Agent 2 sends sort request")

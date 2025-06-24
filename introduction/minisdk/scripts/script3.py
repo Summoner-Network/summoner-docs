@@ -86,7 +86,7 @@ def behavior(msg):
 @agent3.send()
 def behavior():
     print(f"Agent 3 requests for given data")
-    return {"purpose": "elements", "data": ["banana", "apple", "cherry"]}
+    return {"purpose": "elements", "data": ["banana", "apple", "kiwi"]}
 
 for round in range(1,4):
     print(f"\n-> Round {round}")

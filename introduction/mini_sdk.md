@@ -1,11 +1,11 @@
 # The Mini SDK Concept
 
-This section shows how Summoner’s core ideas can be captured in just a few lines of Python. We call this stripped-down prototype miniSummoner. It distills agent communication down to its essence — decorators, memory, and message passing — so you can see exactly what happens under the hood.
+This section shows how Summoner’s core ideas can be captured in just a few lines of Python. We call this stripped-down prototype _miniSummoner_. It distills agent communication down to its essence — decorators, memory, and message passing — so you can see exactly what happens under the hood.
 
 ## Defining an Agent
 
 
-We begin by defining what an agent should look like in **miniSummoner**. At a minimum, it must be able to **receive** and **send** messages, and it should be customizable by the user.
+We begin by defining what an agent should look like in miniSummoner. At a minimum, it must be able to **receive** and **send** messages, and it should be customizable by the user.
 
 <p align="center">
 <img width="230px" src="../assets/img/mini_sdk_intro_alone_rounded.png" />
@@ -193,7 +193,7 @@ With this in place, calling `agent.send_behavior()` or `agent.receive_behavior(m
    def send2():
        for_value = random.choice(["sort_alpha", "sort_length"])
        print(f"Agent 2 requests: {for_value}")
-       return {"for": for_value, "data": ["banana", "apple", "cherry"]}
+       return {"for": for_value, "data": ["banana", "apple", "kiwi"]}
    ```
 
 ### Simulating a server-like envrionment

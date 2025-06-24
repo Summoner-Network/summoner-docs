@@ -166,7 +166,7 @@ Finally, its `@send()` decorator always sends the same fruit list:
 @agent3.send()
 def behavior():
     print("Agent 3 provides data")
-    return {"purpose": "elements", "data": ["banana", "apple", "cherry"]}
+    return {"purpose": "elements", "data": ["banana", "apple", "kiwi"]}
 ```
 
 On each round, Agent 3 simply emits its data payload and waits to store any sorted results that return.
@@ -179,7 +179,7 @@ Each round, **all agents send** their message, then **each agent receives** ever
 ```python
 for round in range(1, 4):
     print(f"\n-> Round {round}")
-    
+
     agents = [agent1, agent2, agent3]
     msgs   = [agent.send_behavior() for agent in agents]
 
