@@ -10,7 +10,7 @@ In the two-party example, each agent defined its own send/receive logic and mana
 <img width="230px" src="../../assets/img/mini_sdk_3agents_rounded.png" />
 </p>
 
-The only new challenge is that Agent 1 must remember and combine two incoming messages before it can act. Everything else — the `Agent` class and the send/receive decorators — remains essentially unchanged.
+The only new challenge is that Agent 1 must remember and combine two incoming messages before it can act. Everything else remains essentially unchanged.
 
 ## The `Agent` Class (unchanged)
 
@@ -52,13 +52,13 @@ def behavior(msg):
         if agent1_memory is None:
             agent1_memory = {}
 
-        # Only store the message if we haven't seen this purpose before
+        # Only store the message if we have not seen this purpose before
         if msg["purpose"] not in agent1_memory:
             print(f"Agent 1 remembers: {msg!r}")
             agent1_memory[msg["purpose"]] = msg
 ```
 
-Before we look at how `send()` acts, it helps to visualize Agent 1’s readiness as a small state machine. 
+Before we look at how `send()` acts, it helps to visualize Agent 1's readiness as a small state machine. 
 ```mermaid
 stateDiagram-v2
     direction LR
@@ -73,13 +73,13 @@ In this state machine:
 * Receiving `"elements"` is the final trigger that moves it into **Ready**, even if `"function"` arrived first.
 * Once the sort is performed and a `"response"` is sent, Agent 1 clears its memory and returns to **Waiting**.
 
-With that in mind, here is the `@send()` decorator. It checks whether both required messages are present, does nothing if they aren’t, and—once in **Ready**—performs the sort, emits a `"response"`, and resets.
+With that in mind, here is the `@send()` decorator. It checks whether both required messages are present, does nothing if they are not, and, once in **Ready**, performs the sort, emits a `"response"`, and resets.
 
 ```python
 @agent1.send()
 def behavior():
     global agent1_memory
-    # 1. If memory isn't a dict with both inputs, stay waiting
+    # 1. If memory is not a dict with both inputs, stay waiting
     if not isinstance(agent1_memory, dict):
         return None
 
@@ -107,12 +107,12 @@ def behavior():
         return None
 ```
 
-This setup guarantees that Agent 1 only acts when it’s truly ready, then returns to its initial state—ready to process the next pair of inputs.
+This setup guarantees that Agent 1 only acts when it is truly ready, and then returns to its initial state to process the next pair of inputs.
 
 
 ## Agent 2: the function requester
 
-Agent 2’s role is to ask for a sorting function each round and record only the sorted results it receives. Its `@receive()` decorator ignores everything except messages marked with `"purpose": "response"`, ensuring it doesn’t react to its own function requests or to Agent 3’s data broadcasts.
+Agent 2's role is to ask for a sorting function each round and record only the sorted results it receives. Its `@receive()` decorator ignores everything except messages marked with `"purpose": "response"`, ensuring it does not react to Agent 3's data broadcasts.
 
 ```python
 import random
@@ -159,7 +159,7 @@ def behavior(msg):
         agent3_memory.append(msg)
 ```
 
-This receive decorator filters out everything but responses, so Agent 3 ignores both the function requests from Agent 2 and its own data broadcasts.
+This receive decorator filters out everything but responses, so Agent 3 ignores the function requests from Agent 2 .
 
 Finally, its `@send()` decorator always sends the same fruit list:
 
