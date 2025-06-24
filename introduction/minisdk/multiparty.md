@@ -52,15 +52,16 @@ def behavior(msg):
             agent1_memory[msg["purpose"]] = msg
 ```
 
-Before we look at how `send()` acts, it helps to visualize Agent 1’s readiness as a small state machine. It begins in **Waiting**, moves to **Ready** once both messages have arrived, and then resets to **Waiting** after sending its response:
+Before we look at how `send()` acts, it helps to visualize Agent 1’s readiness as a small state machine. 
+<!-- It begins in **Waiting**, moves to **Ready** once both messages have arrived, and then resets to **Waiting** after sending its response: -->
 
 ```mermaid
-graph LR
-    Start([*]) --> Waiting
-    Waiting -->|receive function| Ready
-    Waiting -->|receive elements| Waiting
-    Ready -->|receive function| Ready
-    Ready -->|receive elements| Waiting
+stateDiagram-v2
+    direction LR
+    [*] --> Waiting : receive "function"
+    [*] --> Ready : receive "elements"
+    Waiting --> Ready : receive "elements"
+    Ready --> Waiting
 ```
 
 In this state machine:
