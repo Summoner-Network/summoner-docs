@@ -179,8 +179,10 @@ Each round, **all agents send** their message, then **each agent receives** ever
 ```python
 for round in range(1, 4):
     print(f"\n-> Round {round}")
+    
     agents = [agent1, agent2, agent3]
     msgs   = [agent.send_behavior() for agent in agents]
+
     # Pair each agent with the two messages not from itself
     exchanges = [(agents[i], msgs[:i] + msgs[i+1:]) for i in range(len(agents))]
 
