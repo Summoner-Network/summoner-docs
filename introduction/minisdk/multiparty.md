@@ -141,7 +141,6 @@ def behavior():
 
 Every time `send()` runs, Agent 2 chooses between `"sort_alpha"` and `"sort_length"`, logs the choice, and returns a message requesting that sort.
 
----
 
 ## Agent 3: the data supplier
 
