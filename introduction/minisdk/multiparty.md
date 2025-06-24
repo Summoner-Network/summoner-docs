@@ -55,13 +55,12 @@ def behavior(msg):
 Before we look at how `send()` acts, it helps to visualize Agent 1’s readiness as a small state machine. It begins in **Waiting**, moves to **Ready** once both messages have arrived, and then resets to **Waiting** after sending its response:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Waiting
-    Waiting --> Ready    : receive function
-    Waiting --> Waiting  : receive elements
-    Ready --> Ready      : receive function
-    Ready --> Waiting    : receive elements
-
+graph LR
+    Start([*]) --> Waiting
+    Waiting -->|receive function| Ready
+    Waiting -->|receive elements| Waiting
+    Ready -->|receive function| Ready
+    Ready -->|receive elements| Waiting
 ```
 
 In this state machine:
