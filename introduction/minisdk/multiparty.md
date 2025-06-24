@@ -39,14 +39,20 @@ Agent 1 must gather two pieces of information before it can respond: a message s
 
 ```python
 agent1 = Agent()
-agent1_memory = None
+agent1_memory = None  # Memory starts empty; will be filled with messages by purpose
 
 @agent1.receive()
 def behavior(msg):
     global agent1_memory
+
+    # Only process messages that have a "purpose" field
     if "purpose" in msg:
+
+        # Initialize memory as a dict if this is the first message
         if agent1_memory is None:
             agent1_memory = {}
+
+        # Only store the message if we haven't seen this purpose before
         if msg["purpose"] not in agent1_memory:
             print(f"Agent 1 remembers: {msg!r}")
             agent1_memory[msg["purpose"]] = msg
@@ -190,6 +196,8 @@ This loop acts like a tiny network:
 2. Every agent **processes** the two messages sent by the others.
 
 Because send/receive are completely decoupled, the system easily extends from two to three (or more) participants without touching the core `Agent` class.
+
+You can find the full script [here](minisdk/scripts/script3.py).
 
 <p align="center">
   <a href="../mini_sdk.md">&laquo; Previous: The Mini SDK Concept</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="mini_fsm_agents.md">Next: Finite State Machine Logic &raquo;</a>
