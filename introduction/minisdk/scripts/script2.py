@@ -26,21 +26,19 @@ def behavior(msg):
 
 @agent1.send()
 def behavior():
-    if not isinstance(agent1_memory, dict) or "for" not in agent1_memory:
+    if isinstance(agent1_memory, dict) and "for" in agent1_memory and "data" in agent1_memory:
+        task = agent1_memory["for"]
+        data = agent1_memory["data"]
+        print(f"Agent 1 sorts data using {task!r}")
+    else:
         return None
-
-    task = agent1_memory["for"]
-    data = agent1_memory.get("data", [])
-    print(f"Agent 1 sorts data using {task!r}")
 
     if task == "sort_alpha":
         return sorted(data)
-
     elif task == "sort_length":
         return sorted(data, key=len)
-
     else:
-        return f"Unknown task: {task}"
+        return None
     
 import random
 agent2 = Agent()

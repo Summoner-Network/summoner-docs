@@ -145,19 +145,19 @@ With this in place, calling `agent.send_behavior()` or `agent.receive_behavior(m
    ```python
    @agent1.send()
    def send1():
-       if not isinstance(agent1_memory, dict) or "for" not in agent1_memory:
-           return None
-
-       task = agent1_memory["for"]
-       data = agent1_memory.get("data", [])
-       print(f"Agent 1 sorts data using {task!r}")
+       if isinstance(agent1_memory, dict) and "for" in agent1_memory and "data" in agent1_memory:
+            task = agent1_memory["for"]
+            data = agent1_memory["data"]
+            print(f"Agent 1 sorts data using {task!r}")
+        else:
+            return None
 
        if task == "sort_alpha":
            return sorted(data)
        elif task == "sort_length":
            return sorted(data, key=len)
        else:
-           return f"Unknown task: {task}"
+           return None
    ```
 
 ### Agent 2: a random requester
@@ -275,5 +275,5 @@ Next, we will explore multi-party conversations involving more than two agents, 
 
 
 <p align="center">
-  <a href="why5_diff.md">&laquo; Previous: Comparison with Existing Frameworks</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../---.md">Next: ... &raquo;</a>
+  <a href="more/why5_diff.md">&laquo; Previous: Comparison with Existing Frameworks</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="minisdk/multiparty.md">Next: ... &raquo;</a>
 </p>
