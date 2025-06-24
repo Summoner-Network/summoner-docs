@@ -53,8 +53,6 @@ def behavior(msg):
 ```
 
 Before we look at how `send()` acts, it helps to visualize Agent 1’s readiness as a small state machine. 
-<!-- It begins in **Waiting**, moves to **Ready** once both messages have arrived, and then resets to **Waiting** after sending its response: -->
-
 ```mermaid
 stateDiagram-v2
     direction LR
@@ -63,12 +61,11 @@ stateDiagram-v2
     Waiting --> Ready : receive "elements"
     Ready --> Waiting
 ```
-
 In this state machine:
 
 * The agent stays in **Waiting** until it has seen both `"function"` and `"elements"` messages.
 * Receiving `"elements"` is the final trigger that moves it into **Ready**, even if `"function"` arrived first.
-* After sending, the agent clears its memory and returns to **Waiting**.
+* Once the sort is performed and a `"response"` is sent, Agent 1 clears its memory and returns to **Waiting**.
 
 With that in mind, here is the `@send()` decorator. It checks whether both required messages are present, does nothing if they aren’t, and—once in **Ready**—performs the sort, emits a `"response"`, and resets.
 
