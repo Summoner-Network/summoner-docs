@@ -193,3 +193,7 @@ This loop acts like a tiny network:
 
 Because send/receive are completely decoupled, the system easily extends from two to three (or more) participants without touching the core `Agent` class.
 
+<p align="center">
+  <a href="../mini_sdk.md">&laquo; Previous: The Mini SDK Concept</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="mini_fsm_agents.md">Next: Finite State Machine Logic &raquo;</a>
+</p>
+
