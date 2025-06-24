@@ -57,10 +57,10 @@ Before we look at how `send()` acts, it helps to visualize Agent 1’s readiness
 ```mermaid
 stateDiagram-v2
     [*] --> Waiting
-    Waiting --> Ready    : receive({"purpose":"function", …})
-    Waiting --> Waiting  : receive({"purpose":"elements", …})
-    Ready --> Ready      : receive({"purpose":"function", …})
-    Ready --> Waiting    : receive({"purpose":"elements", …})
+    Waiting --> Ready    : receive({"purpose":"function", "..."})
+    Waiting --> Waiting  : receive({"purpose":"elements", "..."})
+    Ready --> Ready      : receive({"purpose":"function", "..."})
+    Ready --> Waiting    : receive({"purpose":"elements", "..."})
 ```
 
 In this state machine:
