@@ -1,7 +1,7 @@
 # From miniSummoner to Summoner
 
 <p align="center">
-<img width="230px" src="../../assets/img/mini_sdk_conclusion_rounded.png" />
+<img width="300px" src="../../assets/img/mini_sdk_conclusion_rounded.png" />
 </p>
 
 Our exploration of a finite state machine (FSM)–driven miniSummoner prototype highlights the power of explicitly managing agent states. In the full Summoner SDK, this approach is taken even further:
