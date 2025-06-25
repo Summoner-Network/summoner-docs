@@ -79,7 +79,7 @@ stateDiagram-v2
 ## Agent 1: FSM-driven sorter
 
 <p align="center">
-<img width="230px" src="../../assets/img/mini_sdk_fsm_code_rounded.png" />
+<img width="270px" src="../../assets/img/mini_sdk_fsm_code_rounded.png" />
 </p>
 
 Agent 1 now uses a finite state machine to control when it stores messages, when it replies, and when it resets. Instead of relying on memory inspection, it chooses behavior paths based on a **named state** like `"Start"`, `"Waiting"`, or `"Ready"`. Each of these states is associated with different `@receive()` handlers and, when appropriate, with a `@send()` action.
@@ -157,7 +157,7 @@ In the previous tutorial, the `@send()` logic had to manually check that both th
 With the FSM structure introduced here, all of that is simplified.
 
 <p align="center">
-<img width="230px" src="../../assets/img/mini_sdk_fsm_send_rounded.png" />
+<img width="270px" src="../../assets/img/mini_sdk_fsm_send_rounded.png" />
 </p>
 
 The `@send()` behavior below is active only in the `"Ready"` state. The FSM ensures that we only enter this state after receiving both inputs — so we no longer need to perform explicit checks. Our send logic can now **focus entirely on the task itself**, not on whether it should run.
@@ -245,7 +245,7 @@ def download2(state):
 ## Simulating the FSM protocol
 
 <p align="center">
-<img width="230px" src="../../assets/img/mini_sdk_fsm_intro_rounded.png" />
+<img width="270px" src="../../assets/img/mini_sdk_fsm_intro_rounded.png" />
 </p>
 
 The `server_protocol` function now:

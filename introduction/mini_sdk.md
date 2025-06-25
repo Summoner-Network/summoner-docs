@@ -8,7 +8,7 @@ This section shows how Summoner’s core ideas can be captured in just a few lin
 We begin by defining what an agent should look like in miniSummoner. At a minimum, it must be able to **receive** and **send** messages, and it should be customizable by the user.
 
 <p align="center">
-<img width="230px" src="../assets/img/mini_sdk_intro_alone_rounded.png" />
+<img width="270px" src="../assets/img/mini_sdk_intro_alone_rounded.png" />
 </p>
 
 
@@ -85,7 +85,7 @@ In the previous section, we introduced a minimal `Agent` class with a single beh
 
 In many real-world scenarios, send and receive logic differ substantially, and you might want to receive multiple messages before replying, or process data differently on each side. To support this flexibility, we now refactor the `Agent` class to let **you** define custom behavior for both `send()` and `receive()` independently, via decorators.
 
-<p align="center"> <img width="230px" src="../assets/img/mini_sdk_intro_rounded.png" /> </p>
+<p align="center"> <img width="270px" src="../assets/img/mini_sdk_intro_rounded.png" /> </p>
 
 This design offers **more power** (you control both sides of the conversation) at the cost of **manual memory management**. Let’s see how it works step by step.
 
@@ -199,7 +199,7 @@ With this in place, calling `agent.send_behavior()` or `agent.receive_behavior(m
 ### Simulating a server-like envrionment
 
 <p align="center">
-<img width="230px" src="../assets/img/mini_sdk_intro_async_rounded.png" />
+<img width="270px" src="../assets/img/mini_sdk_intro_async_rounded.png" />
 </p>
 
 Now we interleave calls to `send_behavior` and `receive_behavior` to simulate asynchronous rounds. Each round has:

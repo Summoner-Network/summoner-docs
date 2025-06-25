@@ -7,7 +7,7 @@ In the two-party example, each agent defined its own send/receive logic and mana
 * **Agent 3 (the data supplier)** provides a fixed dataset and also stores any responses
 
 <p align="center">
-<img width="230px" src="../../assets/img/mini_sdk_3agents_rounded.png" />
+<img width="270px" src="../../assets/img/mini_sdk_3agents_rounded.png" />
 </p>
 
 The only new challenge is that Agent 1 must remember and combine two incoming messages before it can act. Everything else remains essentially unchanged.
