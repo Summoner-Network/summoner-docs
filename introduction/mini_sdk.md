@@ -275,5 +275,5 @@ Next, we will explore multi-party conversations involving more than two agents, 
 
 
 <p align="center">
-  <a href="more/why5_diff.md">&laquo; Previous: Comparison with Existing Frameworks</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="minisdk/multiparty.md">Next: Multiparty Communication: Three Agents &raquo;</a>
+  <a href="more/why5_diff.md">&laquo; Previous: Comparison with Existing Frameworks</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="minisdk/multiparty.md">Next: Multiparty Communication — Three Agents &raquo;</a>
 </p>

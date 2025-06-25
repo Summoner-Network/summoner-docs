@@ -1,4 +1,4 @@
-# Multiparty Communication: Three Agents
+# Multiparty Communication — Three Agents
 
 In the two-party example, each agent defined its own send/receive logic and managed memory explicitly. That same decorator-driven pattern scales naturally to more participants. Here, we introduce three agents — **Agent 1**, **Agent 2**, and **Agent 3** — each playing a distinct role:
 
