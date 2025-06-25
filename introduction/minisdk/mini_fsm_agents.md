@@ -337,7 +337,7 @@ Agent 3 stores: {'purpose': 'response', 'data': ['apple', 'banana', 'kiwi']}
 
 
 
-You can find the full script [here](minisdk/scripts/script4.py).
+You can find the full script [here](scripts/script4.py).
 
 <p align="center">
   <a href="multiparty.md">&laquo; Previous: Multiparty Communication: Three Agents</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../../tutorials/index.md">Next: Tutorials &raquo;</a>
