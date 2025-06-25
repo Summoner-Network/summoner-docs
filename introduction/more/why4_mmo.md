@@ -1,6 +1,6 @@
 # The Feel of an MMO, Not an API Gateway
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100) -->
 
 Summoner is TCP-native and stream-first. Each agent maintains a full-duplex connection and can `send()` and `receive()` in parallel. Conversations are open-ended. Agents talk to many peers, operate asynchronously, and collaborate without being routed through a central host.
 

@@ -1,4 +1,4 @@
-# Conclusion
+# From miniSummoner to Summoner
 
 <p align="center">
 <img width="230px" src="../../assets/img/mini_sdk_conclusion_rounded.png" />

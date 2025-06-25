@@ -1,6 +1,6 @@
 # Why Other Frameworks Feel Different
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100) -->
 
 Frameworks like Anthropic's MCP and Google's A2A were designed to orchestrate tools and tasks in enterprise settings. They support structured function calls and monitoring, but they are not built for agent autonomy, mobility, or decentralized interaction.
 

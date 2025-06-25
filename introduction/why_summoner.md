@@ -3,7 +3,7 @@
 
 ## Is it about new capabilities?
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/20)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/20) -->
 
 It is not _just_ about capabilities — **Summoner** starts from a different vision. 
 
@@ -21,7 +21,7 @@ In other words, **Summoner** is a blueprint for building **agentic worlds** — 
 
 ### Understanding the landscape
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/40)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/40) -->
 
 In the past year, dozens of frameworks have emerged to support agentic communication and orchestration. Some help agents call APIs, others route conversations between tools. Yet few address the question that matters most:
 
@@ -39,7 +39,7 @@ That is the world Summoner is built for.
 
 ### Two views of agent infrastructure
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/90)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/90) -->
 
 <p align="center" style="display: flex; align-items: center; justify-content: center; gap: 20px; text-align: center;">
   <img width="250px" src="../assets/img/centralized_orch_rounded.png" />
@@ -75,7 +75,7 @@ This is Summoner's design. There's no central orchestrator, no need to merge per
 
 ## Summoner: a new Architecture for distributed agents
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100) -->
 
 
 - [Agents as Programs in a Shared World](more/why1_world.md)

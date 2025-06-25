@@ -1,6 +1,6 @@
 ## True Composability: Building Graphs, Not Pipelines
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100) -->
 
 
 Many frameworks claim **composability**. But what they usually mean is the ability to plug multiple APIs into one orchestrator. That is what one should call coordination: everything still flows through a central hub.

@@ -1,6 +1,6 @@
 ## Agents as Programs in a World, Not Just Tools on a Menu
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100) -->
 
 Most existing agent frameworks treat agents as **tools**. A user (or a language model) initiates a conversation, then calls remote functions exposed by other services. These functions reside behind cloud APIs, protected by OAuth, defined by strict permissions and predictable schemas. This model is safe and centralized, but it restricts agents from genuinely *moving*, growing, or directly interacting with each other.
 

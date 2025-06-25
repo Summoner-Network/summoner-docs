@@ -340,5 +340,5 @@ Agent 3 stores: {'purpose': 'response', 'data': ['apple', 'banana', 'kiwi']}
 You can find the full script [here](scripts/script4.py).
 
 <p align="center">
-  <a href="multiparty.md">&laquo; Previous: Multiparty Communication — Three Agents</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="conclusion.md">Next: Conclusion &raquo;</a>
+  <a href="multiparty.md">&laquo; Previous: Multiparty Communication — Three Agents</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="conclusion.md">Next: From miniSummoner to Summoner &raquo;</a>
 </p>

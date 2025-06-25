@@ -1,6 +1,6 @@
 # Roaming and Ownership in Agentic Worlds
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100) -->
 
 Summoner treats agents as autonomous programs, capable of acting without oversight. Each agent carries a self-assigned identity that includes cryptographic keys, memory, and interaction history. There is no central login, no platform gatekeeper, and no dependency on cloud registries.
 

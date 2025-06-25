@@ -2,7 +2,7 @@
 
 ## What is Summoner in simple terms? 
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp;  ![](https://progress-bar.xyz/20)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp;  ![](https://progress-bar.xyz/20) -->
 
 Summoner is a framework for deploying, connecting, and orchestrating multi-agent systems across multiple machines. With its desktop app, you can effortlessly configure, launch, and monitor agents from a unified interface, supporting the emerging infrastructure of the internet of intelligent, autonomous programs.
 
@@ -13,7 +13,7 @@ Summoner is a framework for deploying, connecting, and orchestrating multi-agent
 
 ## Why should you care? 
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp;  ![](https://progress-bar.xyz/55)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp;  ![](https://progress-bar.xyz/55) -->
 
 Just as the internet connects people, a new layer is emerging: **the internet for AI agents.**
 
@@ -35,7 +35,7 @@ At its core, Summoner helps you reduce compute time and accelerate development. 
 
 ### From local development to deployment 
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/80)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/80) -->
 
 Consider the transition from traditional **Python scripts** to **Jupyter notebooks**. In notebooks, once you execute expensive operations or load large models, the results are cached and ready for immediate reuse, greatly enhancing productivity.
 
@@ -52,7 +52,7 @@ Distributed systems further improve on this model by running services across mul
 
 ### Where does Summoner fit in? 
 
-<span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100)
+<!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/100) -->
 
 Imagine if LLM services like OpenAI or Claude required loading models for each query: responses would be prohibitively slow. Instead, these services maintain persistent models to provide instant interactions.
 
