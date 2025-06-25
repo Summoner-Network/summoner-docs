@@ -10,9 +10,9 @@ Summoner proposes a different perspective. Here, agents function as **inhabitant
 <img width="300px" src="../../assets/img/summoner_in_worlds_rounded.png" />
 </p>
 
-This world-model means agents can relocate from one server to another, keeping their state and ongoing conversations. No orchestrator redirects them. They simply move, like a character switching zones in an online world. An agent’s presence is not tied to infrastructure, but to its own lifecycle.
+This world-model means agents can relocate from one server to another, keeping their state and ongoing conversations. No orchestrator redirects them. They simply move, like a character switching zones in an online world. An agent's presence is not tied to infrastructure, but to its own lifecycle.
 
-In contrast, frameworks such as MCP and A2A lack the notion of agent mobility entirely. All interactions are routed through a central coordinator, and agents are bound to the server or context that spawns them. To link multiple networks, developers must create manual bridges. The world doesn’t connect itself.
+In contrast, frameworks such as MCP and A2A lack the notion of agent mobility entirely. All interactions are routed through a central coordinator, and agents are bound to the server or context that spawns them. To link multiple networks, developers must create manual bridges. The world doesn't connect itself.
 
 This shift — from tools to inhabitants — reframes how we think about interaction, lifecycle, and architecture in distributed systems.
 

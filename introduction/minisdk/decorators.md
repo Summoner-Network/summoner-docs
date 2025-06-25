@@ -23,7 +23,7 @@ some_function = some_decorator(some_function)
 
 ## Example 1: Storing Functions in a List
 
-Let’s define a simple decorator that stores decorated functions in a list:
+Let's define a simple decorator that stores decorated functions in a list:
 
 ```python
 some_list = []

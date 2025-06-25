@@ -1,6 +1,6 @@
 # The Mini SDK Concept
 
-This section shows how Summoner’s core ideas can be captured in just a few lines of Python. We call this stripped-down prototype _miniSummoner_. It distills agent communication down to its essence — decorators, memory, and message passing — so you can see exactly what happens under the hood.
+This section shows how Summoner's core ideas can be captured in just a few lines of Python. We call this stripped-down prototype _miniSummoner_. It distills agent communication down to its essence — decorators, memory, and message passing — so you can see exactly what happens under the hood.
 
 ## Defining an Agent
 
@@ -87,7 +87,7 @@ In many real-world scenarios, send and receive logic differ substantially, and y
 
 <p align="center"> <img width="270px" src="../assets/img/mini_sdk_intro_rounded.png" /> </p>
 
-This design offers **more power** (you control both sides of the conversation) at the cost of **manual memory management**. Let’s see how it works step by step.
+This design offers **more power** (you control both sides of the conversation) at the cost of **manual memory management**. Let's see how it works step by step.
 
 ### Defining the new `Agent` scaffold
 
@@ -112,7 +112,7 @@ class Agent:
         return decorator
 ```
 
-With this in place, calling `agent.send_behavior()` or `agent.receive_behavior(msg)` will invoke whatever you’ve registered. Next, we’ll define two agents.
+With this in place, calling `agent.send_behavior()` or `agent.receive_behavior(msg)` will invoke whatever you've registered. Next, we'll define two agents.
 
 
 ### Agent 1: a task processor
@@ -120,7 +120,7 @@ With this in place, calling `agent.send_behavior()` or `agent.receive_behavior(m
 **Goal:** Agent 1 should **receive** a request (a dict with `"for"` and `"data"`), store it in memory, then **send** back a sorted result when asked.
 
 1. **Prepare Agent 1 and its memory**
-   We’ll keep its memory in a separate variable so you can see it explicitly.
+   We'll keep its memory in a separate variable so you can see it explicitly.
 
    ```python
    agent1 = Agent()
@@ -165,7 +165,7 @@ With this in place, calling `agent.send_behavior()` or `agent.receive_behavior(m
 **Goal:** Agent 2 should **send** a randomly chosen sorting request, then **receive** and store whatever comes back.
 
 1. **Prepare Agent 2 and its memory**
-   We’ll accumulate all responses in a list for visibility.
+   We'll accumulate all responses in a list for visibility.
 
    ```python
    import random

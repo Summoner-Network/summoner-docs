@@ -147,7 +147,7 @@ Each decorator **routes a message to the same user logic** but adds context:
 This modular design makes it easy to **plug your application logic into multiple states**, while Summoner manages sequencing, transitions, and scheduling.
 
 
-Here’s a revised version of the **Sending a result when ready** section that integrates your current version while explicitly comparing it to the past approach — showcasing how the FSM simplifies the control logic and strengthens Summoner’s case:
+Here's a revised version of the **Sending a result when ready** section that integrates your current version while explicitly comparing it to the past approach — showcasing how the FSM simplifies the control logic and strengthens Summoner's case:
 
 
 ### Sending a result when ready
