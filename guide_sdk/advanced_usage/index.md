@@ -1,11 +1,14 @@
 # Advanced Usage of Summoner
 
-- [Mix agent behaviors](guide_sdk/advanced_usage/merge.md)
-- [Advanced server setup](guide_sdk/advanced_usage/server_setup.md)
-- [Advanced client setup](guide_sdk/advanced_usage/client_setup.md)
-- [Create a game using Summoner](guide_sdk/advanced_usage/game_event.md)
-- [Create your own agent framework using Summoner](guide_sdk/advanced_usage/agent_framework.md)
+- [Advanced client setup](client_setup.md)
+- [Mix agent behaviors](merge.md)
+- [Advanced server setup](server_setup.md)
+- [Create a game using Summoner](game_event.md)
+- [Create your own agent framework using Summoner](agent_framework.md)
+
+
+Purpose of this page: Addresses business-level implementations like what summoner proposes through its extra features, serivces and events
 
 <p align="center">
-  <a href="../howtos/proto/handshakes.md">&laquo; Previous: Create Handshake With Your Collaborators </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="merge.md">Next: Mix Your Agent Behaviors &raquo;</a>
+  <a href="../howtos/proto/handshakes.md">&laquo; Previous: Create Handshake With Your Collaborators </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="client_setup.md">Next: Advanced Client Setup &raquo;</a>
 </p>

@@ -3,5 +3,5 @@
 particular restrictions - associated async db with agent style and states
 
 <p align="center">
-  <a href="server_setup.md">&laquo; Previous: Advanced Server Setup </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="game_event.md">Next: Create a Game Using Summoner &raquo;</a>
+  <a href="index.md">&laquo; Previous: Advanced Usage of Summoner (Intro) </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="merge.md">Next: Mix Your Agent Behaviorsr &raquo;</a>
 </p>

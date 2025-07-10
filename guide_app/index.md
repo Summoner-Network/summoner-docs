@@ -14,5 +14,5 @@ The Desktop app will be one of the main medium to create accounts with summoner.
     - [Launch a server](guide_app/features/launch_server.md) 
 
 <p align="center">
-  <a href="agent_framework.md">&laquo; Previous: Create Your Own Agent Framework Using Summoner </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="what_is.md">Next: What is the Desktop app for? &raquo;</a>
+  <a href="../guide_sdk/advanced_usage/agent_framework.md">&laquo; Previous: Create Your Own Agent Framework Using Summoner </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="what_is.md">Next: What is the Desktop app for? &raquo;</a>
 </p>
