@@ -32,5 +32,5 @@ Our exploration of a finite state machine (FSM)–driven miniSummoner prototype 
 With these capabilities, Summoner becomes more than a toy FSM framework — it is a fully featured orchestration engine for building robust, composable, and secure agent-based systems.
 
 <p align="center">
-  <a href="mini_fsm_agents.md">&laquo; Previous: Finite State Machine Logic</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../../tutorials/index.md">Next: Tutorials &raquo;</a>
+  <a href="mini_fsm_agents.md">&laquo; Previous: Finite State Machine Logic</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../../guide_sdk/index.md">Next: Summoner SDK Guides &raquo;</a>
 </p>

@@ -7,7 +7,7 @@
 Summoner is a framework for deploying, connecting, and orchestrating multi-agent systems across multiple machines. With its desktop app, you can effortlessly configure, launch, and monitor agents from a unified interface, supporting the emerging infrastructure of the internet of intelligent, autonomous programs.
 
 <p align="center">
-<img width="450px" src="assets/img/summoner_user.png" />
+<img width="450px" src="../assets/img/summoner_user.png" />
 </p>
 
 
@@ -27,7 +27,7 @@ While major tech companies experiment with **agent-to-agent** communication, man
 Yes. And in fact, you probably already care about agents without realizing it.
 
 <p align="center">
-<img width="250px" src="assets/img/meme_agent_1.jpeg" />
+<img width="250px" src="../assets/img/meme_agent_1.jpeg" />
 </p>
 
 At its core, Summoner helps you reduce compute time and accelerate development. Let us explore a common scenario to illustrate how.
@@ -46,7 +46,7 @@ The industry moved to **cloud solutions** precisely to maintain persistent servi
 Distributed systems further improve on this model by running services across multiple machines. AI agents represent the next evolutionary step: persistent, intelligent services capable of independent action, interaction, and dynamic responses.
 
 <p align="center">
-<img width="450px" src="assets/comics/why_summoner.png" />
+<img width="450px" src="../assets/comics/why_summoner.png" />
 </p>
 
 
@@ -57,7 +57,7 @@ Distributed systems further improve on this model by running services across mul
 Imagine if LLM services like OpenAI or Claude required loading models for each query: responses would be prohibitively slow. Instead, these services maintain persistent models to provide instant interactions.
 
 <p align="center">
-<img width="240px" src="assets/img/upload_time.png" />
+<img width="240px" src="../assets/img/upload_time.png" />
 </p>
 
 Summoner can offer this efficiency for your own applications, bridging the gap between experimental code and robust distributed systems. It lets you run your agents locally or across a network, keeping them persistently active and communicative without the complexity and cost of full-scale cloud infrastructure.
@@ -66,5 +66,5 @@ With Summoner, building efficient, persistent, and future-ready agent-based appl
 
 
 <p align="center">
-<a href="README.md">&laquo; Previous: Table of Contents</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="introduction/index.md">Next: Introduction &raquo;</a>
+<a href="../index.md">&laquo; Previous: Table of Contents</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../introduction/index.md">Next: Introduction &raquo;</a>
 </p>
