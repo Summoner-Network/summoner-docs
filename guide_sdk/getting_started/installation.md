@@ -18,9 +18,8 @@ The [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) repositor
 You then customize your new SDK by editing the `build.txt` file to specify which modules to include. This modular architecture allows for many valid SDK compositions based on different combinations of features surrounding the SDK core.
 
 <p align="center">
-  <img width="300px" src="../../assets/img/summoner_arch.png" alt="Summoner architecture diagram" />
+  <img width="300px" src="../../assets/img/summoner_architecture.png" alt="Summoner architecture diagram" />
 </p>
-
 
 > 📦 The default `build.txt` in the template includes:
 >
@@ -127,6 +126,10 @@ You can modify this file at any time to add or remove modules.
 
 
 ### Step 3: Run the Installer
+
+<p align="center">
+  <img width="550px" src="../../assets/gifs/sdk_installation.gif" alt="Summoner architecture diagram" />
+</p>
 
 Once `build.txt` is configured, run the script:
 
