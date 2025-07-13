@@ -6,19 +6,20 @@ We begin with an introduction to the SDK, its core principles, and installation 
 
 [**Getting Started**](getting_started/index.md)
 
-* [What is the Summoner SDK for?](getting_started/what_is.md)
-* [Installation](getting_started/installation.md)
-* [Quickstart](getting_started/quickstart/index.md)
+  * [What is the Summoner SDK for?](getting_started/what_is.md)
+  * [Prerequisites](getting_started/prerequesites.md)
+  * [Installation](getting_started/installation.md)
+  * [Quickstart](getting_started/quickstart/index.md)
 
 To deepen your understanding, the next section explains the core concepts needed to manage and orchestrate agent behavior effectively.
 
 [**Fundamentals**](fundamentals/index.md)
 
-* [Clients and agents](fundamentals/client_agent.md)
-* [Servers and relays](fundamentals/server_relay.md)
-* [Traveling between servers](fundamentals/traveling.md)
-* [Agent behavior as flows](fundamentals/flow.md)
-* [Async programming and event loops](fundamentals/async.md)
+  * [Clients and agents](fundamentals/client_agent.md)
+  * [Servers and relays](fundamentals/server_relay.md)
+  * [Traveling between servers](fundamentals/traveling.md)
+  * [Agent behavior as flows](fundamentals/flow.md)
+  * [Async programming and event loops](fundamentals/async.md)
 
 The **How-tos** provide step-by-step guides to apply the fundamentals in practical settings and extend your own stack.
 
@@ -54,11 +55,11 @@ The **Advanced Usage** section is intended primarily for internal development, b
 
 [**Advanced Usage**](advanced_usage/index.md)
 
-* [Mix agent behaviors](advanced_usage/merge.md)
-* [Advanced server setup](advanced_usage/server_setup.md)
-* [Advanced client setup](advanced_usage/client_setup.md)
-* [Create a game using Summoner](advanced_usage/game_event.md)
-* [Build your own agent framework on top of Summoner](advanced_usage/agent_framework.md)
+  * [Mix agent behaviors](advanced_usage/merge.md)
+  * [Advanced server setup](advanced_usage/server_setup.md)
+  * [Advanced client setup](advanced_usage/client_setup.md)
+  * [Create a game using Summoner](advanced_usage/game_event.md)
+  * [Build your own agent framework on top of Summoner](advanced_usage/agent_framework.md)
 
 
 <p align="center">

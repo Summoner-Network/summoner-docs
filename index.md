@@ -22,6 +22,7 @@
 - [**🚀 Summoner SDK Guides**](guide_sdk/index.md)
     - [***Getting started***](guide_sdk/getting_started/index.md)
         - [What is the Summoner SDK for?](guide_sdk/getting_started/what_is.md)
+        - [Prerequisites](getting_started/prerequesites.md)
         - [Installation](guide_sdk/getting_started/installation.md)
         - [Quickstart](guide_sdk/getting_started/quickstart/index.md)
             <!-- - [Prerequisites](guide_sdk/getting_started/quickstart/prerequesites.md)

@@ -22,10 +22,8 @@ This includes:
 * **Orchestration handshakes** to ensure proper task completion and information flow
 * **Cryptographic primitives** to ensure secure and private interaction
 
-<hr><hr>
 
 <p align="center">
-  <a href="index.md">&laquo; Previous: Getting Started</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="installation.md">Next: Installation &raquo;</a>
+  <a href="index.md">&laquo; Previous: Getting Started</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="prerequisites.md">Next: Prerequisites &raquo;</a>
 </p>
 
-<hr><hr>

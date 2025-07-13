@@ -11,40 +11,33 @@ If you're looking to install and use the desktop app, refer to the [Desktop App 
 
 The `summoner-sdk` is modular. It is built around a core library (`summoner-core`) and includes optional features that can be added or removed depending on your needs. We will showcase the SDK using both core components and common add-ons — for example, the agent classes from [`summoner-creatures`](https://github.com/Summoner-Network/summoner-creatures), which provide decentralized identity, cryptographic functionality, and other capabilities to extend core client behavior.
 
-This section will walk you through:
+**This section will walk you through:**
 
-1. A general overview of the SDK and its role in the Summoner ecosystem
-2. Installation instructions
-3. A quickstart tutorial with minimal code examples
-4. A beginner’s guide explaining the architecture (clients, servers, agents), and key concepts such as async flows and event loops
+  1. A general overview of the SDK and its role in the Summoner ecosystem:
 
-### Documentation Structure
+        * [What is the Summoner SDK for?](what_is.md) 
 
-1. [What is the Summoner SDK for?](what_is.md)
-   *When and how to use the SDK in your projects*
+  2. Installation instructions:
 
-2. [Installation](installation.md)
-   *How to obtain and verify the SDK package*
+      * [Prerequisites](quickstart/prerequesites.md)
+      * [Installation](installation.md) 
 
-3. [Quickstart](quickstart/index.md)
-   *Core principles and minimal working examples*
+  3. A beginner’s guide explaining the architecture, and key concepts such as async flows and event loops:
 
-   * [Prerequisites](quickstart/prerequesites.md)
-   * [Basics](quickstart/basics.md)
+      * [Quickstart](quickstart/index.md) 
+        * [Basics](quickstart/basics.md)
 
-     * [Client](quickstart/basics_client.md)
-     * [Server](quickstart/basics_server.md)
-   * [Beginner guide](quickstart/beginner.md)
+          * [Client](quickstart/basics_client.md)
+          * [Server](quickstart/basics_server.md)
+        * [Beginner guide](quickstart/beginner.md)
 
-     * [Clients vs Agents](quickstart/begin_client.md)
-     * [Servers vs Clients](quickstart/begin_server.md)
-     * [Agent behavior as flows](quickstart/begin_flow.md)
-     * [Async programming and event loops](quickstart/begin_async.md)
+          * [Clients vs Agents](quickstart/begin_client.md)
+          * [Servers vs Clients](quickstart/begin_server.md)
+          * [Agent behavior as flows](quickstart/begin_flow.md)
+          * [Async programming and event loops](quickstart/begin_async.md)
 
-<hr><hr>
 
 <p align="center">
-  <a href="../index.md">&laquo; Previous: Summoner SDK Guides</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="what_is.md">Next: What is the Summoner SDK for? &raquo;</a>
+<a href="../index.md">&laquo; Previous: Summoner SDK Guides</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="what_is.md">Next: What is the Summoner SDK for? &raquo;</a>
 </p>
 
-<hr><hr>
