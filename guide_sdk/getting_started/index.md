@@ -1,154 +1,50 @@
-# Getting Started
+## Getting Started
 
-A rapid introduction to installing the Summoner SDK and running your first agent and server. Follow these steps to set up your environment and explore the essentials in minutes.
+The Summoner platform consists of two main components:
 
-**Purpose & audience**  
-- **Who:** new Summoner SDK users  
-- **What:** step-by-step setup and first-run walkthrough  
-- **Outcome:** have a working client, agent, and server in minutes
+* An SDK for building and organizing your agents
+* A desktop app for managing deployment and runtime environments
 
----
+To get started with the SDK, clone the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) repository. For the desktop app, visit the [`summoner-desktop`](https://github.com/Summoner-Network/summoner-desktop) repository. The desktop app is fully functional today, but future versions may require you to create an account.
 
-## Prerequisites
+If you're looking to install and use the desktop app, refer to the [Desktop App Guide](../../guide_app/index.md). This section of the documentation focuses on the SDK: how to install it, run clients and servers locally, and use sample agents from the [`summoner-agents`](https://github.com/Summoner-Network/summoner-agents) repository.
 
-- **Python** 3.10 or later  
-- **Git** installed and on your PATH  
-- Familiarity with the command line  
-- *(Optional)* virtual environment tool (venv, conda)
+The `summoner-sdk` is modular. It is built around a core library (`summoner-core`) and includes optional features that can be added or removed depending on your needs. We will showcase the SDK using both core components and common add-ons — for example, the agent classes from [`summoner-creatures`](https://github.com/Summoner-Network/summoner-creatures), which provide decentralized identity, cryptographic functionality, and other capabilities to extend core client behavior.
 
----
+This section will walk you through:
 
-## Contents
+1. A general overview of the SDK and its role in the Summoner ecosystem
+2. Installation instructions
+3. A quickstart tutorial with minimal code examples
+4. A beginner’s guide explaining the architecture (clients, servers, agents), and key concepts such as async flows and event loops
 
-1. [Installation](installation.md)  
-   _How to obtain and verify the SDK package_  
-2. [Quickstart](quickstart/index.md)  
-   _Run a minimal example end-to-end_  
-   1. [Prerequisites](quickstart/prerequesites.md)  
-   2. [Basics](quickstart/basics.md)  
-      - [Client](quickstart/basics_client.md)  
-      - [Server](quickstart/basics_server.md)  
-   3. [Beginner guide](quickstart/beginner.md)  
-      - [Clients versus agents](quickstart/begin_client.md)  
-      - [Servers versus clients](quickstart/begin_server.md)  
-      - [Agent behaviour as flows](quickstart/begin_flow.md)  
-      - [Async programming and event loops](quickstart/begin_async.md)
+### Documentation Structure
 
----
+1. [What is the Summoner SDK for?](what_is.md)
+   *When and how to use the SDK in your projects*
 
-## 1. Installation
+2. [Installation](installation.md)
+   *How to obtain and verify the SDK package*
 
-**What you’ll learn**  
-- Setting up a Python virtual environment  
-- Installing Summoner via pip  
-- Verifying the installation  
+3. [Quickstart](quickstart/index.md)
+   *Core principles and minimal working examples*
 
-**Outline**  
-1. Create a venv (`python -m venv .venv`)  
-2. Activate it (`source .venv/bin/activate` on Linux/macOS)  
-3. Install the package (`pip install summoner-sdk`)  
-4. Run `summoner --version` to confirm  
+   * [Prerequisites](quickstart/prerequesites.md)
+   * [Basics](quickstart/basics.md)
 
-> **Sample copy:**  
-> “To install the Summoner SDK, first create and activate a virtual environment. Then run `pip install summoner-sdk`. Finally, execute `summoner --version` to verify you have the latest release.”
+     * [Client](quickstart/basics_client.md)
+     * [Server](quickstart/basics_server.md)
+   * [Beginner guide](quickstart/beginner.md)
 
----
+     * [Clients vs Agents](quickstart/begin_client.md)
+     * [Servers vs Clients](quickstart/begin_server.md)
+     * [Agent behavior as flows](quickstart/begin_flow.md)
+     * [Async programming and event loops](quickstart/begin_async.md)
 
-## 2. Quickstart
-
-A bare-bones example that brings up an agent and a server, showing core flow.
-
-### 2.1 Prerequisites
-
-- Confirm Python 3.10+ (`python --version`)  
-- Ensure Git is available (`git --version`)  
-- *(Optional)* Clone the examples repo:  
-```bash
-  git clone https://github.com/Summoner-Network/examples.git
-```
-
-> **Sample copy:**
-> “Before proceeding, make sure your environment meets the requirements above. If you’d like to follow along with our example code, clone the official examples repository.”
-
-### 2.2 Basics
-
-#### 2.2.1 Client
-
-* Define your first `Agent` subclass
-* Implement an `on_message` handler
-* Run the client with `run_client(...)`
-
-> **Code snippet:**
->
-> ```python
-> # agent.py
-> from summoner import Agent, run_client
->
-> class HelloAgent(Agent):
->     async def on_message(self, msg):
->         print("Received:", msg)
->         await self.send("ack")
->
-> if __name__ == "__main__":
->     run_client(HelloAgent)
-> ```
-
-#### 2.2.2 Server
-
-* Start the relay server (`summoner-server start`)
-* Configure host/port via flags or config file
-* Observe agent connections in logs
-
-> **Sample copy:**
-> “The server routes messages between agents. Launch it with `summoner-server start --host 0.0.0.0 --port 8000`, then watch for connection messages in the console.”
-
-### 2.3 Beginner guide
-
-Deepen your understanding of core concepts through explanations and diagrams.
-
-* **Clients vs agents**: roles and lifecycle
-* **Servers vs clients**: routing vs execution
-* **Flows**: modeling agent logic as stateful sequences
-* **Async & event loops**: integrating with asyncio
-
-> **Sample copy:**
-> “In Summoner, a client process hosts your agent code, while the server handles message routing and persistence. Below is a sequence diagram illustrating a simple request–response flow.”
-
----
-
-<p align="center">
-  <a href="../index.md">&laquo; Previous: Summoner SDK Guides</a>
-  &nbsp;|&nbsp;
-  <a href="installation.md">Next: Installation &raquo;</a>
-</p>
-```
-
-### How to use this template
-
-1. **Drop in your front-matter** (for sidebar navigation).
-2. **Adjust the sample copy** to your tone and style.
-3. **Fill out each linked page** using the section outlines as your guide.
-4. Iterate in small steps: once you’ve drafted **Installation**, come back here for feedback before moving on.
-
-Let me know if you’d like more detail or another page next!
-
-
-
------
-
-- [What is the Summoner SDK for?](guide_sdk/getting_started/what_is.md)
-- [Installation](guide_sdk/getting_started/installation.md)
-- [Quickstart](guide_sdk/getting_started/quickstart/index.md)
-    - [Prerequisites](guide_sdk/getting_started/quickstart/prerequesites.md)
-    - [Basics](guide_sdk/getting_started/quickstart/basics.md)
-        - [Client](guide_sdk/getting_started/quickstart/basics_client.md)
-        - [Server](guide_sdk/getting_started/quickstart/basics_server.md)
-    - [Beginner guide](guide_sdk/getting_started/quickstart/beginner.md)
-        - [Clients versus agents](guide_sdk/getting_started/quickstart/begin_client.md)
-        - [Servers versus clients](guide_sdk/getting_started/quickstart/begin_server.md)
-        - [Agent behaviour as flows](guide_sdk/getting_started/quickstart/begin_flow.md)
-        - [Async programming and event loops](guide_sdk/getting_started/quickstart/begin_async.md)
+<hr><hr>
 
 <p align="center">
   <a href="../index.md">&laquo; Previous: Summoner SDK Guides</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="what_is.md">Next: What is the Summoner SDK for? &raquo;</a>
 </p>
+
+<hr><hr>
