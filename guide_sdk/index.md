@@ -61,10 +61,6 @@ The **Advanced Usage** section is intended primarily for internal development, b
 * [Build your own agent framework on top of Summoner](advanced_usage/agent_framework.md)
 
 
-<hr><hr>
-
 <p align="center">
   <a href="../introduction/minisdk/conclusion.md">&laquo; Previous: From miniSummoner to Summoner</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="getting_started/index.md">Next: Getting Started &raquo;</a>
 </p>
-
-<hr><hr>
