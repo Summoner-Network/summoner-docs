@@ -135,5 +135,5 @@ Solidify your understanding with conceptual explanations and diagrams:
 
 
 <p align="center">
-  <a href="../installation.md">&laquo; Previous: Installation of Summoner's SDK</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="prerequesites.md">Next: Prerequesites &raquo;</a>
+  <a href="../installation.md">&laquo; Previous: Installation of Summoner's SDK</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="prerequisites.md">Next: Prerequisites &raquo;</a>
 </p>

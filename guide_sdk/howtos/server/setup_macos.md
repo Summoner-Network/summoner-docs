@@ -100,6 +100,6 @@ Same router instructions as on Linux apply.
 
 
 <p align="center">
-<a href="setup_linux.md">&laquo; Previous: Define Agent Behavior as Asynchronous Tasks
+<a href="setup_linux.md">&laquo; Previous: Set up a Server on Linux
  </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="to_internet.md">Next: Router setup to open a NAT server &raquo;</a>
 </p>

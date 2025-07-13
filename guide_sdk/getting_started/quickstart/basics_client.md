@@ -147,5 +147,5 @@ class MyAgent(Agent):
 
 
 <p align="center">
-  <a href="basics.md">&laquo; Previous: Basics (Intro)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="basics_agent.md">Next: Agent (Basics) &raquo;</a>
+  <a href="basics.md">&laquo; Previous: Basics (Intro)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="basics_server.md">Next: Server (Basics) &raquo;</a>
 </p>

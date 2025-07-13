@@ -136,7 +136,7 @@ Let me know if you’d like more detail or another page next!
 
 -----
 
-
+- [What is the Summoner SDK for?](guide_sdk/getting_started/what_is.md)
 - [Installation](guide_sdk/getting_started/installation.md)
 - [Quickstart](guide_sdk/getting_started/quickstart/index.md)
     - [Prerequisites](guide_sdk/getting_started/quickstart/prerequesites.md)
@@ -150,5 +150,5 @@ Let me know if you’d like more detail or another page next!
         - [Async programming and event loops](guide_sdk/getting_started/quickstart/begin_async.md)
 
 <p align="center">
-  <a href="../index.md">&laquo; Previous: Summoner SDK Guides</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="installation.md">Next: Getting Started &raquo;</a>
+  <a href="../index.md">&laquo; Previous: Summoner SDK Guides</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="what_is.md">Next: What is the Summoner SDK for? &raquo;</a>
 </p>
