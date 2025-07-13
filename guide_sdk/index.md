@@ -4,7 +4,7 @@ This section guides you through the correct use of the Summoner SDK. It clarifie
 
 We begin with an introduction to the SDK, its core principles, and installation process.
 
-## [**Getting Started**](getting_started/index.md)
+[**Getting Started**](getting_started/index.md)
 
 * [What is the Summoner SDK for?](getting_started/what_is.md)
 * [Installation](getting_started/installation.md)
@@ -12,7 +12,7 @@ We begin with an introduction to the SDK, its core principles, and installation 
 
 To deepen your understanding, the next section explains the core concepts needed to manage and orchestrate agent behavior effectively.
 
-## [**Fundamentals**](fundamentals/index.md)
+[**Fundamentals**](fundamentals/index.md)
 
 * [Clients and agents](fundamentals/client_agent.md)
 * [Servers and relays](fundamentals/server_relay.md)
@@ -22,37 +22,37 @@ To deepen your understanding, the next section explains the core concepts needed
 
 The **How-tos** provide step-by-step guides to apply the fundamentals in practical settings and extend your own stack.
 
-## [**How-tos**](howtos/index.md)
+[**How-tos**](howtos/index.md)
 
-**Client**
+  * Client
 
-* [Design and create agents](howtos/client/design_create.md)
-* [Configure agent identity](howtos/client/id.md)
-* [Set up an asynchronous database](howtos/client/async_db.md)
-* [Persist agent state](howtos/client/state_persist.md)
-* [Organize agent behavior as asynchronous tasks](howtos/client/async_task.md)
+    * [Design and create agents](howtos/client/design_create.md)
+    * [Configure agent identity](howtos/client/id.md)
+    * [Set up an asynchronous database](howtos/client/async_db.md)
+    * [Persist agent state](howtos/client/state_persist.md)
+    * [Organize agent behavior as asynchronous tasks](howtos/client/async_task.md)
 
-**Server**
+  * Server
 
-* [Set up a server on Linux](howtos/server/setup_linux.md)
-* [Set up a server on macOS](howtos/server/setup_macos.md)
-* [Expose a local server to the internet](howtos/server/to_internet.md)
+    * [Set up a server on Linux](howtos/server/setup_linux.md)
+    * [Set up a server on macOS](howtos/server/setup_macos.md)
+    * [Expose a local server to the internet](howtos/server/to_internet.md)
 
-**System**
+  * System
 
-* [Debug clients, servers, and agents](howtos/system/debug.md)
-* [Integrate your own agent stack](howtos/system/integrate.md)
+    * [Debug clients, servers, and agents](howtos/system/debug.md)
+    * [Integrate your own agent stack](howtos/system/integrate.md)
 
-**Protocol**
+  * Protocol
 
-* [Handle multiparty interactions](howtos/proto/multiparty.md)
-* [Validate messages and build a reputation system](howtos/proto/validation.md)
-* [Encrypt and decrypt messages](howtos/proto/encrypt_decrypt.md)
-* [Create handshakes with collaborators](howtos/proto/handshakes.md)
+    * [Handle multiparty interactions](howtos/proto/multiparty.md)
+    * [Validate messages and build a reputation system](howtos/proto/validation.md)
+    * [Encrypt and decrypt messages](howtos/proto/encrypt_decrypt.md)
+    * [Create handshakes with collaborators](howtos/proto/handshakes.md)
 
 The **Advanced Usage** section is intended primarily for internal development, but users are welcome to explore it. It includes experimental or upcoming capabilities that will shape future add-ons and extensions of the SDK.
 
-## [**Advanced Usage**](advanced_usage/index.md)
+[**Advanced Usage**](advanced_usage/index.md)
 
 * [Mix agent behaviors](advanced_usage/merge.md)
 * [Advanced server setup](advanced_usage/server_setup.md)
