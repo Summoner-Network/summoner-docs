@@ -1,159 +1,154 @@
 # Installation of the Summoner SDK
 
-Quickly set up your development environment and get the Summoner SDK installed—either via our one-stop build script or directly from PyPI.
+Because the Summoner SDK is composed of multiple repositories, we do **not** currently support installation via package registries like PyPI. Instead, we use Bash-based installation scripts to manage setup and composition.
 
-## Purpose & audience
-- **Who:** Developers who want a friction-free way to install and start using Summoner  
-- **What you’ll get:**  
-  - Clear, version-agnostic installation steps  
-  - A choice between pip install vs. our build/dev script  
-  - Troubleshooting tips and verification commands
+This script-based approach is consistent across key components of the platform, including:
 
----
+* [`summoner-desktop`](https://github.com/Summoner-Network/summoner-desktop): the Electron-based desktop app
+* [`summoner-core`](https://github.com/Summoner-Network/summoner-core): the core logic of the SDK
+* [`summoner-creatures`](https://github.com/Summoner-Network/summoner-creatures): agent extensions and features
 
-## 1. Prerequisites
+Each of these repositories contains its own `setup.sh`, `install.sh` or build script, and these scripts **chain together** during installation. For example, installing the SDK via `summoner-desktop` will trigger the `summoner-sdk` script, which in turn calls the setup scripts from `summoner-core` and any modules specified in `build.txt`.
 
-Before installing, ensure you have:
 
-- **Python 3.10+** and `python3` on your PATH  
-- **Git** on your PATH  
-- **Bash shell** (for the build script)  
-- *(Optional)* `venv` or `conda` for isolated environments  
+## A Template-Based SDK
 
-> **Tip:** On Windows, use WSL or Git Bash to run our build script.
+The [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) repository is a **GitHub template repository**, meaning users should not modify it directly. Instead, use GitHub’s "Use this template" feature to generate a new repository that includes only the installation logic.
 
----
-
-## 2. Installation Methods
-
-You can install the SDK in **two** ways:
-
-| Method                     | Pros                                       | Cons                           |
-|----------------------------|--------------------------------------------|--------------------------------|
-| **`pip install summoner-sdk`** | Fastest; pulls latest published release   | No native-module merging       |
-| **`build_sdk.sh` script**  | Clones core + merges your native modules   | Requires Bash, build.txt setup |
-
----
-
-### 2.1. Via PyPI (pip)
-
-**Steps**  
-1. Create and activate a virtual environment  
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-```
-
-2. Install the SDK
-
-   ```bash
-   pip install summoner-sdk
-   ```
-3. Verify installation
-
-   ```bash
-   summoner --version
-   ```
-
-> **Sample copy:**
-> “Installing from PyPI is the fastest way to get started. It delivers the core SDK without any native-module extensions.”
-
----
-
-### 2.2. Using the Build & Dev Script
-
-Our `build_sdk.sh` handles cloning the core repo, merging your native modules, creating a venv, and running smoke tests.
-
-#### 2.2.1. Setup
-
-1. Place your native-module repos in `build.txt` (one URL per line).
-2. *(Optional)* For a quick demo, list a starter-template in `test_build.txt`.
-
-#### 2.2.2. Running the Script
-
-* **Source mode** (recommended): keeps you in the activated venv
-
-  ```bash
-  source build_sdk.sh setup [build|test_build]
-  ```
-* **Execute mode**: runs in a subshell; you’ll need to manually activate
-
-  ```bash
-  bash build_sdk.sh setup
-  source venv/bin/activate
-  ```
-
-#### 2.2.3. Key Commands
-
-| Command       | What it does                                                         | Example                         |
-| ------------- | -------------------------------------------------------------------- | ------------------------------- |
-| `setup`       | Clone core, merge native modules, create & activate venv, run extras | `source build_sdk.sh setup`     |
-| `delete`      | Remove all generated dirs (sdk/, venv/, native\_build/)              | `bash build_sdk.sh delete`      |
-| `reset`       | Shortcut for delete + setup                                          | `bash build_sdk.sh reset`       |
-| `deps`        | Reinstall Rust/Python deps in venv                                   | `bash build_sdk.sh deps`        |
-| `test_server` | Launch a demo server against your SDK                                | `bash build_sdk.sh test_server` |
-| `clean`       | Wipe build artifacts, keep venv                                      | `bash build_sdk.sh clean`       |
-
-> **Sample copy:**
-> “The build script is ideal if you’re developing custom native extensions. It reads your `build.txt`, clones each repo, merges them into Summoner Core, then spins up a ready-to-use venv.”
-
----
-
-## 3. Verifying Your Installation
-
-Whichever method you choose, confirm everything is in place:
-
-```bash
-# Check SDK CLI
-summoner --help
-
-# Run a minimal smoke-test
-echo "from summoner import Agent; print(Agent)" | python3
-```
-
----
-
-## 4. Troubleshooting
-
-* **“command not found: summoner”**
-
-  * Ensure you’ve activated your venv: `source venv/bin/activate`
-  * Check your PATH: `which summoner`
-
-* **Build script errors**
-
-  * Verify `build.txt` URLs are correct
-  * Confirm `git` and `python3` are installed
-
-* **Version mismatch**
-
-  * For pip: `pip install --upgrade summoner-sdk`
-  * For script: `bash build_sdk.sh deps`
-
----
+You then customize your new SDK by editing the `build.txt` file to specify which modules to include. This modular architecture allows for many valid SDK compositions based on different combinations of features surrounding the SDK core.
 
 <p align="center">
-  <a href="what_is.md">&laquo; Previous: What is the Summoner SDK for?</a>
-  &nbsp;|&nbsp;
-  <a href="quickstart/index.md">Next: Quickstart &raquo;</a>
+  <img width="300px" src="../../assets/img/summoner_arch.png" alt="Summoner architecture diagram" />
 </p>
+
+
+> 📦 The default `build.txt` in the template includes:
+>
+> * `summoner-smart-tools` (currently private)
+> * `summoner-creatures` (public)
+
+A best practice is to only publish new code or features specific to your SDK, and keep the actual installation logic clean and declarative through `build.txt`. For example, [`summoner-agents`](https://github.com/Summoner-Network/summoner-agents) is built from this template and contains only agent code — the SDK is installed via `build_sdk.sh` based on its own `build.txt`.
+
+
+## Python and Rust Installation
+
+The installation scripts used in this process include:
+
+* [`build_sdk.sh`](https://github.com/Summoner-Network/summoner-sdk/blob/main/build_sdk.sh) (from `summoner-sdk`)
+* [`setup.sh`](https://github.com/Summoner-Network/summoner-core/blob/main/setup.sh) (from `summoner-core`)
+* [`reinstall_python_sdk.sh`](https://github.com/Summoner-Network/summoner-core/blob/main/reinstall_python_sdk.sh)
+* [`reinstall_rust_server.sh`](https://github.com/Summoner-Network/summoner-core/blob/main/reinstall_rust_server.sh)
+
+These scripts assume you already have **Python 3.9+** and **Rust** installed. If not, follow the instructions below (also detailed in the `summoner-core` README):
+
+### 1. Install Python
+
+Check your current Python version:
+
+```bash
+python3 --version
 ```
 
-### Why this structure?
+If Python is not installed, install it using your system's package manager:
 
-1. **Front matter & sidebar\_label**
-   ­Integrates nicely with your docsite sidebar.
-2. **Purpose & audience**
-   ­Sets expectations (“why read this?”).
-3. **Clear Install Methods**
-   ­Beginners can choose pip, power-users can opt for build script.
-4. **Tables for commands**
-   ­Easily scannable reference for each script command.
-5. **Copy-templates**
-   ­Neutral-tone paragraphs you can copy/paste.
-6. **Troubleshooting**
-   ­Addresses the most common pain points right on this page.
+**On macOS:**
 
+```bash
+brew install python
+```
+
+**On Ubuntu/Debian:**
+
+```bash
+sudo apt update
+sudo apt install python3 python3-venv python3-pip
+```
+
+
+### 2. Install Rust
+
+Install Rust using [`rustup`](https://rustup.rs):
+
+**On macOS (via Homebrew):**
+
+```bash
+brew install rustup
+rustup-init
+```
+
+**On macOS/Linux (via curl):**
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Restart your terminal and verify:
+
+```bash
+rustc --version     # Should print the Rust compiler version
+cargo --version     # Should print the Cargo package manager version
+```
+
+
+## 🔧 Build the SDK with a Custom `build.txt`
+
+Once Python and Rust are installed, you can define your SDK composition and install it.
+
+### Step 1: Create Your SDK Repository
+
+1. Go to the [`summoner-sdk` template repository](https://github.com/Summoner-Network/summoner-sdk)
+2. Click **"Use this template"**
+3. Choose **"Create a new repository"**, name your project, and confirm
+
+<p align="center">
+  <img width="450px" src="../../assets/img/use_template.png" alt="Use this template button screenshot" />
+</p>
+
+Clone your new repository:
+
+```bash
+git clone https://github.com/<your_account>/<your_repo>.git
+cd <your_repo>
+```
+
+
+### Step 2: Define the SDK in `build.txt`
+
+Edit the `build.txt` file to include the modules you want. For example, to include the `kobold` agent module from `summoner-creatures`:
+
+```txt
+https://github.com/Summoner-Network/summoner-creatures.git:
+kobold
+```
+
+> ⚠️ As of this writing, the `kobold` module is still under development. Full support for agent behavior will be available soon.
+
+You can modify this file at any time to add or remove modules.
+
+
+### Step 3: Run the Installer
+
+Once `build.txt` is configured, run the script:
+
+```bash
+source build_sdk.sh setup
+```
+
+This will:
+
+* Create a Python `venv/`
+* Install all required Python and Rust dependencies
+* Pull in the requested features defined in `build.txt`
+* Link them together into a functional SDK workspace
+
+If you prefer to execute the script instead of sourcing it:
+
+```bash
+bash build_sdk.sh setup
+source venv/bin/activate
+```
+
+You are now ready to begin development using your custom Summoner SDK.
 
 <p align="center">
   <a href="what_is.md">&laquo; Previous: What is Summoner's SDK used for?</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="quickstart/index.md">Next: Quickstart &raquo;</a>
