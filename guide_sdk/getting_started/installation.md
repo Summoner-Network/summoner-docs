@@ -26,7 +26,7 @@ A best practice is to only publish new code or features specific to your SDK, an
 
 
 <p align="center">
-  <img width="220px" src="../../assets/img/summoner_architecture.png" alt="Summoner architecture diagram" />
+  <img width="220px" src="../../assets/img/summoner_arch.png" alt="Summoner architecture diagram" />
 </p>
 
 ## Python and Rust Installation
