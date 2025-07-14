@@ -17,10 +17,10 @@ The [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) repositor
 
 You then customize your new SDK by editing the `build.txt` file to specify which modules to include. This modular architecture allows for many valid SDK compositions based on different combinations of features surrounding the SDK core.
 
-> 📦 The default `build.txt` in the template includes:
->
-> * `summoner-smart-tools` (currently private)
-> * `summoner-creatures` (public)
+> [!NOTE]
+> The default `build.txt` in the template includes:
+>   * `summoner-smart-tools` (currently private)
+>   * `summoner-creatures` (public)
 
 A best practice is to only publish new code or features specific to your SDK, and keep the actual installation logic clean and declarative through `build.txt`. For example, [`summoner-agents`](https://github.com/Summoner-Network/summoner-agents) is built from this template and contains only agent code — the SDK is installed via `build_sdk.sh` based on its own `build.txt`.
 
