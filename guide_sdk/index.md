@@ -65,15 +65,12 @@ The **Advanced Usage** section is intended primarily for internal development, b
 
 ---
 
-### Moving Forward
+### What Next?
 
-Whether you are building your first agent or developing a custom deployment stack, this guide is designed to support your journey through the Summoner SDK. You are free to explore topics in any order — or simply follow the arrows below for a natural progression through the material.
-
+Once you are ready to try the SDK in a real-world setting, we recommend starting with the [**Desktop App Guide**](guide_app/index.md), which walks through creating and deploying a working agent inside the official Summoner Desktop App.
 
 <p align="center">
   <a href="../introduction/minisdk/conclusion.md">&laquo; Previous: From miniSummoner to Summoner</a>
   &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="getting_started/index.md">Next: Getting Started &raquo;</a>
 </p>
-
-
