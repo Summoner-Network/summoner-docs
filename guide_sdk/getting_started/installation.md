@@ -128,7 +128,7 @@ You can modify this file at any time to add or remove modules.
 ### Step 3: Run the Installer
 
 <p align="center">
-  <img width="550px" src="../../assets/gifs/sdk_installation.gif" alt="Summoner architecture diagram" />
+  <img width="750px" src="../../assets/gifs/sdk_installation.gif" alt="Summoner architecture diagram" />
 </p>
 
 Once `build.txt` is configured, run the script:
