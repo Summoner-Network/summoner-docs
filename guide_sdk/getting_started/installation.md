@@ -10,16 +10,12 @@ This script-based approach is consistent across key components of the platform, 
 
 Each of these repositories contains its own `setup.sh`, `install.sh` or build script, and these scripts **chain together** during installation. For example, installing the SDK via `summoner-desktop` will trigger the `summoner-sdk` script, which in turn calls the setup scripts from `summoner-core` and any modules specified in `build.txt`.
 
-
 ## A Template-Based SDK
 
 The [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) repository is a **GitHub template repository**, meaning users should not modify it directly. Instead, use GitHub’s "Use this template" feature to generate a new repository that includes only the installation logic.
 
-You then customize your new SDK by editing the `build.txt` file to specify which modules to include. This modular architecture allows for many valid SDK compositions based on different combinations of features surrounding the SDK core.
 
-<p align="center">
-  <img width="300px" src="../../assets/img/summoner_architecture.png" alt="Summoner architecture diagram" />
-</p>
+You then customize your new SDK by editing the `build.txt` file to specify which modules to include. This modular architecture allows for many valid SDK compositions based on different combinations of features surrounding the SDK core.
 
 > 📦 The default `build.txt` in the template includes:
 >
@@ -28,6 +24,10 @@ You then customize your new SDK by editing the `build.txt` file to specify which
 
 A best practice is to only publish new code or features specific to your SDK, and keep the actual installation logic clean and declarative through `build.txt`. For example, [`summoner-agents`](https://github.com/Summoner-Network/summoner-agents) is built from this template and contains only agent code — the SDK is installed via `build_sdk.sh` based on its own `build.txt`.
 
+
+<p align="center">
+  <img width="220px" src="../../assets/img/summoner_architecture.png" alt="Summoner architecture diagram" />
+</p>
 
 ## Python and Rust Installation
 
