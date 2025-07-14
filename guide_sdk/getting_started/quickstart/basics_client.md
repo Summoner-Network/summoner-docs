@@ -4,10 +4,10 @@ Summoner clients are built on top of Python's `asyncio` TCP functionality, but t
 
 ## From Client to Agent
 
-A **Summoner agent** begins as a TCP client — but adds two essential layers:
+A **Summoner agent** begins as a TCP client, but adds two essential layers:
 
 * **Orchestration**: The ability to route and manage behaviors dynamically across internal components.
-* **Decentralized Identity**: Each agent cryptographically signs messages, owns a verifiable identity, and can participate in secure agent-to-agent communication.
+* **✨<span style="color:#0097A1;">(Planned)</span>✨ Decentralized Identity**: Each agent cryptographically signs messages, owns a verifiable identity, and can participate in secure agent-to-agent communication.
 
 This leads to the working definition:
 
@@ -21,6 +21,18 @@ Clients and agents in Summoner are not monolithic. Internally, they are structur
 * Endpoints can act independently or in cooperation, enabling **subagents** to form inside larger agent structures.
 
 This graph-based architecture enables modularity: endpoints can be created, composed, and nested to form rich agent behaviors.
+
+<p align="center">
+  <span style="display:inline-block; text-align:center; margin-right:20px;">
+    <strong>Single Subagent</strong><br/>
+    <img width="240px" src="../../../assets/img/agent_simple2_rounded.png"/>
+  </span>
+  <span style="display:inline-block; text-align:center; margin-left:20px;">
+    <strong>Multi-Subagent System</strong><br/>
+    <img width="372px" src="../../../assets/img/agent_complex2_rounded.png"/>
+  </span>
+</p>
+
 
 ## Finite-State Coordination
 
@@ -43,6 +55,12 @@ This allows you to:
 
 * Build simple agents with one or two routes.
 * Compose complex multi-agent systems from reusable building blocks.
+
+<p align="center">
+    <strong>Composition of Simple Agents Into a Multi-Subagent System</strong><br/>
+    <img width="440px" src="../../../assets/img/agent_composition.png"/>
+</p>
+
 
 ---
 
