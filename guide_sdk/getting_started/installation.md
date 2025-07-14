@@ -100,7 +100,7 @@ Once Python and Rust are installed, you can define your SDK composition and inst
 3. Choose **"Create a new repository"**, name your project, and confirm
 
 <p align="center">
-  <img width="450px" src="../../assets/img/use_template.png" alt="Use this template button screenshot" />
+  <img width="450px" src="../../assets/img/use_template_2_rounded.png" alt="Use this template button screenshot" />
 </p>
 
 Clone your new repository:
