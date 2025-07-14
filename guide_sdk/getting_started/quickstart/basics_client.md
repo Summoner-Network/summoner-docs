@@ -27,10 +27,10 @@ This graph-based architecture enables modularity: endpoints can be created, comp
 <table>
   <tr>
     <th>
-      <div align="center"><strong>Single Agent</strong></div>
+      <div align="center"><strong>Single Subagent</strong></div>
     </th>
     <th>
-      <div align="center"><strong>Multi-Agent System</strong></div>
+      <div align="center"><strong>Multi-Subagent System</strong></div>
     </th>
   </tr>
   <tr>
@@ -74,7 +74,7 @@ This allows you to:
 * Compose complex multi-agent systems from reusable building blocks.
 
 <p align="center">
-    <strong>Composition of Simple Agents Into a Multi-Subagent System</strong><br/>
+    <strong>Composition of Three Simple Agents into a Multi-Subagent System</strong><br/>
     <img width="440px" src="../../../assets/img/agent_composition.png"/>
 </p>
 
