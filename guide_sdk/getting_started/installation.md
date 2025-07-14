@@ -133,6 +133,9 @@ You can modify this file at any time to add or remove modules.
 
 ### Step 3: Run the Installer
 
+> _🔁 The demo below is a looping animation. If you want to view it from the beginning, **right-click → Open Image in New Tab** or **refresh the page**._
+
+
 <p align="center">
   <img width="750px" src="../../assets/gifs/sdk_installation.gif" alt="Summoner architecture diagram" />
 </p>
