@@ -29,16 +29,21 @@ A best practice is to only publish new code or features specific to your SDK, an
   <img width="220px" src="../../assets/img/summoner_arch.png" alt="Summoner architecture diagram" />
 </p>
 
-## Python and Rust Installation
 
-The installation scripts used in this process include:
+## Required Languages and Setup Scripts
 
-* [`build_sdk.sh`](https://github.com/Summoner-Network/summoner-sdk/blob/main/build_sdk.sh) (from `summoner-sdk`)
-* [`setup.sh`](https://github.com/Summoner-Network/summoner-core/blob/main/setup.sh) (from `summoner-core`)
-* [`reinstall_python_sdk.sh`](https://github.com/Summoner-Network/summoner-core/blob/main/reinstall_python_sdk.sh)
-* [`reinstall_rust_server.sh`](https://github.com/Summoner-Network/summoner-core/blob/main/reinstall_rust_server.sh)
+Summoner's SDK uses a layered script system to orchestrate installation and composition. These scripts handle environment setup, dependency resolution, and module integration. They rely on both **Python** and **Rust**, which are foundational to the platform.
 
-These scripts assume you already have **Python 3.9+** and **Rust** installed. If not, follow the instructions below (also detailed in the `summoner-core` README):
+The key scripts involved are:
+
+* [`build_sdk.sh`](https://github.com/Summoner-Network/summoner-sdk/blob/main/build_sdk.sh) – top-level installer for assembling the SDK (from `summoner-sdk`)
+* [`setup.sh`](https://github.com/Summoner-Network/summoner-core/blob/main/setup.sh) – initializes the SDK core (from `summoner-core`)
+* [`reinstall_python_sdk.sh`](https://github.com/Summoner-Network/summoner-core/blob/main/reinstall_python_sdk.sh) – installs Python dependencies (from `summoner-core`)
+* [`reinstall_rust_server.sh`](https://github.com/Summoner-Network/summoner-core/blob/main/reinstall_rust_server.sh) – builds and installs the Rust server (from `summoner-core`)
+
+These scripts **assume** that both **Python 3.9+** and the **Rust toolchain** are already installed and available in your environment.
+
+
 
 ### 1. Install Python
 
