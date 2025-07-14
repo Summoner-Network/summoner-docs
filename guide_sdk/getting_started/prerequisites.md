@@ -41,6 +41,10 @@ We recommend familiarity with:
 * [Multi-agent systems](https://en.wikipedia.org/wiki/Multi-agent_system) and, more broadly, [complex systems](https://en.wikipedia.org/wiki/Complex_system)
 * [Asynchronous programming](https://en.wikipedia.org/wiki/Asynchrony_%28computer_programming%29)
 
+<p align="center">
+  <img width="240px" src="../../assets/img/golem_wizard_rounded.png" alt="Summoner architecture diagram" />
+</p>
+
 For users interested in the **theoretical foundations of agent design**, the SDK draws from several areas in mathematics and computer science, such as:
 
 * [Graph theory](https://en.wikipedia.org/wiki/Graph_theory), including [graph traversal](https://en.wikipedia.org/wiki/Graph_traversal) and [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)

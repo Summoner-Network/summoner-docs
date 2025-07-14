@@ -7,6 +7,11 @@ The Summoner platform is designed to help you create and run intelligent agents,
 
 To begin, you can clone the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) repository, which contains everything you need to create and run agents. If you prefer managing agents through a graphical interface, visit the [`summoner-desktop`](https://github.com/Summoner-Network/summoner-desktop) repository. The desktop app is fully functional today, though future versions may require account creation for cloud features.
 
+
+<p align="center">
+  <img width="240px" src="../../assets/img/reading_summoner_rounded.png" alt="Summoner architecture diagram" />
+</p>
+
 > [!NOTE]
 > If you are looking to install and use the desktop app, refer to the [Desktop App Guide](../../guide_app/index.md).
 >
