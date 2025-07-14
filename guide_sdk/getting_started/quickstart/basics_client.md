@@ -1,10 +1,10 @@
-# Basics on TCP-Based Summoner Clients
+# Basics on TCP-Based Clients
 
 Summoner clients are built on top of Python's `asyncio` TCP functionality, but they go far beyond basic socket connections. The client architecture introduces orchestration logic and a security layer, transforming a simple TCP client into a programmable, composable agent.
 
 ## From Client to Agent
 
-A **Summoner agent** begins as a TCP client—but adds two essential layers:
+A **Summoner agent** begins as a TCP client — but adds two essential layers:
 
 * **Orchestration**: The ability to route and manage behaviors dynamically across internal components.
 * **Decentralized Identity**: Each agent cryptographically signs messages, owns a verifiable identity, and can participate in secure agent-to-agent communication.
@@ -37,7 +37,7 @@ This makes agents not just reactive, but **coordinated systems of intent**.
 A key design principle in Summoner is composability:
 
 * A **collection of endpoints** can be treated as a higher-order agent.
-* Subagents can be embedded, routed, or delegated to—because all communication is structured and orchestrated consistently.
+* Subagents can be embedded, routed, or delegated to — because all communication is structured and orchestrated consistently.
 
 This allows you to:
 
