@@ -1,4 +1,4 @@
-# Basics on TCP-Based Clients
+# Basics on TCP-Based Summoner Clients
 
 Summoner clients are built on top of Python's `asyncio` TCP functionality, but they go far beyond basic socket connections. The client architecture introduces orchestration logic and a security layer, transforming a simple TCP client into a programmable, composable agent.
 
@@ -22,16 +22,33 @@ Clients and agents in Summoner are not monolithic. Internally, they are structur
 
 This graph-based architecture enables modularity: endpoints can be created, composed, and nested to form rich agent behaviors.
 
-<p align="center">
-  <span style="display:inline-block; text-align:center; margin-right:20px;">
-    <strong>Single Subagent</strong><br/>
-    <img width="240px" src="../../../assets/img/agent_simple2_rounded.png"/>
-  </span>
-  <span style="display:inline-block; text-align:center; margin-left:20px;">
-    <strong>Multi-Subagent System</strong><br/>
-    <img width="372px" src="../../../assets/img/agent_complex2_rounded.png"/>
-  </span>
-</p>
+<div align="center">
+
+<table>
+  <tr>
+    <th>
+      <div align="center"><strong>Single Agent</strong></div>
+    </th>
+    <th>
+      <div align="center"><strong>Multi-Agent System</strong></div>
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <div align="center">
+        <img width="240px" src="../../../assets/img/agent_simple2_rounded.png"/>
+      </div>
+    </td>
+    <td>
+      <div align="center">
+        <img width="372px" src="../../../assets/img/agent_complex2_rounded.png"/>
+      </div>
+    </td>
+  </tr>
+</table>
+
+</div>
+
 
 
 ## Finite-State Coordination

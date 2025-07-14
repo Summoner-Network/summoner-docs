@@ -1,4 +1,4 @@
-# Basics on TCP-Based Servers
+# Basics on TCP-Based Summoner Servers
 
 ## Why Start with TCP?
 
