@@ -13,6 +13,7 @@ Users on Windows may still use the SDK, but installation will require some adapt
 
 Please note that some components — especially the [Rust installation](https://www.rust-lang.org/tools/install) — may differ significantly from Unix workflows. However, Windows users can still rely on the **Python-only implementation** of the server (by commenting out the Rust-based imports in the server code) and freely use the client code, which is entirely written in Python.
 
+
 ## Software Requirements
 
 To install the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk), the following software must be available:

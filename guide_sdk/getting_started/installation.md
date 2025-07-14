@@ -10,6 +10,10 @@ This script-based approach is consistent across key components of the platform, 
 
 Each of these repositories contains its own `setup.sh`, `install.sh` or build script, and these scripts **chain together** during installation. For example, installing the SDK via `summoner-desktop` will trigger the `summoner-sdk` script, which in turn calls the setup scripts from `summoner-core` and any modules specified in `build.txt`.
 
+<p align="center">
+  <img width="240px" src="../../assets/img/alchemia_rounded.png"/>
+</p>
+
 ## A Template-Based SDK
 
 The [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) repository is a **GitHub template repository**, meaning users should not modify it directly. Instead, use GitHub's "Use this template" feature to generate a new repository that includes only the installation logic.
