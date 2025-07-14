@@ -1,136 +1,120 @@
-# Basics on the TCP-based Summoner servers
+# Basics on TCP-Based Servers
 
-- config
-- logs
-- python (base) versus rust (recommended): what to choose
+## Why Start with TCP?
 
+Summoner is a protocol for orchestrating agents across machines. It builds on TCP — the bedrock of internet communication — to ensure reliable delivery, ordered messages, and stable connections. Before we explain what makes Summoner unique, we ground ourselves in the basics.
 
-----------
+## What Is TCP?
 
+**TCP (Transmission Control Protocol)** ensures that data sent between machines arrives intact, in order, and without duplication. Introduced in the 1970s, it remains central to the modern internet.
 
-# Server Basics
+TCP is a **transport-layer** protocol, operating above physical and routing layers:
 
-> Learn how to configure, run, and monitor your Summoner relay server over TCP, choosing between Python and Rust implementations.
+* **MAC (Media Access Control):** Manages data access to the physical network (e.g., Ethernet, Wi-Fi).
+* **IP (Internet Protocol):** Handles routing of packets from source to destination.
 
-**Purpose & audience**  
-- **Who:** Developers deploying a Summoner server in dev or production  
-- **What:** configuration options, logging best practices, implementation choices, and startup procedures  
-- **Outcome:** a ready-to-use server scaffold tuned to your environment
+Built atop these, TCP establishes a virtual pipe between programs on separate machines.
 
----
+## Ports and Addresses
 
-## 1. Configuration
+Each TCP connection is defined by two endpoints:
 
-### 1.1 Config file  
-- Default path: `config.yaml` or `config.json` in working directory  
-- Common fields:  
-  - `host`: interface to bind (e.g. `0.0.0.0`)  
-  - `port`: listening port (e.g. `8000`)  
-  - `max_connections`: cap on simultaneous agents  
-  - `reconnect_policy`: backoff strategy  
+* **IP Address** — The location of a machine (e.g., `127.0.0.1`, `192.168.0.12`, or a public WAN IP).
+* **Port** — The application-level channel on that machine (e.g., `8000`, `443`).
 
-> **Sample copy:**  
-> “Place a `config.yaml` next to your startup script. Example:  
-> ```yaml
-> host: 0.0.0.0
-> port: 8000
-> max_connections: 100
-> reconnect_policy:
->   initial_delay: 1
->   max_delay: 30
-> ```  
->
-
-### 1.2 CLI flags  
-- Override any config entry at runtime:  
-```bash
-  summoner-server start --host 127.0.0.1 --port 9000 --max-connections 50
-```
-
-* Flags take precedence over file settings
-
----
-
-## 2. Logging
-
-### 2.1 Built-in logging
-
-* Default logger at INFO level
-* Prints to stdout with timestamps and levels
-
-### 2.2 Custom handlers
-
-* File logging: write to `logs/server.log`
-* Rotating logs: use `logging.handlers.RotatingFileHandler`
-* Example setup in code:
-
-  ```python
-  import logging
-  from summoner.server import SummonerServer
-
-  logger = logging.getLogger("summoner.server")
-  fh = logging.handlers.RotatingFileHandler("logs/server.log", maxBytes=1e6, backupCount=3)
-  logger.addHandler(fh)
-  logger.setLevel(logging.DEBUG)
-
-  SummonerServer(name="main").run()
-  ```
-
----
-
-## 3. Python vs Rust Implementations
-
-| Implementation | Pros                            | Cons                              |
-| -------------- | ------------------------------- | --------------------------------- |
-| **Python**     | Quick iteration, easy debugging | Lower throughput under high load  |
-| **Rust**       | High performance, low latency   | Requires Rust toolchain and build |
-
-> **Sample copy:**
-> “For prototypes or debugging, the Python server is ideal. Switch to the Rust binary for production to handle hundreds of agents with minimal overhead.”
-
----
-
-## 4. Running the Server
-
-### 4.1 CLI mode
-
-```bash
-# Python server
-summoner-server start --config config.yaml
-
-# Rust server (if installed)
-summoner-server-rust --config config.yaml
-```
-
-### 4.2 Programmatic mode
-
-```python
-from summoner.server import SummonerServer
-
-if __name__ == "__main__":
-    server = SummonerServer(name="my_relay")
-    server.run(config_path="config.yaml")
-```
-
----
-
-## 5. Monitoring Connections
-
-* **Console output:** watch for `Client connected: <agent_id>` messages
-* **Metrics endpoint:** (if enabled) expose Prometheus metrics on `/metrics`
-* **Health checks:** integrate with your orchestration tool (Kubernetes, systemd)
-
-> **Sample copy:**
-> “Enable the metrics module in your config to scrape live connection counts and message rates. Use `kubectl port-forward` or `curl` for quick checks.”
-
----
+Summoner servers bind to a specific host and port. Clients initiate connections by targeting these identifiers.
 
 <p align="center">
-  <a href="basics_agent.md">&laquo; Previous: Agent (Basics)</a>
-  &nbsp;|&nbsp;
-  <a href="beginner.md">Next: Beginner's Guide &raquo;</a>
+  <img width="240px" src="../../../assets/img/TCP_illustration_rounded.png"/>
 </p>
 
+## Sample Code: Binding to Host and Port
+
+To better understand how TCP connections are established in practice, it helps to look at concrete code examples. The concept of "binding" refers to the process where a server reserves a specific IP address and port on which it listens for incoming connections. Clients then connect to this address\:port pair to initiate communication.
+
+Below are two simple echo server examples: one written in Python using `asyncio`, and one in Rust using the `tokio` async runtime. Both demonstrate the same principles: 
+- listening on a port, 
+- accepting client connections, 
+- and responding to received messages.
+
+### Python (asyncio)
+
+```python
+async def handle_client(reader, writer):
+    data = await reader.read(100)
+    writer.write(data)
+    await writer.drain()
+    writer.close()
+
+async def main():
+    server = await asyncio.start_server(handle_client, '127.0.0.1', 8000)
+    async with server:
+        await server.serve_forever()
+
+asyncio.run(main())
+```
+
+### Rust (Tokio)
+
+```rust
+#[tokio::main]
+async fn main() -> tokio::io::Result<()> {
+    let listener = TcpListener::bind("127.0.0.1:8000").await?;
+
+    loop {
+        let (mut socket, _) = listener.accept().await?;
+        tokio::spawn(async move {
+            let mut buf = [0; 1024];
+            let n = socket.read(&mut buf).await.unwrap();
+            socket.write_all(&buf[0..n]).await.unwrap();
+        });
+    }
+}
+```
+
+## Local, LAN, WAN, and DNS
+
+Understanding how machines are addressed and located on networks is essential for deploying Summoner servers. Here's a breakdown:
+
+* **Localhost (`127.0.0.1`)**: Refers to the local machine itself. Connections to this address stay entirely within the same computer and are typically used for development or self-contained processes.
+
+* **LAN (Local Area Network)**: Includes private IP ranges like `192.168.x.x` or `10.x.x.x`, used within home, office, or cluster networks. Machines on the same LAN can communicate directly without needing internet access.
+
+* **WAN (Wide Area Network)**: Represents public IP addresses that are globally reachable. WAN addresses allow machines to communicate across the internet, but typically require port forwarding or firewall rules to accept inbound connections.
+
+* **DNS (Domain Name System)**: Resolves human-readable domain names (like `summoner.org`) into IP addresses. It abstracts away numerical addressing, making services easier to locate and move between machines.
+
+These distinctions guide where and how to launch Summoner nodes:
+
+
+| Use Case                  | Address Type              | Description                                                 |                                                                                                                |
+| ------------------------- | ------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Isolated testing          | `localhost`               | Runs entirely on the local machine                          |                                                                                                                |
+| Internal networks (LAN)   | `192.168.x.x`, `10.x.x.x` | Trusted machines within a private network                   |                                                                                                                |
+| Internet-facing services  | Public IP (WAN)           | Reachable from anywhere, requires firewall/port setup       |                                                                                                                |
+| Discoverability & scaling | DNS                       | Maps domain names to IPs, useful for discoverability and dynamic infrastructure   |
+
+
+## The Role of Protocols in Coordination
+
+Protocols are not just data formats, they also define expectations: 
+- _Who speaks first?_
+- _How are delays handled?_
+- _What happens when a message is malformed?_
+
+Summoner introduces a higher-level protocol designed for **asynchronous, agent-to-agent communication**, enabling coordination through a shared server without relying on centralized scheduling.
+
+## TLS and What Summoner Replaces
+
+**TLS (Transport Layer Security)** encrypts communication and verifies server identities via centralized Certificate Authorities. It secures data in transit but does not support:
+
+* Persistent peer identities
+* Decentralized trust
+* Agent-level message signing or verification
+
+**Summoner introduces a cryptographically verifiable identity layer**, replacing TLS with agent-specific keys and persistent reputations. This enables secure messaging and coordination without third-party trust anchors.
+
+In essence, Summoner builds on TCP's transport layer, bypasses TLS's centralized model, and defines a new coordination protocol tailored for autonomous agents.
 
 
 <p align="center">

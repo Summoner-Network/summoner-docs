@@ -1,148 +1,52 @@
-# Basics on the TCP-based Summoner clients
+# Basics on TCP-Based Summoner Clients
 
+Summoner clients are built on top of Python's `asyncio` TCP functionality, but they go far beyond basic socket connections. The client architecture introduces orchestration logic and a security layer, transforming a simple TCP client into a programmable, composable agent.
 
-- config
-- logs (config or self.logger.info ...)
-- memory (variables, queue...)
-- `setup()` (event loops)
+## From Client to Agent
 
------
+A **Summoner agent** begins as a TCP client—but adds two essential layers:
 
+* **Orchestration**: The ability to route and manage behaviors dynamically across internal components.
+* **Decentralized Identity**: Each agent cryptographically signs messages, owns a verifiable identity, and can participate in secure agent-to-agent communication.
 
-# Client Basics
+This leads to the working definition:
 
-> Learn how to configure, log, manage state, and bootstrap your Summoner client over a TCP connection.
+> **Agent = TCP Client + Decentralized Identity + Orchestration Logic**
 
-**Purpose & audience**  
-- **Who:** developers writing custom Summoner clients  
-- **What:** how to set up connection options, capture logs, hold in-memory state, and start the asyncio event loop  
-- **Outcome:** a working client scaffold you can extend for your own agent logic
+## Graphs of Endpoints
 
----
+Clients and agents in Summoner are not monolithic. Internally, they are structured as **graphs of endpoints**:
 
-## 1. Configuration
+* Each **endpoint** is a self-contained handler for a route or message type.
+* Endpoints can act independently or in cooperation, enabling **subagents** to form inside larger agent structures.
 
-### 1.1 Default settings  
-- Where Summoner looks for `config.yaml` or `config.json`  
-- Typical fields: `host`, `port`, `reconnect_delay`, `log_level`
+This graph-based architecture enables modularity: endpoints can be created, composed, and nested to form rich agent behaviors.
 
-> **Sample copy:**  
-> “By default, the client reads connection parameters from `config.yaml` in your working directory. You can override any value at runtime via keyword arguments to `run_client(...)`.”
+## Finite-State Coordination
 
-### 1.2 Overriding via code  
-- Pass `host` and `port` directly  
-- Use environment variables (`SUMMONER_HOST`, `SUMMONER_PORT`)  
-- Merging CLI flags with file config
+The orchestration logic behind these endpoint graphs is modeled as a **finite-state machine (FSM)**:
 
-```python
-from summoner import run_client
+* **Stateful transitions** dictate how the agent responds to events or messages.
+* **Local state** at each endpoint allows agents to evolve their behavior over time.
+* **Global coordination** across endpoints is driven by the underlying FSM logic.
 
-# override config file
-run_client(MyAgent, host="127.0.0.1", port=9000)
-````
+This makes agents not just reactive, but **coordinated systems of intent**.
 
----
+## Composability by Design
 
-## 2. Logging
+A key design principle in Summoner is composability:
 
-### 2.1 Built-in logger
+* A **collection of endpoints** can be treated as a higher-order agent.
+* Subagents can be embedded, routed, or delegated to—because all communication is structured and orchestrated consistently.
 
-* Every `Agent` instance has `self.logger`
-* Default level: INFO
-* Logs to console; configurable to file
+This allows you to:
 
-> **Sample copy:**
-> “Use `self.logger.info("…")` inside your agent to record events. Change verbosity with `config.log_level = "DEBUG"`.”
-
-### 2.2 Custom handlers
-
-* Adding file or rotating handlers
-* Example: write logs to `logs/client.log`
-
-```python
-import logging
-from summoner import Agent, run_client
-
-class MyAgent(Agent):
-    def setup(self):
-        fh = logging.FileHandler("logs/client.log")
-        self.logger.addHandler(fh)
-        self.logger.setLevel(logging.DEBUG)
-```
+* Build simple agents with one or two routes.
+* Compose complex multi-agent systems from reusable building blocks.
 
 ---
 
-## 3. State & Memory
-
-### 3.1 In-memory variables
-
-* Store simple counters or flags on `self`
-* Example: `self.message_count = 0`
-
-### 3.2 Queues and buffers
-
-* Use `asyncio.Queue` for outgoing/incoming message buffering
-* Example: `self.outbox = asyncio.Queue()`
-
-> **Sample copy:**
-> “Hold transient state in your agent instance. For more complex persistence, see the `state_persist` how-to.”
-
-```python
-import asyncio
-class MyAgent(Agent):
-    def setup(self):
-        self.message_count = 0
-        self.outbox = asyncio.Queue()
-
-    async def on_message(self, msg):
-        self.message_count += 1
-        await self.outbox.put(msg)
-```
-
----
-
-## 4. Bootstrapping & Event Loop
-
-### 4.1 `setup()` hook
-
-* Called once before connection
-* Ideal for creating tasks, queues, or custom loop policies
-
-### 4.2 Starting the loop
-
-* `run_client(...)` handles loop creation and shutdown
-* Pass additional loop arguments if needed
-
-> **Sample copy:**
-> “Override `setup()` to spin up background tasks before your agent connects. The SDK will then call `run_client`, which starts and manages the asyncio event loop for you.”
-
-```python
-class MyAgent(Agent):
-    def setup(self):
-        self.logger.info("Initializing agent")
-        self.loop.create_task(self.background_task())
-
-    async def background_task(self):
-        while True:
-            await asyncio.sleep(10)
-            self.logger.info("Heartbeat")
-```
-
----
-
-<p align="center">
-  <a href="basics.md">&laquo; Previous: Basics (Intro)</a>
-  &nbsp;|&nbsp;
-  <a href="basics_agent.md">Next: Agent (Basics) &raquo;</a>
-</p>
-```
-
-**How to adapt this template**
-
-* Swap in your actual config file names/formats.
-* Extend the logging section with your preferred handlers.
-* Link to deeper how-tos (e.g. state persistence) as appropriate.
-* Replace sample copy with tone and terminology matching your docs.
+Summoner clients, therefore, are not just TCP sockets with callbacks. They are the structural foundation for programmable, composable agents — each carrying its own identity, behavior graph, and orchestration model.
 
 
 
@@ -150,3 +54,4 @@ class MyAgent(Agent):
   <a href="basics_server.md">&laquo; Previous: Server (Basics) </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 
   <a href="beginner.md">Next: Beginner's Guide &raquo;</a>
 </p>
+
