@@ -87,11 +87,11 @@ Understanding how machines are addressed and located on networks is essential fo
 These distinctions guide where and how to launch Summoner nodes:
 
 
-| Use Case                  | Address Type              | Description                                                 |                                                                                                                |
-| ------------------------- | ------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Isolated testing          | `localhost`               | Runs entirely on the local machine                          |                                                                                                                |
-| Internal networks (LAN)   | `192.168.x.x`, `10.x.x.x` | Trusted machines within a private network                   |                                                                                                                |
-| Internet-facing services  | Public IP (WAN)           | Reachable from anywhere, requires firewall/port setup       |                                                                                                                |
+| Use Case                  | Address Type              | Description                                                 |                                                                                                                
+| ------------------------- | ------------------------- | ----------------------------------------------------------- | 
+| Isolated testing          | `localhost`               | Runs entirely on the local machine                          |                                                                                                                
+| Internal networks (LAN)   | `192.168.x.x`, `10.x.x.x` | Trusted machines within a private network                   |                                                                                                                
+| Internet-facing services  | Public IP (WAN)           | Reachable from anywhere, requires firewall/port setup       |                                                                                                                
 | Discoverability & scaling | DNS                       | Maps domain names to IPs, useful for discoverability and dynamic infrastructure   |
 
 
