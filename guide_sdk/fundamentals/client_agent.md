@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
 ## 3. Agent Logic Without Flows
 
-You don’t need to model a full FSM to write an agent. For simple behaviors, override the basic lifecycle hooks:
+You don't need to model a full FSM to write an agent. For simple behaviors, override the basic lifecycle hooks:
 
 ```python
 class EchoAgent(Agent):

@@ -29,7 +29,7 @@ ip a | grep ether
 * Write down your **LAN IP** (e.g., `192.168.1.229`)
 * Write down your **MAC address** (e.g., `cc:15:31:d9:ae:e0`)
 
-  * It’s usually under your active Wi-Fi or Ethernet interface
+  * It's usually under your active Wi-Fi or Ethernet interface
 
 ---
 

@@ -9,7 +9,7 @@ To begin, you can clone the [`summoner-sdk`](https://github.com/Summoner-Network
 
 
 <p align="center">
-  <img width="240px" src="../../assets/img/reading_summoner_rounded.png" alt="Summoner architecture diagram" />
+  <img width="240px" src="../../assets/img/reading_summoner_rounded.png" />
 </p>
 
 > [!NOTE]
@@ -23,7 +23,7 @@ The SDK is modular by design. It is built around a core library (`summoner-core`
 
 **This section will guide you through:**
 
-### 1. Understanding the SDK’s role in the Summoner ecosystem
+### 1. Understanding the SDK's role in the Summoner ecosystem
 
 * [What is the Summoner SDK for?](what_is.md)
 
@@ -37,13 +37,13 @@ The SDK is modular by design. It is built around a core library (`summoner-core`
 * [Quickstart](quickstart/index.md): Your starting point
 
   * [Basics](quickstart/basics.md): Initial concepts and interactions
-
-    * [Client](quickstart/basics_client.md)
     * [Server](quickstart/basics_server.md)
+    * [Client](quickstart/basics_client.md)
+    
   * [Beginner guide](quickstart/beginner.md): Foundational ideas
 
-    * [Clients vs Agents](quickstart/begin_client.md)
     * [Servers vs Clients](quickstart/begin_server.md)
+    * [Clients vs Agents](quickstart/begin_client.md)
     * [Agent behavior as flows](quickstart/begin_flow.md)
     * [Async programming and event loops](quickstart/begin_async.md)
 

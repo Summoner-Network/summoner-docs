@@ -20,7 +20,7 @@ more theory is explained in [core concepts]()
 ------
 
 
-# Beginner’s Guide to Summoner Clients
+# Beginner's Guide to Summoner Clients
 
 > A minimal, step-by-step walkthrough for launching and customizing your first client-hosted agents. No deep Rust knowledge required—just Python and a bit of async.
 
@@ -77,7 +77,7 @@ python templates/myclient.py
 python templates/myclient.py
 ```
 
-Once running, type in one client’s console and see the other echo or respond.
+Once running, type in one client's console and see the other echo or respond.
 
 ---
 
@@ -186,7 +186,7 @@ agent.run(host="127.0.0.1", port=8888)
 
 ## 4. Going Further: Routes as Transitions
 
-Summoner routes aren’t just labels—they map directly to **state transitions** in your agent’s flow graph.
+Summoner routes aren't just labels—they map directly to **state transitions** in your agent's flow graph.
 
 ```python
 @agent.receive(route="idle → asking")
@@ -202,7 +202,7 @@ async def after_ask(): ...
 ---
 
 <p align="center">
-  <a href="beginner.md">&laquo; Previous: Beginner’s Guide</a>
+  <a href="beginner.md">&laquo; Previous: Beginner's Guide</a>
   &nbsp;|&nbsp;
   <a href="begin_server.md">Next: Servers vs Clients &raquo;</a>
 </p>
@@ -216,7 +216,7 @@ async def after_ask(): ...
 4. **Decorator overview**: shows how to plug into the SDK.
 5. **Routes section**: introduces the FSM-style transition model without overload.
 
-Let me know if you’d like more detail on any step or further polishing!
+Let me know if you'd like more detail on any step or further polishing!
 
 
 
@@ -240,9 +240,9 @@ Let me know if you’d like more detail on any step or further polishing!
 <img width="210px" src="../img/druid_agent.png" />
 </p>
 
-<!-- > **Within Summoner’s realms, AI agents traverse digital frontiers, forging pacts that weave the fabric of a new civilization. Through negotiation as protocol and trade as emergent behavior, Summoner powers the Internet of Autonomous Agents.** -->
+<!-- > **Within Summoner's realms, AI agents traverse digital frontiers, forging pacts that weave the fabric of a new civilization. Through negotiation as protocol and trade as emergent behavior, Summoner powers the Internet of Autonomous Agents.** -->
 
-> _Within Summoner’s realms, AI agents journey through open frontiers, forging pacts that weave the fabric of a **new digital civilization**. Like guilds rising within a boundless city, these negotiations and trades emerge into a **living economy**, all built atop **Summoner’s foundations**._
+> _Within Summoner's realms, AI agents journey through open frontiers, forging pacts that weave the fabric of a **new digital civilization**. Like guilds rising within a boundless city, these negotiations and trades emerge into a **living economy**, all built atop **Summoner's foundations**._
 
 ## Quickstart
 
@@ -386,7 +386,7 @@ Let us create a simple two-agent system that simulates a basic conversation.
 This example helps illustrate:
 - How two agents can play different roles
 - How they communicate asynchronously
-- How one agent’s message can trigger a response from another
+- How one agent's message can trigger a response from another
 
 
 ### `question_agent.py` – the Asker
@@ -573,5 +573,6 @@ In future tutorials, we will explore how to use these path-like routes to build 
 
 
 <p align="center">
-  <a href="beginner.md">&laquo; Previous: Beginner’s Guide (Intro)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_server.md">Next: Beginner's Guide to Summoner's Servers &raquo;</a>
+  <a href="begin_server.md">&laquo; Previous: Beginner's Guide to Summoner's Servers </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_flow.md">Next: Beginner's Guide to Agent's Flows &raquo;</a>
 </p>
+

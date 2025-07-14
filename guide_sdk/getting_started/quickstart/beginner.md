@@ -1,4 +1,4 @@
-# Beginner’s Guide
+# Beginner's Guide
 
 Here we show VERY-minimal code snippets (declaration or function headings)
 
@@ -17,9 +17,9 @@ present concepts
 ------
 
 
-# Beginner’s Guide
+# Beginner's Guide
 
-> Very minimal code snippets and core concepts to get you oriented with Summoner’s client, server, and agent flows.
+> Very minimal code snippets and core concepts to get you oriented with Summoner's client, server, and agent flows.
 
 **Purpose & audience**  
 - **Who:** new users who want a concise overview of key patterns  
@@ -28,7 +28,7 @@ present concepts
 
 ---
 
-## What You’ll Learn
+## What You'll Learn
 
 - How a client sends and receives messages  
 - How to start a basic server  
@@ -104,7 +104,7 @@ class LoopAgent(Agent):
 
 * **Async programming & event loops**
 
-  * Summoner uses Python’s `asyncio` for non-blocking I/O
+  * Summoner uses Python's `asyncio` for non-blocking I/O
   * Override `setup()` to create tasks, queues, or open connections
 
 ---
@@ -127,5 +127,5 @@ class LoopAgent(Agent):
 
 
 <p align="center">
-  <a href="basics_server.md">&laquo; Previous: Basics (Intro)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_client.md">Next: Quickstart with Summoner's clients &raquo;</a>
+  <a href="basics_client.md">&laquo; Previous: Client (Basics)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_server.md">Next: Beginner's Guide to Summoner's servers &raquo;</a>
 </p>

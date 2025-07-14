@@ -14,7 +14,7 @@ Some messages are starved and listenning needs to be a loop until it triggers
 
 # Fundamentals
 
-> Deepen your understanding of Summoner’s core abstractions, message flow, and runtime patterns.
+> Deepen your understanding of Summoner's core abstractions, message flow, and runtime patterns.
 
 **Purpose & audience**  
 - **Who:** developers who have tried the Quickstart and want to master the building blocks  
@@ -35,11 +35,11 @@ Some messages are starved and listenning needs to be a loop until it triggers
 
 ### 1. Clients and agents  
 [fundamentals/client_agent.md]  
-Explore the distinctions and interactions between client processes and agent instances. Learn how identity, lifecycle hooks, and protocol handlers define your agent’s behavior.
+Explore the distinctions and interactions between client processes and agent instances. Learn how identity, lifecycle hooks, and protocol handlers define your agent's behavior.
 
 ### 2. Servers and relay  
 [fundamentals/server_relay.md]  
-Understand the relay’s role as a message router. Cover configuration, scaling strategies, trust boundaries, and best practices for monitoring and high availability.
+Understand the relay's role as a message router. Cover configuration, scaling strategies, trust boundaries, and best practices for monitoring and high availability.
 
 ### 3. Traveling between servers  
 [fundamentals/traveling.md]  
@@ -51,7 +51,7 @@ Delve into the flow-based model: defining states, transitions, and routes. See h
 
 ### 5. Async programming and event loops  
 [fundamentals/async.md]  
-A focused look at Python’s `asyncio` in Summoner: event loop lifecycles, coroutine scheduling, integrating async databases and queues, and handling back-pressure.
+A focused look at Python's `asyncio` in Summoner: event loop lifecycles, coroutine scheduling, integrating async databases and queues, and handling back-pressure.
 
 ---
 

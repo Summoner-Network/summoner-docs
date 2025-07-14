@@ -7,6 +7,10 @@ Users on Windows may still use the SDK, but installation will require some adapt
 * Use [Git Bash](https://gitforwindows.org/) or [WSL](https://learn.microsoft.com/en-us/windows/wsl/install), or
 * Manually modify the installation scripts to use Windows-compatible commands.
 
+<p align="center">
+  <img width="240px" src="../../assets/img/summoners_library_rounded.png"/>
+</p>
+
 Please note that some components — especially the [Rust installation](https://www.rust-lang.org/tools/install) — may differ significantly from Unix workflows. However, Windows users can still rely on the **Python-only implementation** of the server (by commenting out the Rust-based imports in the server code) and freely use the client code, which is entirely written in Python.
 
 ## Software Requirements
@@ -16,6 +20,12 @@ To install the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk
 * `python3` (Python 3.9+ is required) and the `pip` package installer
 * `git` available on your `PATH` (needed to clone repositories and follow tutorials)
 * `rustc` and `cargo` (we **strongly recommend** installing Rust using the [`rustup`](https://rustup.rs) toolchain manager)
+
+
+<p align="center">
+  <img width="140px" src="../../assets/img/scroll_on_floor_rounded.png"/>
+</p>
+
 
 > [!NOTE]
 > If you are using our **automated installation scripts** (typically described in each repository's `README.md`), all required Python and Rust packages will be installed for you — including:
@@ -42,7 +52,7 @@ We recommend familiarity with:
 * [Asynchronous programming](https://en.wikipedia.org/wiki/Asynchrony_%28computer_programming%29)
 
 <p align="center">
-  <img width="240px" src="../../assets/img/golem_wizard_rounded.png" alt="Summoner architecture diagram" />
+  <img width="240px" src="../../assets/img/golem_wizard_rounded.png" />
 </p>
 
 For users interested in the **theoretical foundations of agent design**, the SDK draws from several areas in mathematics and computer science, such as:

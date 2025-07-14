@@ -12,7 +12,7 @@ Each of these repositories contains its own `setup.sh`, `install.sh` or build sc
 
 ## A Template-Based SDK
 
-The [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) repository is a **GitHub template repository**, meaning users should not modify it directly. Instead, use GitHub’s "Use this template" feature to generate a new repository that includes only the installation logic.
+The [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) repository is a **GitHub template repository**, meaning users should not modify it directly. Instead, use GitHub's "Use this template" feature to generate a new repository that includes only the installation logic.
 
 
 You then customize your new SDK by editing the `build.txt` file to specify which modules to include. This modular architecture allows for many valid SDK compositions based on different combinations of features surrounding the SDK core.
@@ -26,7 +26,7 @@ A best practice is to only publish new code or features specific to your SDK, an
 
 
 <p align="center">
-  <img width="220px" src="../../assets/img/summoner_arch.png" alt="Summoner architecture diagram" />
+  <img width="220px" src="../../assets/img/summoner_arch.png" />
 </p>
 
 
@@ -106,7 +106,7 @@ Once Python and Rust are installed, you can define your SDK composition and inst
 3. Choose **"Create a new repository"**, name your project, and confirm
 
 <p align="center">
-  <img width="450px" src="../../assets/img/use_template_2_rounded.png" alt="Use this template button screenshot" />
+  <img width="450px" src="../../assets/img/use_template_2_rounded.png" />
 </p>
 
 Clone your new repository:
@@ -126,7 +126,8 @@ https://github.com/Summoner-Network/summoner-creatures.git:
 kobold
 ```
 
-> ⚠️ As of this writing, the `kobold` module is still under development. Full support for agent behavior will be available soon.
+> [!WARNING]
+>  As of this writing, the `kobold` module is still under development. Full support for agent behavior will be available soon.
 
 You can modify this file at any time to add or remove modules.
 
@@ -137,7 +138,7 @@ You can modify this file at any time to add or remove modules.
 
 
 <p align="center">
-  <img width="750px" src="../../assets/gifs/sdk_installation.gif" alt="Summoner architecture diagram" />
+  <img width="750px" src="../../assets/gifs/sdk_installation.gif" />
 </p>
 
 Once `build.txt` is configured, run the script:
@@ -163,5 +164,5 @@ source venv/bin/activate
 You are now ready to begin development using your custom Summoner SDK.
 
 <p align="center">
-  <a href="what_is.md">&laquo; Previous: What is Summoner's SDK used for?</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="quickstart/index.md">Next: Quickstart &raquo;</a>
+  <a href="prerequisites.md">&laquo; Previous: Prerequisites</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="quickstart/index.md">Next: Quickstart &raquo;</a>
 </p>

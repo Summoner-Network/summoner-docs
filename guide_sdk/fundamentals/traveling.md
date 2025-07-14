@@ -20,7 +20,7 @@ Tutorials on traveling agent and the idea that controling an agent cam be done b
 **Purpose & audience**  
 - **Who:** developers building multi-relay or geo-distributed agent networks  
 - **What:** overview of the travel API, code examples for instructing an agent to migrate, and best practices for state handoff  
-- **Outcome:** you’ll be able to send “move” commands to your agents and have them reconnect to a new server automatically
+- **Outcome:** you'll be able to send “move” commands to your agents and have them reconnect to a new server automatically
 
 ---
 
@@ -45,7 +45,7 @@ Tutorials on traveling agent and the idea that controling an agent cam be done b
 
 ## 3. Travel API Overview
 
-Summoner’s client class provides:
+Summoner's client class provides:
 
 ```python
 await self.travel(host: str, port: int, route: str = "")  

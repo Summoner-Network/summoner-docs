@@ -11,5 +11,5 @@ Refer to:
 - [Server](guide_sdk/getting_started/quickstart/basics_server.md)
 
 <p align="center">
-  <a href="prerequisites.md">&laquo; Previous: Prerequesites</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="basics_client.md">Next: Client (Basics) &raquo;</a>
+  <a href="index.md">&laquo; Previous: Quickstart</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="basics_server.md">Next: Server (Basics) &raquo;</a>
 </p>

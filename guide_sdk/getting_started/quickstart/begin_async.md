@@ -109,9 +109,9 @@ These examples show how `setup()` provides a structured way to initialize asynch
 
 --------
 
-# Beginner’s Guide to Async Programming
+# Beginner's Guide to Async Programming
 
-> Learn the fundamentals of Python’s `asyncio` model as used by Summoner, and how to integrate async databases and queues into your agents.
+> Learn the fundamentals of Python's `asyncio` model as used by Summoner, and how to integrate async databases and queues into your agents.
 
 **Purpose & audience**  
 - **Who:** developers new to asynchronous programming in Python  
@@ -127,7 +127,7 @@ These examples show how `setup()` provides a structured way to initialize asynch
   - Ideal for I/O-bound workloads  
 - **Parallelism**  
   - Multiple tasks truly running at once on separate cores  
-  - Python’s GIL limits true parallelism for CPU-bound code
+  - Python's GIL limits true parallelism for CPU-bound code
 
 > **Sample copy:**  
 > “Summoner leverages concurrency: your agent can await network I/O, database calls, and timers without blocking other tasks.”
@@ -144,7 +144,7 @@ These examples show how `setup()` provides a structured way to initialize asynch
   - Gracefully handle shutdown on signals
 
 > **Sample copy:**  
-> “You don’t need to create the loop yourself—call `run_client(MyAgent)` and let Summoner wire everything up.”
+> “You don't need to create the loop yourself—call `run_client(MyAgent)` and let Summoner wire everything up.”
 
 ---
 
@@ -254,7 +254,7 @@ if __name__ == "__main__":
 ```
 
 > **Copy-template:**
-> “This example shows a background task consuming a queue and persisting messages asynchronously to SQLite, all without blocking the agent’s main loop.”
+> “This example shows a background task consuming a queue and persisting messages asynchronously to SQLite, all without blocking the agent's main loop.”
 
 ---
 

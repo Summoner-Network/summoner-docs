@@ -128,11 +128,11 @@ if __name__ == "__main__":
 <p align="center">
   <a href="basics_agent.md">&laquo; Previous: Agent (Basics)</a>
   &nbsp;|&nbsp;
-  <a href="beginner.md">Next: Beginner’s Guide &raquo;</a>
+  <a href="beginner.md">Next: Beginner's Guide &raquo;</a>
 </p>
 
 
 
 <p align="center">
-  <a href="basics_client.md">&laquo; Previous: Client (Basics)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="beginner.md">Next: Beginner’s Guide &raquo;</a>
+  <a href="basics.md">&laquo; Previous: Basics (Intro) </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="basics_client.md">Next: Client (Basics) &raquo;</a>
 </p>

@@ -10,18 +10,18 @@ This is the opportunity to illustrate all concepts of create_task and run_until_
 
 # Async Programming and Event Loops
 
-> A deep dive into Python’s `asyncio` model as leveraged by Summoner, covering task scheduling, blocking operations, and integration with agent lifecycles.
+> A deep dive into Python's `asyncio` model as leveraged by Summoner, covering task scheduling, blocking operations, and integration with agent lifecycles.
 
 **Purpose & audience**  
 - **Who:** developers building production-grade agents and servers with Summoner  
 - **What:** in-depth patterns for the event loop, creating and managing tasks, and handling blocking work  
-- **Outcome:** write robust, non-blocking code that cleanly integrates with Summoner’s `run_client` and `run_server`
+- **Outcome:** write robust, non-blocking code that cleanly integrates with Summoner's `run_client` and `run_server`
 
 ---
 
 ## 1. The Event Loop
 
-Summoner’s CLI entrypoints (`run_client`, `run_server`) create and run an `asyncio` event loop under the hood. The loop:
+Summoner's CLI entrypoints (`run_client`, `run_server`) create and run an `asyncio` event loop under the hood. The loop:
 
 - **Schedules coroutines** and callbacks  
 - **Manages I/O** (network sockets, timers)  
@@ -36,7 +36,7 @@ Summoner’s CLI entrypoints (`run_client`, `run_server`) create and run an `asy
 
 ### 2.1 `create_task`
 
-Use `self.loop.create_task(...)` inside your agent’s `setup()` hook to fire-and-forget background work:
+Use `self.loop.create_task(...)` inside your agent's `setup()` hook to fire-and-forget background work:
 
 ```python
 class MyAgent(Agent):
@@ -51,7 +51,7 @@ class MyAgent(Agent):
 ````
 
 * Tasks run concurrently with message handlers
-* Errors in a task don’t crash the loop; attach exception handlers if needed
+* Errors in a task don't crash the loop; attach exception handlers if needed
 
 ### 2.2 `ensure_future`
 
@@ -112,7 +112,7 @@ loop.run_until_complete(main_coroutine())
 * **Graceful shutdown:** implement `async def teardown(self):` in your agent to close resources (e.g., database connections, file handles).
 
 > **Sample copy:**
-> “Summoner calls your agent’s `teardown()` when the loop is stopping. Use it to cancel any background tasks and clean up state.”
+> “Summoner calls your agent's `teardown()` when the loop is stopping. Use it to cancel any background tasks and clean up state.”
 
 ---
 

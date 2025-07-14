@@ -21,16 +21,16 @@ Server:
 
 
 
-Here’s a structured rewrite for **`begin_server.md`** that mirrors the style of the client guide—light on code, rich in conceptual insight.
+Here's a structured rewrite for **`begin_server.md`** that mirrors the style of the client guide—light on code, rich in conceptual insight.
 
 ````markdown
 ---
 sidebar_label: Servers vs Clients
 ---
 
-# Beginner’s Guide to Summoner Servers
+# Beginner's Guide to Summoner Servers
 
-> Minimal examples and core concepts for launching a Summoner relay server. Understand the server’s role, trust boundaries, and available modes.
+> Minimal examples and core concepts for launching a Summoner relay server. Understand the server's role, trust boundaries, and available modes.
 
 **Purpose & audience**  
 - **Who:** developers deploying a relay server in dev or production  
@@ -107,7 +107,7 @@ Summoner supports different relay topologies:
 * **End-to-end Encryption**
 
   * Encrypt payloads on the client side.
-  * Use Summoner’s protocol hooks to negotiate keys before sending.
+  * Use Summoner's protocol hooks to negotiate keys before sending.
 
 * **Handshake & Authentication**
 
@@ -115,7 +115,7 @@ Summoner supports different relay topologies:
   * Reject unauthorized clients by closing the connection.
 
 > **Sample copy:**
-> “Treat the relay as a dumb pipe. For sensitive data, always encrypt before `send()`, and validate peer credentials in your agent’s `on_connect()`.”
+> “Treat the relay as a dumb pipe. For sensitive data, always encrypt before `send()`, and validate peer credentials in your agent's `on_connect()`.”
 
 ---
 
@@ -148,10 +148,10 @@ Summoner supports different relay topologies:
 </p>
 
 
-**Next up:** the **Flows** page, where we’ll map out how agents transition between states. Let me know if you’d like extra code snippets or deeper dives here!
+**Next up:** the **Flows** page, where we'll map out how agents transition between states. Let me know if you'd like extra code snippets or deeper dives here!
 
 
 
 <p align="center">
-  <a href="begin_client.md">&laquo; Previous: Beginner's Guide to Summoner's Clients </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_flow.md">Next: Beginner's Guide to Agent's Flows &raquo;</a>
+  <a href="beginner.md">&laquo; Previous: Beginner's Guide (Intro)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_client.md">Next: Beginner's Guide to Summoner's Clients &raquo;</a>
 </p>

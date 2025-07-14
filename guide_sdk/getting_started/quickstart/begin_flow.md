@@ -24,12 +24,12 @@ Compare to smart contract and events released when something is done (rewatch or
 ------------
 
 
-# Beginner’s Guide to Agent Flows
+# Beginner's Guide to Agent Flows
 
 > Understand why Summoner models agent logic as flows, and how FSMs, higher abstractions, and protocol layers enable composable, reliable behaviors.
 
 **Purpose & audience**  
-- **Who:** anyone curious about the “why” behind Summoner’s flow model  
+- **Who:** anyone curious about the “why” behind Summoner's flow model  
 - **What:** core theory—FSMs, composability, and emerging patterns  
 - **Outcome:** grasp why flows simplify complex protocols and how to leverage them  
 
@@ -46,14 +46,14 @@ Compare to smart contract and events released when something is done (rewatch or
   - Explicit state diagrams catch edge cases (timeouts, retries) early  
 
 > **Sample copy:**  
-> “Instead of writing ad-hoc loops to read bytes and parse messages, Summoner lets you declare a sequence of named states. The framework handles low-level I/O, so you focus on ‘what happens next.’”
+> “Instead of writing ad-hoc loops to read bytes and parse messages, Summoner lets you declare a sequence of named states. The framework handles low-level I/O, so you focus on ‘what happens next.'”
 
 ---
 
 ## 2. Finite State Machines (FSMs)
 
 - **States**  
-  - Named stages in your agent’s lifecycle (e.g. `idle`, `asking`, `responding`)  
+  - Named stages in your agent's lifecycle (e.g. `idle`, `asking`, `responding`)  
 - **Transitions**  
   - Triggered by messages or timeouts  
   - Expressed as routes (e.g. `"idle → asking"`)  
@@ -68,7 +68,7 @@ async def on_ask(msg):
 ````
 
 > **Copy-template:**
-> “FSMs let you map out every possible step. If a message arrives out of order, you’ll know exactly which state handler should catch it.”
+> “FSMs let you map out every possible step. If a message arrives out of order, you'll know exactly which state handler should catch it.”
 
 ---
 
@@ -82,7 +82,7 @@ async def on_ask(msg):
   * You can chain routes (`a→b`, `b→c`) to form larger workflows
 * **Identity & associativity**
 
-  * “Do nothing” transitions and grouping steps don’t change the overall flow
+  * “Do nothing” transitions and grouping steps don't change the overall flow
 
 > **Sample copy:**
 > “By treating states as objects and transitions as morphisms, Summoner guarantees that combining two flows yields another valid flow. This algebraic view underpins safe, reusable patterns.”
@@ -114,7 +114,7 @@ async def on_ask(msg):
 4. **Compose flows** by reusing state names and route patterns across agents.
 
 > **Sample copy:**
-> “Whether building a chat bot, a game NPC, or a multi-party protocol, think in terms of small, testable transitions. Summoner’s flow engine then glues them into a resilient whole.”
+> “Whether building a chat bot, a game NPC, or a multi-party protocol, think in terms of small, testable transitions. Summoner's flow engine then glues them into a resilient whole.”
 
 ---
 

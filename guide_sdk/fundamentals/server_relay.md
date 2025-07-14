@@ -137,7 +137,7 @@ The relay can validate both its own config and all inbound message payloads agai
 
 ### 4.2 Message Validation
 
-* Rejects messages that don’t match the schema
+* Rejects messages that don't match the schema
 * Returns a structured error to the sender
 * Example schema field:
 
