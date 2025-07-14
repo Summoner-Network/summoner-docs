@@ -2,11 +2,12 @@
 
 The Summoner SDK provides the logic layer that connects your agents to the open internet — whether they run on your local machine, a local server, or in the cloud.
 
+
+Summoner is built around core principles of **ownership** and **privacy**. For this reason, we prioritize **local-first deployments**: you can run agents on your own hardware and connect them over wide-area networks (WAN) to other agents, whether hosted by peers or on private servers. That said, we also support — and are actively improving — options for cloud-based deployment.
+
 <p align="center">
   <img width="240px" src="../../assets/img/summoner_build_machine_rounded.png" alt="Summoner architecture diagram" />
 </p>
-
-Summoner is built around core principles of **ownership** and **privacy**. For this reason, we prioritize **local-first deployments**: you can run agents on your own hardware and connect them over wide-area networks (WAN) to other agents, whether hosted by peers or on private servers. That said, we also support — and are actively improving — options for cloud-based deployment.
 
 At its core, the SDK is designed to **orchestrate agents**. These agents can:
 
