@@ -43,6 +43,7 @@ The key scripts involved are:
 
 These scripts **assume** that both **Python 3.9+** and the **Rust toolchain** are already installed and available in your environment.
 
+If you are not yet set up, the following section will guide you through installing both languages. This is a one-time setup required before building or running the SDK.
 
 
 ### 1. Install Python
