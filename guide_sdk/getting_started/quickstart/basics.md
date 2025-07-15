@@ -21,9 +21,8 @@ Without clear protocols, systems become inefficient or fail entirely.
 ## Clients vs. Servers
 
 > [!NOTE] 
-> **Definitions.**  
-> * A _client_ is a program that initiates a connection to a server to send requests and receive responses.  
-> * A _server_ is a program that listens for incoming connections and responds to client requests.
+> **Definition.** A _client_ is a program that initiates a connection to a server to send requests and receive responses.  
+> **Definition.** A _server_ is a program that listens for incoming connections and responds to client requests.
 
 In the Summoner platform, clients form the basis of agents, while servers act as coordination points where multiple agents can connect and exchange messages. For more details, see the sections on [clients](basics_client.md) and [servers](basics_server.md).
 
