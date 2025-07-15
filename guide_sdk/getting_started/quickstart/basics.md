@@ -18,6 +18,16 @@ Without clear protocols, systems become inefficient or fail entirely.
   <img width="240px" src="../../../assets/img/no_protocol_rounded.png"/>
 </p>
 
+## Clients vs. Servers
+
+> [!NOTE] **Definitions.**  
+> * A _client_ is a program that initiates a connection to a server to send requests and receive responses.  
+> * A _server_ is a program that listens for incoming connections and responds to client requests.
+
+In the Summoner platform, clients form the basis of agents, while servers act as coordination points where multiple agents can connect and exchange messages. For more details, see the sections on [clients](basics_client.md) and [servers](basics_server.md).
+
+
+
 
 ## Summoner in Practice
 
@@ -27,7 +37,10 @@ Summoner builds on TCP, a foundational **internet protocol** introduced in the 1
   <img width="240px" src="../../../assets/img/with_protocol_rounded.png"/>
 </p>
 
-To understand how these systems interact, see how a basic [client](guide_sdk/getting_started/quickstart/basics_client.md) or [server](guide_sdk/getting_started/quickstart/basics_server.md) connects via TCP. The [Beginner's Guide](beginner.md) explains how Summoner servers and clients are structured on top of these basics.
+<!-- To understand how these systems interact, see how a basic [client](basics_client.md) or [server](basics_server.md) connects via TCP. The [Beginner's Guide](beginner.md) explains how Summoner servers and clients are structured on top of these basics. -->
+
+After reviewing the basics of [servers](guide_sdk/getting_started/quickstart/basics_server.md) and [clients](guide_sdk/getting_started/quickstart/basics_client.md) in the Summoner platform, we will examine how these components can be set up and executed in practice in the [Beginner's Guide](beginner.md).
+
 
 <p align="center">
   <a href="index.md">&laquo; Previous: Quickstart</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="basics_server.md">Next: Server (Basics) &raquo;</a>

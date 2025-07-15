@@ -1,5 +1,7 @@
 # Basics on TCP-Based Summoner Servers
 
+> [!NOTE] **Definition.** A server is a program that passively listens for incoming connections and responds to requests. In the Summoner protocol, servers enable agent coordination by relaying messages between connected clients.
+
 ## Why Start with TCP?
 
 Summoner is a protocol for orchestrating agents across machines. It builds on TCP — the bedrock of internet communication — to ensure reliable delivery, ordered messages, and stable connections. Before we explain what makes Summoner unique, we ground ourselves in the basics.
@@ -30,7 +32,9 @@ Summoner servers bind to a specific host and port. Clients initiate connections 
 
 ## Sample Code: Binding to Host and Port
 
-To better understand how TCP connections are established in practice, it helps to look at concrete code examples. The concept of "binding" refers to the process where a server reserves a specific IP address and port on which it listens for incoming connections. Clients then connect to this address\:port pair to initiate communication.
+To better understand how TCP connections are established in practice, it helps to look at concrete code examples. The concept of "binding" refers to the process where a server reserves a specific IP address and port on which it listens for incoming connections. Clients then connect to this <code>address\:port</code> pair to initiate communication.
+
+<!-- To accept connections, a server must first bind to an address: a combination of IP and port. This reserves a communication channel where clients can connect and send messages. -->
 
 Below are two simple echo server examples: one written in Python using `asyncio`, and one in Rust using the `tokio` async runtime. Both demonstrate the same principles: 
 - listening on a port, 
@@ -87,32 +91,35 @@ Understanding how machines are addressed and located on networks is essential fo
 These distinctions guide where and how to launch Summoner nodes:
 
 
-| Use Case                  | Address Type              | Description                                                 |                                                                                                                
-| ------------------------- | ------------------------- | ----------------------------------------------------------- | 
-| Isolated testing          | `localhost`               | Runs entirely on the local machine                          |                                                                                                                
-| Internal networks (LAN)   | `192.168.x.x`, `10.x.x.x` | Trusted machines within a private network                   |                                                                                                                
-| Internet-facing services  | Public IP (WAN)           | Reachable from anywhere, requires firewall/port setup       |                                                                                                                
-| Discoverability & scaling | DNS                       | Maps domain names to IPs, useful for discoverability and dynamic infrastructure   |
+| Use Case                  | Address Type              | Description                                      |
+|--------------------------|---------------------------|--------------------------------------------------|
+| Isolated testing          | `localhost`               | Runs entirely on the local machine               |
+| Internal networks (LAN)   | `192.168.x.x`, `10.x.x.x` | For trusted machines within a private network    |
+| Internet-facing services  | Public IP (WAN)           | Globally reachable, needs port/firewall setup    |
+| Discoverability & scaling | DNS                       | Resolves domain names to IPs, enabling discoverability and flexible infrastructure     |
 
 
 ## The Role of Protocols in Coordination
 
-Protocols are not just data formats, they also define expectations: 
-- _Who speaks first?_
-- _How are delays handled?_
-- _What happens when a message is malformed?_
+A **protocol** defines not just message formats, but the entire structure of interaction:
+  - _Who initiates communication?_
+  - _How are delays and retries handled?_
+  - _What happens if a message is malformed or incomplete?_
 
 Summoner introduces a higher-level protocol designed for **asynchronous, agent-to-agent communication**, enabling coordination through a shared server without relying on centralized scheduling.
 
 ## TLS and What Summoner Replaces
 
-**TLS (Transport Layer Security)** encrypts communication and verifies server identities via centralized Certificate Authorities. It secures data in transit but does not support:
+> [!NOTE]  
+> ✨ This feature is part of the upcoming **Kobold** update.
 
-* Persistent peer identities
-* Decentralized trust
-* Agent-level message signing or verification
+**TLS (Transport Layer Security)** encrypts communication and verifies server identities via centralized Certificate Authorities. While TLS secures data in transit, it lacks:
 
-**Summoner introduces a cryptographically verifiable identity layer**, replacing TLS with agent-specific keys and persistent reputations. This enables secure messaging and coordination without third-party trust anchors.
+  * Persistent peer identities tied to agents
+  * Decentralized trust without certificate authorities
+  * Fine-grained message-level verification
+
+Summoner replaces TLS with **agent-level cryptography**: each agent owns private keys, signs its messages, and verifies others — all without relying on third-party infrastructure.
 
 In essence, Summoner builds on TCP's transport layer, bypasses TLS's centralized model, and defines a new coordination protocol tailored for autonomous agents.
 

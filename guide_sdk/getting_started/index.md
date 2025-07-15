@@ -25,7 +25,7 @@ The SDK is modular by design. It is built around a core library (`summoner-core`
 
 ### 1. Understanding the SDK's role in the Summoner ecosystem
 
-* [What is the Summoner SDK for?](what_is.md)
+* [What Does the Summoner SDK Do?](what_is.md)
 
 ### 2. Setting up your development environment
 
@@ -54,5 +54,5 @@ Whether you are exploring agent-based programming for the first time or integrat
 <p align="center">
   <a href="../index.md">&laquo; Previous: Summoner SDK Guides</a>
   &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="what_is.md">Next: What is the Summoner SDK for? &raquo;</a>
+  <a href="what_is.md">Next: What Does the Summoner SDK Do? &raquo;</a>
 </p>

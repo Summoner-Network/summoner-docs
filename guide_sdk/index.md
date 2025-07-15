@@ -8,7 +8,7 @@ We begin with an introduction to the SDK, its core principles, and installation 
 
 [**Getting Started**](getting_started/index.md)
 
-* [What is the Summoner SDK for?](getting_started/what_is.md)
+* [What Does the Summoner SDK Do?](getting_started/what_is.md)
 * [Prerequisites](getting_started/prerequisites.md)
 * [Installation](getting_started/installation.md)
 * [Quickstart](getting_started/quickstart/index.md)

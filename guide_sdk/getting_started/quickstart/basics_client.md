@@ -1,24 +1,39 @@
 # Basics on TCP-Based Summoner Clients
 
-Summoner clients are built on top of Python's `asyncio` TCP functionality, but they go far beyond basic socket connections. The client architecture introduces orchestration logic and a security layer, transforming a simple TCP client into a programmable, composable agent.
+<!-- Given that we still have the server page and the intro page to review, the following modification might be enough? -->
 
-## From Client to Agent
+> [!NOTE] **Definition.** A _client_ is a program that initiates a connection to a server to send requests and receive responses. In Summoner, clients evolve into programmable agents that go far beyond this basic role.
 
-A **Summoner agent** begins as a TCP client, but adds two essential layers:
+**Summoner clients** are built on top of Python's `asyncio` TCP functionality, but they go far beyond basic socket connections. The client architecture forms the foundation for **Summoner agents**, which add orchestration logic and a security layer, transforming a simple TCP client into a programmable, composable agent.
 
-* **Orchestration**: The ability to route and manage behaviors dynamically across internal components.
-* **✨<span style="color:#0097A1;">(Planned)</span>✨ Decentralized Identity**: Each agent cryptographically signs messages, owns a verifiable identity, and can participate in secure agent-to-agent communication.
+## From Summoner Client to Summoner Agent
+
+<!-- A **Summoner agent** begins as a TCP-based Summoner client, but adds two essential layers: -->
+
+> [!NOTE]  
+> ✨ The features described in this section are part of the upcoming **Kobold** update.
+
+At the lowest level, a **Summoner agent** is just a TCP-based Summoner client: it connects to a server and exchanges messages. But Summoner layers additional capabilities on top:
+
+* **Orchestration**: the ability to initiate or complete tasks through a [programmable graph of handlers](#graphs-of-endpoints), allowing the agent to behave as a coordinated system.
+* **Decentralized Identity**: each agent cryptographically signs messages, owns a verifiable identity, and participates in secure agent-to-agent communication.
+* **Reputation Logic**: the combination of orchestration and decentralized identity enables richer control over protocol event validity, allowing agents to infer trust through reputation metrics.
 
 This leads to the working definition:
 
-> **Agent = TCP Client + Decentralized Identity + Orchestration Logic**
+> **Agent = TCP Client + Orchestration + Decentralized Identity + Reputation Logic**
+
 
 ## Graphs of Endpoints
 
-Clients and agents in Summoner are not monolithic. Internally, they are structured as **graphs of endpoints**:
+
+Summoner clients and agents are not monolithic. Internally, they are structured as **graphs of endpoints**:
 
 * Each **endpoint** is a self-contained handler for a route or message type.
 * Endpoints can act independently or in cooperation, enabling **subagents** to form inside larger agent structures.
+
+> [!NOTE]
+> In other words, an _endpoint_ is a named message handler — a function that reacts to specific routes or message types. You can think of it like a local mailbox, waiting to respond when the right message arrives.
 
 This graph-based architecture enables modularity: endpoints can be created, composed, and nested to form rich agent behaviors.
 
@@ -36,12 +51,12 @@ This graph-based architecture enables modularity: endpoints can be created, comp
   <tr>
     <td>
       <div align="center">
-        <img width="240px" src="../../../assets/img/agent_simple2_rounded.png"/>
+        <img width="270px" src="../../../assets/img/agent_simple3_rounded.png"/>
       </div>
     </td>
     <td>
       <div align="center">
-        <img width="372px" src="../../../assets/img/agent_complex2_rounded.png"/>
+        <img width="435px" src="../../../assets/img/agent_complex3_rounded.png"/>
       </div>
     </td>
   </tr>
@@ -66,7 +81,7 @@ This makes agents not just reactive, but **coordinated systems of intent**.
 A key design principle in Summoner is composability:
 
 * A **collection of endpoints** can be treated as a higher-order agent.
-* Subagents can be embedded, routed, or delegated to — because all communication is structured and orchestrated consistently.
+* Subagents can be embedded, routed, or delegated to, because all communication is structured and orchestrated consistently.
 
 This allows you to:
 
@@ -75,7 +90,7 @@ This allows you to:
 
 <p align="center">
     <strong>Composition of Three Simple Agents into a Multi-Subagent System</strong><br/>
-    <img width="440px" src="../../../assets/img/agent_composition.png"/>
+    <img width="470px" src="../../../assets/img/agent_composition.png"/>
 </p>
 
 

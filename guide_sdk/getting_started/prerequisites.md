@@ -65,6 +65,6 @@ For users interested in the **theoretical foundations of agent design**, the SDK
 
 
 <p align="center">
-  <a href="what_is.md">&laquo; Previous: What is Summoner's SDK used for?</a>  &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="installation.md">Next: Installation &raquo;</a>
+  <a href="what_is.md">&laquo; Previous: What Does the Summoner SDK Do?</a>  &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="installation.md">Next: Installation &raquo;</a>
 </p>
 

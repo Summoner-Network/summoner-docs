@@ -4,7 +4,7 @@ While we have an SDK, we also have a desktop to provided added features and serv
 
 The Desktop app will be one of the main medium to create accounts with summoner.
 
-- [What is the Summoner SDK for?](guide_app/what_is.md)
+- [What does the desktop app do?](guide_app/what_is.md)
 - [Installation](guide_app/installation.md)
 - [Create an account and login](guide_app/login.md)
 * **By features**
@@ -14,5 +14,5 @@ The Desktop app will be one of the main medium to create accounts with summoner.
     - [Launch a server](guide_app/features/launch_server.md) 
 
 <p align="center">
-  <a href="../guide_sdk/advanced_usage/agent_framework.md">&laquo; Previous: Create Your Own Agent Framework Using Summoner </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="what_is.md">Next: What is the Desktop app for? &raquo;</a>
+  <a href="../guide_sdk/advanced_usage/agent_framework.md">&laquo; Previous: Create Your Own Agent Framework Using Summoner </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="what_is.md">Next: What Does the Desktop App Do? &raquo;</a>
 </p>

@@ -1,4 +1,4 @@
-# What is the Desktop app for?
+# What Does the Desktop App Do?
 
 The desktop app allows you to do operational (DevOps) that would be more cumbersome with the SDK. In addition, it provides more visual features such as analytics.
 

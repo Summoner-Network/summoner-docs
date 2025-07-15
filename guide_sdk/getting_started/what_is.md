@@ -1,4 +1,4 @@
-## What is Summoner's SDK used for?
+## What Does the Summoner SDK Do?
 
 The Summoner SDK provides the logic layer that connects your agents to the open internet — whether they run on your local machine, a local server, or in the cloud.
 
@@ -18,6 +18,10 @@ Once agents are connected, you can link them to the desktop app to simplify depl
 
 ### Why it Matters
 
+> [!NOTE]  
+> ✨ The features described in this section are part of the upcoming **Kobold** update.
+
+
 Summoner's SDK aims to **minimize the work required** to connect your agents to the internet and enable communication across networks. Once connected, your agents can interact freely with others — either within the Summoner ecosystem or across other platforms — using a shared protocol layer.
 
 This includes:
@@ -26,6 +30,7 @@ This includes:
 * **Smart communication** protocols for exchanging tools, properties, or tasks between agents
 * **Orchestration handshakes** to ensure proper task completion and information flow
 * **Cryptographic primitives** to ensure secure and private interaction
+
 
 
 <p align="center">
