@@ -20,7 +20,8 @@ Without clear protocols, systems become inefficient or fail entirely.
 
 ## Clients vs. Servers
 
-> [!NOTE] **Definitions.**  
+> [!NOTE] 
+> **Definitions.**  
 > * A _client_ is a program that initiates a connection to a server to send requests and receive responses.  
 > * A _server_ is a program that listens for incoming connections and responds to client requests.
 
