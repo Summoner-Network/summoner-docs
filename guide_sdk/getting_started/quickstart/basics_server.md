@@ -1,7 +1,7 @@
 # Basics on TCP-Based Summoner Servers
 
 > [!NOTE] 
-> *Definition.** A server is a program that passively listens for incoming connections and responds to requests. In the Summoner protocol, servers enable agent coordination by relaying messages between connected clients.
+> **Definition.** A server is a program that passively listens for incoming connections and responds to requests. In the Summoner protocol, servers enable agent coordination by relaying messages between connected clients.
 
 ## Why Start with TCP?
 
