@@ -7,6 +7,7 @@
     - [ ] Update [What Does the Summoner SDK Do?](guide_sdk/getting_started/what_is.md)
     - [ ] Update [server's basics](guide_sdk/getting_started/quickstart/basics_server.md)
     - [ ] Update [client's basics](guide_sdk/getting_started/quickstart/basics_client.md)
+    - [ ] Update [Getting started: Server](guide_sdk/getting_started/quickstart/begin_server.md)
 
 ## 📚 Documentation Overview
 

@@ -10,7 +10,7 @@
 Because the server is open source, users may modify its behavior — for example, to observe, reorder, delay, or drop messages. This reflects a key design principle: **trust should be established at the edges, not in the relay.**
 
 <p align="center">
-  <img width="240px" src="../../../assets/img/summoner_observed_rounded.png"/>
+  <img width="270px" src="../../../assets/img/summoner_observed_rounded.png"/>
 </p>
 
 This architecture prioritizes flexibility and decentralization, but it also shifts critical responsibilities to the agents and the protocols they follow. Rather than relying on the server for safety, developers are encouraged to adopt the following layered approach to structure trust and coordination:
@@ -23,7 +23,7 @@ This architecture prioritizes flexibility and decentralization, but it also shif
 
 > These layers complement each other. Identity confirms who you are, orchestration defines what is allowed, and handshakes ensure both sides agree before interaction.
 
-📘 For more on implementing these safeguards, see [Advanced Topics](../../advanced_usage/index.md).
+📜 For more on implementing these safeguards, see [Advanced Topics](../../advanced_usage/index.md).
 
 
 ## Running a Server (Python or Rust)
@@ -160,7 +160,7 @@ This time the server will **ignore the Python arguments** and use the config fil
 > If both code and config specify a host or port, the **config file takes precedence**. This makes it easier to manage server deployments with minimal code changes.
 
 
-📘 See [Server Fundamentals](../../fundamentals/server_relay.md) for additional configuration options (e.g. logging, developer flags).
+📜 See [Server Fundamentals](../../fundamentals/server_relay.md) for additional configuration options (e.g. logging, developer flags).
 
 
 ## Communication Model: Broadcast by Default
@@ -185,7 +185,7 @@ This model simplifies transport and encourages openness, but it also means each 
 > [!IMPORTANT]
 > It is strongly recommended that you implement identity checks, message validation, and encryption within your agent logic. The SDK provides hook functions to help with this.
 
-📘 See [Advanced Usage](../../advanced_usage/index.md) for:
+📜 See [Advanced Usage](../../advanced_usage/index.md) for:
 
 * Message filtering and validation
 * Encryption and signing
