@@ -176,10 +176,10 @@ As of July 2025, Summoner servers use **broadcast messaging**:
 ```mermaid
 flowchart LR
     A[Client A] -->|Message| Server
-    Server --> B
-    Server --> C
-    Server --> D
-    Server --> E
+    Server --> B[Client B]
+    Server --> C[Client C]
+    Server --> D[Client D]
+    Server --> E[Client E]
 ```
 
 This model simplifies transport and encourages openness, but it also means each agent is responsible for its own safety:
