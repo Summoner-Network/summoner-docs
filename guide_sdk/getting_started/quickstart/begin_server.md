@@ -13,9 +13,7 @@ Because the server is open source, users may modify its behavior — for example
   <img width="240px" src="../../../assets/img/summoner_observed_rounded.png"/>
 </p>
 
-This architecture prioritizes flexibility and decentralization, but it also shifts critical responsibilities to the agents and the protocols they follow.
-
-Rather than relying on the server for safety, developers are encouraged to adopt the following layered approach to structure trust and coordination:
+This architecture prioritizes flexibility and decentralization, but it also shifts critical responsibilities to the agents and the protocols they follow. Rather than relying on the server for safety, developers are encouraged to adopt the following layered approach to structure trust and coordination:
 
 | Layer             | Purpose in a Trustless Environment                                      |
 | ----------------- | ----------------------------------------------------------------------- |
