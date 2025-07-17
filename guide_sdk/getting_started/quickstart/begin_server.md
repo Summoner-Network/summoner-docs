@@ -176,9 +176,6 @@ As of July 2025, Summoner servers use **broadcast messaging**:
 ```mermaid
 flowchart LR
     A[Client A] -->|Message| Server
-    B[Client B] -->|Message| Server
-    C[Client C] -->|Message| Server
-    Server --> A
     Server --> B
     Server --> C
 ```
