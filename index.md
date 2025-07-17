@@ -34,7 +34,7 @@
                 - [Client](guide_sdk/getting_started/quickstart/basics_client.md)
                 - [Agent](guide_sdk/getting_started/quickstart/basics_agent.md)
                 - [Server](guide_sdk/getting_started/quickstart/basics_server.md)
-            - [Beginner guide](guide_sdk/getting_started/quickstart/beginner.md)
+            - [Beginner guide](guide_sdk/getting_started/quickstart/begin.md)
                 - [Clients versus agents](guide_sdk/getting_started/quickstart/begin_client.md)
                 - [Servers versus clients](guide_sdk/getting_started/quickstart/begin_server.md)
                 - [Agent behaviour as flows](guide_sdk/getting_started/quickstart/begin_flow.md)

@@ -1,4 +1,4 @@
-# Beginner's Guide to Agent's Flows
+# Orchestrating Agent Behavior Using Flows
 
 Very light code use, but overview is good (with many insights if possible)
 
@@ -65,7 +65,7 @@ Compare to smart contract and events released when something is done (rewatch or
 @agent.receive(route="idle → asking")
 async def on_ask(msg):
     # move from idle to asking
-````
+```
 
 > **Copy-template:**
 > “FSMs let you map out every possible step. If a message arrives out of order, you'll know exactly which state handler should catch it.”
@@ -127,5 +127,5 @@ async def on_ask(msg):
 
 
 <p align="center">
-  <a href="begin_server.md">&laquo; Previous: Beginner's Guide to Summoner's Servers </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_async.md">Next: Beginner's Guide to Async Programming &raquo;</a>
+  <a href="begin_server.md">&laquo; Previous: Getting Started with Clients & Agents </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_async.md">Next: Asynchronous Programming in Summoner &raquo;</a>
 </p>

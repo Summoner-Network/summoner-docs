@@ -1,4 +1,4 @@
-# Beginner's Guide to Summoner's Clients
+# Getting Started with Summoner Clients & Agents
 
 Very light code use, but overview is good (with many insights if possible)
 
@@ -202,7 +202,7 @@ async def after_ask(): ...
 ---
 
 <p align="center">
-  <a href="beginner.md">&laquo; Previous: Beginner's Guide</a>
+  <a href="begin.md">&laquo; Previous: Beginner's Guide</a>
   &nbsp;|&nbsp;
   <a href="begin_server.md">Next: Servers vs Clients &raquo;</a>
 </p>
@@ -573,6 +573,6 @@ In future tutorials, we will explore how to use these path-like routes to build 
 
 
 <p align="center">
-  <a href="begin_server.md">&laquo; Previous: Beginner's Guide to Summoner's Servers </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_flow.md">Next: Beginner's Guide to Agent's Flows &raquo;</a>
+  <a href="begin_server.md">&laquo; Previous: Getting Started with Servers </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_flow.md">Next: Orchestrating Agent Using Flows &raquo;</a>
 </p>
 

@@ -1,157 +1,219 @@
-# Beginner's Guide to Summoner's Servers
+# Getting Started with Summoner Servers
+
+> How to think about and run a Summoner server
 
 
-Very light code use, but overview is good (with many insights if possible)
+## The Trust Model: Servers Are Just Pipes
 
-How to launch and use servers
+**Summoner servers are untrusted relays.** They operate as public message hubs where any connected client can send, receive, or disconnect at any time. By default, servers forward all messages to all clients (excluding the sender), without enforcing validation, authentication, access control, or delivery guarantees.
 
-Servers are relay and should not be trusted
+Because the server is open source, users may modify its behavior — for example, to observe, reorder, delay, or drop messages. This reflects a key design principle: **trust should be established at the edges, not in the relay.**
+
+<p align="center">
+  <img width="240px" src="../../../assets/img/summoner_observed_rounded.png"/>
+</p>
+
+This architecture prioritizes flexibility and decentralization, but it also shifts critical responsibilities to the agents and the protocols they follow.
+
+Rather than relying on the server for safety, developers are encouraged to adopt the following layered approach to structure trust and coordination:
+
+| Layer             | Purpose in a Trustless Environment                                      |
+| ----------------- | ----------------------------------------------------------------------- |
+| **Identity**      | Agents use verifiable DIDs and sign their messages                      |
+| **Orchestration** | Agents follow flows that declare valid behaviors and expected states    |
+| **Handshakes**    | Agents establish shared expectations through protocol-level negotiation |
+
+> These layers complement each other. Identity confirms who you are, orchestration defines what is allowed, and handshakes ensure both sides agree before interaction.
+
+📘 For more on implementing these safeguards, see [Advanced Topics](../../advanced_usage/index.md).
 
 
-How to program a server
+## Running a Server (Python or Rust)
 
-Server:
-- broacast
-- dedicated (relay)
-- host client
-- hybrid (event several hsot +  possible independent relay)
+Summoner supports two server modes out of the box:
+**Python-native** (default) and **Rust-backed** (via config). Both expose the same interface from your Python scripts.
 
+Before continuing, ensure the Summoner SDK is installed. You can then create and launch a server by following one of the two options below.
 
----------
+### Option 1: Python Server (No Config Required)
 
-
-
-Here's a structured rewrite for **`begin_server.md`** that mirrors the style of the client guide—light on code, rich in conceptual insight.
-
-````markdown
----
-sidebar_label: Servers vs Clients
----
-
-# Beginner's Guide to Summoner Servers
-
-> Minimal examples and core concepts for launching a Summoner relay server. Understand the server's role, trust boundaries, and available modes.
-
-**Purpose & audience**  
-- **Who:** developers deploying a relay server in dev or production  
-- **What:**  
-  1. How to start the server via CLI or code  
-  2. The four server modes and when to use each  
-  3. Why the relay is untrusted and how to secure messages  
-- **Outcome:**  
-  - Have a running server in minutes  
-  - Pick the right deployment mode  
-  - Grasp basic security considerations
-
----
-
-## 1. Starting the Relay
-
-### 1.1 CLI mode
-
-```bash
-# Python relay
-summoner-server start --config path/to/config.yaml
-
-# Rust relay (higher performance)
-summoner-server-rust start --config path/to/config.yaml
-````
-
-* **Flags override** the config file (e.g. `--port 9000`).
-* Default `config.yaml` fields:
-
-  ```yaml
-  host: 0.0.0.0
-  port: 8000
-  max_connections: 100
-  ```
-
-### 1.2 Programmatic mode
+Create a file named `first_server.py` in your working directory:
 
 ```python
 from summoner.server import SummonerServer
 
 if __name__ == "__main__":
-    server = SummonerServer(name="my_relay")
-    server.run(config_path="config.yaml")
+    SummonerServer(name="first_server").run()
 ```
 
-> **Sample copy:**
-> “Use the CLI for quick spin-ups. For embedding or advanced orchestration, start the server from Python code.”
+Run the server:
 
----
+```bash
+python first_server.py
+```
 
-## 2. Server Modes
+This will launch the default Python server on `127.0.0.1:8888`. The output should look like:
 
-Summoner supports different relay topologies:
+```text
+[DEBUG] Config file not found: 
+2025-07-17 00:53:38.149 - first_server - INFO - Python server listening on 127.0.0.1:8888
+```
 
-| Mode                | Description                                                       | Use case                                 |
-| ------------------- | ----------------------------------------------------------------- | ---------------------------------------- |
-| **Broadcast**       | Sends every message to all connected agents (pub/sub style)       | Chat rooms, global notifications         |
-| **Dedicated**       | Routes only between predefined pairs or groups (point-to-point)   | Private pipelines, 1-on-1 sessions       |
-| **Embedded (Host)** | Runs the relay inside a client process for local testing          | Rapid prototyping, offline demos         |
-| **Hybrid**          | Multiple relay instances forward messages among themselves (mesh) | Geo-distributed deployments, L2 networks |
+### Option 2: Rust Server (Using a Config File)
 
-> **Sample copy:**
-> “Choose Broadcast for open networks. Use Dedicated when messages should go only to specific agents. Embedded mode lets you run a mini-relay in the same process, and Hybrid links multiple relays across hosts.”
+To use the high-performance Rust implementation, follow these steps:
 
----
+1. Create a `server_config.json` file:
 
-## 3. Security & Trust
+   ```json
+   {
+     "version": "rss_3"
+   }
+   ```
 
-* **Untrusted Relay**
+2. Update your Python script:
 
-  * The server forwards messages blindly.
-  * Do *not* rely on it for confidentiality or integrity.
+   ```python
+   from summoner.server import SummonerServer
 
-* **End-to-end Encryption**
+   if __name__ == "__main__":
+       SummonerServer(name="first_server").run(config_path="server_config.json")
+   ```
 
-  * Encrypt payloads on the client side.
-  * Use Summoner's protocol hooks to negotiate keys before sending.
+3. Run the server:
 
-* **Handshake & Authentication**
+   ```bash
+   python first_server.py
+   ```
 
-  * Implement a handshake in `on_connect` to verify identities.
-  * Reject unauthorized clients by closing the connection.
+You should now see:
 
-> **Sample copy:**
-> “Treat the relay as a dumb pipe. For sensitive data, always encrypt before `send()`, and validate peer credentials in your agent's `on_connect()`.”
+```text
+[DEBUG] Loaded config from: server_config.json
+2025-07-17 00:58:40.428 - first_server - INFO - 🚀 Rust server listening on 127.0.0.1:8888
+```
 
----
 
-## 4. Logging & Monitoring
+Here is the improved version that incorporates your points — especially demonstrating clearly that values in the config file **override** those given in the Python code. Option 2 now explicitly builds on Option 1:
 
-* **Built-in logs** at INFO level show connections/disconnections.
-* **Custom handlers**:
 
-  ```python
-  import logging
-  from summoner.server import SummonerServer
+## Customizing Host and Port
 
-  logger = logging.getLogger("summoner.server")
-  fh = logging.FileHandler("logs/relay.log")
-  logger.addHandler(fh)
-  logger.setLevel(logging.DEBUG)
+By default, the server listens on `127.0.0.1:8888`. You can change this in two ways: either in the Python code or in the config file.
 
-  SummonerServer(name="relay").run()
-  ```
-* **Metrics endpoint** (if enabled): scrape Prometheus metrics on `/metrics`.
 
-> **Tip:** integrate with your orchestration platform (Kubernetes probes, systemd) using the metrics or health-check flags.
+### Option 1: Set Address in Code
 
----
+You can specify a custom host and port directly in `.run()`:
+
+```python
+from summoner.server import SummonerServer
+
+if __name__ == "__main__":
+    SummonerServer(name="first_server").run(
+        host="127.0.0.1",
+        port=1234,
+        config_path="server_config.json"
+    )
+```
+
+Now run the server:
+
+```bash
+python first_server.py
+```
+
+You should see:
+
+```text
+[DEBUG] Loaded config from: server_config.json
+2025-07-17 01:03:29.646 - first_server - INFO - 🚀 Rust server listening on 127.0.0.1:1234
+```
+
+This confirms the address from code was used.
+
+
+### Option 2: Set Address in Config File
+
+Now **keep the Python code from Option 1 unchanged**, and instead modify `server_config.json`:
+
+```json
+{
+  "host": "0.0.0.0",
+  "port": 5555,
+  "version": "rss_3"
+}
+```
+
+Then rerun:
+
+```bash
+python first_server.py
+```
+
+This time the server will **ignore the Python arguments** and use the config file instead:
+
+```text
+[DEBUG] Loaded config from: server_config.json
+2025-07-17 01:07:32.500 - first_server - INFO - 🚀 Rust server listening on 0.0.0.0:5555
+```
+
+> [!TIP]
+> If both code and config specify a host or port, the **config file takes precedence**. This makes it easier to manage server deployments with minimal code changes.
+
+
+📘 See [Server Fundamentals](../../fundamentals/server_relay.md) for additional configuration options (e.g. logging, developer flags).
+
+
+## Communication Model: Broadcast by Default
+
+As of July 2025, Summoner servers use **broadcast messaging**:
+
+* Every message is sent to all connected clients **except** the sender
+* Clients must decide whether to process or ignore what they receive
+* There is no concept of "targeted delivery" at the server level (yet)
+
+```mermaid
+flowchart LR
+    A[Client A] -->|Message| Server
+    B[Client B] -->|Message| Server
+    C[Client C] -->|Message| Server
+    Server --> A
+    Server --> B
+    Server --> C
+```
+
+This model simplifies transport and encourages openness, but it also means each agent is responsible for its own safety:
+
+> [!IMPORTANT]
+> It is strongly recommended that you implement identity checks, message validation, and encryption within your agent logic. The SDK provides hook functions to help with this.
+
+📘 See [Advanced Usage](../../advanced_usage/index.md) for:
+
+* Message filtering and validation
+* Encryption and signing
+* Upcoming server modes (Kobold update)
+
+
+## Roadmap: Server Modes and Routing Models
+
+The current broadcast model works well for open interaction. But depending on your use case, different routing topologies may be more appropriate. These are under active development.
+
+| Mode          | Description                               | Example Use Case                     |
+| ------------- | ----------------------------------------- | ------------------------------------ |
+| **Broadcast** | All agents receive all messages (default) | Chat rooms, public boards            |
+| **Dedicated** | Direct routing between a defined set of agents         | Private interactions, 2–3 player negotiations   |
+| **Hosted**    | A central agent receives all messages and forwards them to the appropriate recipients  | Evaluation arenas, game masters      |
+| **Hybrid**    | Combines broadcast, dedicated, and hosted modes | MMORPGs: players, events, and NPCs in sync |
+
+> [!NOTE]
+> The upcoming **Kobold** update will include:
+>
+> * Dedicated messaging
+> * Handshake enforcement
+> * Peer trust config and whitelisting
+
 
 <p align="center">
-  <a href="begin_client.md">&laquo; Previous: Clients vs Agents</a>
-  &nbsp;|&nbsp;
-  <a href="begin_flow.md">Next: Agent Flows &raquo;</a>
-</p>
-
-
-**Next up:** the **Flows** page, where we'll map out how agents transition between states. Let me know if you'd like extra code snippets or deeper dives here!
-
-
-
-<p align="center">
-  <a href="beginner.md">&laquo; Previous: Beginner's Guide (Intro)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_client.md">Next: Beginner's Guide to Summoner's Clients &raquo;</a>
+  <a href="begin.md">&laquo; Previous: Beginner's Guide (Intro)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_client.md">Next: Getting Started with Clients & Agents &raquo;</a>
 </p>

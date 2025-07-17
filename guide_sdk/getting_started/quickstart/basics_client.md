@@ -1,4 +1,4 @@
-# Basics on TCP-Based Summoner Clients
+# Basics of Summoner Clients
 
 <!-- Given that we still have the server page and the intro page to review, the following modification might be enough? -->
 
@@ -9,12 +9,12 @@
 
 ## From Summoner Client to Summoner Agent
 
-<!-- A **Summoner agent** begins as a TCP-based Summoner client, but adds two essential layers: -->
-
 > [!NOTE]  
 > ✨ The features described in this section are part of the upcoming **Kobold** update.
 
-At the lowest level, a **Summoner agent** is just a TCP-based Summoner client: it connects to a server and exchanges messages. But Summoner layers additional capabilities on top:
+At the lowest level, a **Summoner agent** is just a Summoner client: it connects to a TCP server and exchanges messages. But Summoner layers additional capabilities on top:
+
+<!-- A **Summoner agent** begins as a Summoner client, but adds two essential layers: -->
 
 * **Orchestration**: the ability to initiate or complete tasks through a [programmable graph of handlers](#graphs-of-endpoints), allowing the agent to behave as a coordinated system.
 * **Decentralized Identity**: each agent cryptographically signs messages, owns a verifiable identity, and participates in secure agent-to-agent communication.
@@ -65,8 +65,6 @@ This graph-based architecture enables modularity: endpoints can be created, comp
 
 </div>
 
-
-
 ## Finite-State Coordination
 
 The orchestration logic behind these endpoint graphs is modeled as a **finite-state machine (FSM)**:
@@ -103,6 +101,6 @@ Summoner clients, therefore, are not just TCP sockets with callbacks. They are t
 
 <p align="center">
   <a href="basics_server.md">&laquo; Previous: Server (Basics) </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 
-  <a href="beginner.md">Next: Beginner's Guide &raquo;</a>
+  <a href="begin.md">Next: Beginner's Guide &raquo;</a>
 </p>
 

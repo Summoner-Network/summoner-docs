@@ -40,7 +40,7 @@ The SDK is modular by design. It is built around a core library (`summoner-core`
     * [Server](quickstart/basics_server.md)
     * [Client](quickstart/basics_client.md)
     
-  * [Beginner guide](quickstart/beginner.md): Foundational ideas
+  * [Beginner guide](quickstart/begin.md): Foundational ideas
 
     * [Servers vs Clients](quickstart/begin_server.md)
     * [Clients vs Agents](quickstart/begin_client.md)

@@ -1,4 +1,4 @@
-# Beginner's Guide to Async Programming
+# Working with Asynchronous Programming in Summoner
 
 Explain the principles of parallelism and async
 
@@ -267,5 +267,5 @@ if __name__ == "__main__":
 
 
 <p align="center">
-  <a href="begin_flow.md">&laquo; Previous: Beginner's Guide to Agent's Flows </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../../fundamentals/index.md">Next: Fundamentals &raquo;</a>
+  <a href="begin_flow.md">&laquo; Previous: Orchestrating Agent Using Flows </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../../fundamentals/index.md">Next: Fundamentals &raquo;</a>
 </p>

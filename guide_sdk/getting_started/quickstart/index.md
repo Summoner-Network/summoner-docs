@@ -11,7 +11,7 @@ This Quickstart introduces the core concepts required to work with the Summoner 
    * [Basics](basics.md) —  *situates Summoner's protocol layer on top of TCP*
 
    You will then explore how Summoner builds on TCP through conceptual illustrations:  
-   * [Server](basics_server.md) — *explores how the server handles connections and routes communication*
+   * [Server](basics_server.md) — *explores how a TCP server handles connections and routes communication*
    * [Client](basics_client.md) — *explores how a TCP client fits into Summoner's architecture*
 
 
@@ -19,8 +19,8 @@ This Quickstart introduces the core concepts required to work with the Summoner 
 
 Next, we examine how the components interact within the broader system and how communication is mediated:
 
-* [Servers vs Clients](begin_server.md) — *shows how servers relay messages to coordinate communication between clients*
-* [Clients vs Agents](begin_client.md) — *explores how a TCP client fits into Summoner's architecture*
+* [Getting Started With Servers](begin_server.md) — *shows how servers relay messages to coordinate communication between clients*
+* [Getting Started With Clients & Agents](begin_client.md) — *explores how a TCP client fits into Summoner's architecture*
 
 
 ### 3. **Agent Behavior and Execution Model**  
