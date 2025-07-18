@@ -3,7 +3,7 @@
 This guide walks through how to set up the [`summoner-core`](https://github.com/Summoner-Network/summoner-core) SDK on Windows.
 
 <p align="center">
-  <img width="240px" src="../../assets/img/windows_install_rounded.png"/>
+  <img width="340px" src="../../assets/img/windows_install_rounded.png"/>
 </p>
 
 > [!WARNING]
