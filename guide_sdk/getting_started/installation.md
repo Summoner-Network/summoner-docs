@@ -14,6 +14,8 @@ Each of these repositories contains its own `setup.sh`, `install.sh` or build sc
   <img width="240px" src="../../assets/img/alchemia_rounded.png"/>
 </p>
 
+For Windows users, we provide a basic setup guide focused on installation commands [here](windows_install.md).
+
 ## A Template-Based SDK
 
 The [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) repository is a **GitHub template repository**, meaning users should not modify it directly. Instead, use GitHub's "Use this template" feature to generate a new repository that includes only the installation logic.

@@ -11,7 +11,7 @@ Users on Windows may still use the SDK, but installation will require some adapt
   <img width="240px" src="../../assets/img/summoners_library_rounded.png"/>
 </p>
 
-Please note that some components — especially the [Rust installation](https://www.rust-lang.org/tools/install) — may differ significantly from Unix workflows. However, Windows users can still rely on the **Python-only implementation** of the server (by commenting out the Rust-based imports in the server code) and freely use the client code, which is entirely written in Python.
+Please note that some components — especially the [Rust installation](https://www.rust-lang.org/tools/install) — may differ significantly from Unix workflows. However, Windows users can still rely on the **Python-only implementation** of the server and can freely use the client code, which is entirely written in Python.
 
 
 ## Software Requirements
