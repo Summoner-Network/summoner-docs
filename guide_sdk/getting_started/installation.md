@@ -14,7 +14,7 @@ Each of these repositories contains its own `setup.sh`, `install.sh` or build sc
   <img width="280px" src="../../assets/img/alchemia_rounded.png"/>
 </p>
 
-For Windows users, we provide a basic setup guide focused on installation commands [here](windows_install.md).
+For Windows users, we provide a setup guide adapted to the Windows environment [here](windows_install.md).
 
 ## A Template-Based SDK
 
