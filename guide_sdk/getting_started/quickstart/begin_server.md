@@ -189,7 +189,7 @@ This model simplifies transport and encourages openness, but it also means each 
 
 * Message filtering and validation
 * Encryption and signing
-* Upcoming server modes (Kobold update)
+* Upcoming server modes (Aurora update)
 
 
 ## Roadmap: Server Modes and Routing Models
@@ -204,7 +204,7 @@ The current broadcast model works well for open interaction. But depending on yo
 | **Hybrid**    | Combines broadcast, dedicated, and hosted modes | MMORPGs: players, events, and NPCs in sync |
 
 > [!NOTE]
-> The upcoming **Kobold** update will include:
+> The upcoming **Aurora** update will include:
 >
 > * Dedicated messaging
 > * Handshake enforcement

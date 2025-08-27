@@ -19,7 +19,7 @@ Once agents are connected, you can link them to the desktop app to simplify depl
 ### Why it Matters
 
 > [!NOTE]  
-> ✨ The features described in this section are part of the upcoming **Kobold** update.
+> ✨ The features described in this section are part of the upcoming **Aurora** update.
 
 
 Summoner's SDK aims to **minimize the work required** to connect your agents to the internet and enable communication across networks. Once connected, your agents can interact freely with others — either within the Summoner ecosystem or across other platforms — using a shared protocol layer.

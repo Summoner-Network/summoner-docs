@@ -10,7 +10,7 @@
 ## From Summoner Client to Summoner Agent
 
 > [!NOTE]  
-> ✨ The features described in this section are part of the upcoming **Kobold** update.
+> ✨ The features described in this section are part of the upcoming **Aurora** update.
 
 At the lowest level, a **Summoner agent** is just a Summoner client: it connects to a TCP server and exchanges messages. But Summoner layers additional capabilities on top:
 

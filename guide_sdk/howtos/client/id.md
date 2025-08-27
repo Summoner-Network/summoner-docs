@@ -2,7 +2,7 @@
 
 We need agent libraries but explain how the ID can just be modeled by using hooks
 
-Implement without ID and then use kobold.
+Implement without ID and then use aurora.
 
 
  <p align="center">

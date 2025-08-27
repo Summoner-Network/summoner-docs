@@ -17,7 +17,7 @@ To begin, you can clone the [`summoner-sdk`](https://github.com/Summoner-Network
 >
 > This section of the documentation focuses on the SDK: how to install it, run clients and servers locally, and use sample agents from the [`summoner-agents`](https://github.com/Summoner-Network/summoner-agents) repository.
 
-The SDK is modular by design. It is built around a core library (`summoner-core`) and includes optional components that you can add or remove as needed. We will showcase the SDK using both its core modules and common extensions — for example, the agent classes from [`summoner-creatures`](https://github.com/Summoner-Network/summoner-creatures), which add decentralized identity, cryptographic tools, and other runtime capabilities.
+The SDK is modular by design. It is built around a core library (`summoner-core`) and includes optional components that you can add or remove as needed. We will showcase the SDK using both its core modules and common extensions — for example, the agent classes from [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass), which add decentralized identity, cryptographic tools, and other runtime capabilities.
 
 ---
 

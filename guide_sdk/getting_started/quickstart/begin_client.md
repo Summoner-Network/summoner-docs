@@ -1,5 +1,37 @@
 # Getting Started with Summoner Clients & Agents
 
+## Learnings from designing agents
+
+1) Hook are processing all messages, while send and receive would implement specialized message processing.
+    - Hooks: every message
+    - Send/Receive: tailored (event-related)
+
+2) Send should can read states but should not write (change) the states. This is what happens in the negotiation, which might explain why message-droping can break the workflow. If state changes follows receive and triggers, it should be more organized. So states should be handled on receiving end.
+    - receive("interested --> accept_too"): still compute history
+    - add: can this solve the problem?
+        - receive("accept_too --> none", priority = -1) (receipt of new offer or interest -> reset)
+        - receive("none --> interested", priority = 0)
+
+3) Best way to mix client is to use:
+    - connectors
+    - user server for client-client communication
+
+4) Important in case we use initial arrows; download states input can have None keys 
+    {None: [], "state:...": [] }
+
+5) In flow, a way to forget about a graph walkthrough is to return None: then no state is proposed for the key.
+
+6) Receive using on_triggers or on_actions is only triggered once. Safer to use handlers without any event
+
+7) best practice: 
+ - Using triggers and not action (and also using parentd) can allow us to send several times, as long as the tirgger is true
+ - use download state to upstates to not have conflicting logic. Download state should handle priority
+
+8) Priority: Priority=-1 is to ensure we dont cut abrutly and we broacast enough to finish handsahke
+
+
+## Notes
+
 Very light code use, but overview is good (with many insights if possible)
 
 explain client:
@@ -7,11 +39,14 @@ explain client:
 - receive
 - other functions
 
-explain agents (kobold) (link to page)
+explain agents (aurora) (link to page)
 
 explain a lot about composability with other stacks
 
 more theory is explained in [core concepts]()
+
+
+
 
 <hr>
 

@@ -112,7 +112,7 @@ Summoner introduces a higher-level protocol designed for **asynchronous, agent-t
 ## TLS and What Summoner Replaces
 
 > [!NOTE]  
-> ✨ This feature is part of the upcoming **Kobold** update.
+> ✨ This feature is part of the upcoming **Aurora** update.
 
 **TLS (Transport Layer Security)** encrypts communication and verifies server identities via centralized Certificate Authorities. While TLS secures data in transit, it lacks:
 

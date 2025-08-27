@@ -5,7 +5,7 @@
     - [<code style="background: transparent;">Summoner<b>.server</b></code>](sdk_doc/server.md)
     - [<code style="background: transparent;">Summoner<b>.protocol</b></code>](sdk_doc/proto.md)
 - [***Agent libraries***](lib_agent/index.md)
-    - [Kobold](lib_agent/kobold.md)
+    - [Aurora](lib_agent/aurora.md)
 - [***Protocol libraries***](lib_proto/index.md)
     - [Smart tools](lib_proto/smart_tools.md)
 

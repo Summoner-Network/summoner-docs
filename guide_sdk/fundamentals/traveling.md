@@ -121,7 +121,7 @@ if __name__ == "__main__":
 ## 7. Tutorials & Further Reading
 
 * [How-tos: Traveling Between Servers](../howtos/proto/traveling.md)
-* [Agent Libraries: Summoner-Agent Travel Extensions](../../reference/lib_agent/kobold.md)
+* [Agent Libraries: Summoner-Agent Travel Extensions](../../reference/lib_agent/aurora.md)
 
 ---
 

@@ -3,7 +3,7 @@
 ## 📝 Recent updates or active progress
 
 - [ ] This documentation is actively being worked on
-- [ ] Preparing for the **Kobold release**:
+- [ ] Preparing for the **Aurora release**:
     - [ ] Update [What Does the Summoner SDK Do?](guide_sdk/getting_started/what_is.md)
     - [ ] Update [server's basics](guide_sdk/getting_started/quickstart/basics_server.md)
     - [ ] Update [client's basics](guide_sdk/getting_started/quickstart/basics_client.md)
@@ -86,7 +86,7 @@
         - [<code style="background: transparent;">Summoner<b>.server</b></code>](reference/sdk_doc/server.md)
         - [<code style="background: transparent;">Summoner<b>.protocol</b></code>](reference/sdk_doc/proto.md)
     - [***Agent libraries***](reference/lib_agent/index.md)
-        - [Kobold](reference/lib_agent/kobold.md)
+        - [Aurora](reference/lib_agent/aurora.md)
     - [***Protocol libraries***](reference/lib_proto/index.md)
         - [Smart tools](reference/lib_proto/smart_tools.md)
 
