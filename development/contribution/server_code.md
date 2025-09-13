@@ -26,9 +26,9 @@ summoner
 ├── client             # Agent core SDK (Python)
 ├── protocol
 ├── rust               # Rust server implementations
-│   ├── rust_server_sdk
-│   └── rust_server_sdk_1
-│   └── rust_server_sdk_2
+│   ├── rust_server_v1_0_0
+│   └── rust_server_v1_1_3
+│   └── rust_server_v1_2_8
 └── server             # Python server
 ```
 
@@ -85,7 +85,7 @@ More details are available in the [Installation Guide](doc_installation.md).
 To begin development on a new Rust server implementation:
 
 1. **Identify a base module**  
-   Navigate to `summoner/rust/` and locate the most recent module (e.g. `rust_server_sdk_2`).
+   Navigate to `summoner/rust/` and locate the most recent module (e.g. `rust_server_v2_8_1`).
 
 2. **Duplicate and rename**  
    Copy the folder and rename it (e.g. `awesome_rust_server`).
@@ -136,7 +136,7 @@ To begin development on a new Rust server implementation:
        server_config = load_config(config_path=config_path, debug=True)
 
        rust_dispatch = {
-           "rss": lambda h, p: rss.start_tokio_server(self.name, h, p),
+           "rust": lambda h, p: rust_server.start_tokio_server(self.name, h, p),
            # .... previous Rust implementations here ...
            "my_new_rust_patch": lambda h, p: awesome_rust_server.start_tokio_server(
                self.name, 
@@ -177,7 +177,7 @@ Thank you for the correction. Here is a slightly more concise version with the c
     ```
     The `--dev-core` flag ensures the summoner module is installed in _editable mode_, which is recommended during development.
 
-## Module Documentation: `rust_server_sdk_2`
+## Module Documentation: `rust_server_v1_0_0`
 
 This diagram shows how our core server functions call one another **top-to-bottom**, and exactly how data moves between them:
 

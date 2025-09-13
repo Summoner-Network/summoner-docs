@@ -65,7 +65,7 @@ To use the high-performance Rust implementation, follow these steps:
 
    ```json
    {
-     "version": "rss_3"
+     "version": "rust"
    }
    ```
 
@@ -139,7 +139,7 @@ Now **keep the Python code from Option 1 unchanged**, and instead modify `server
 {
   "host": "0.0.0.0",
   "port": 5555,
-  "version": "rss_3"
+  "version": "rust"
 }
 ```
 
