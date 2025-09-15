@@ -1,7 +1,7 @@
 # Debug Clients, Servers and Agents
 
 
-make sure you installed the requirements of an agent as the terminal may crash: link to the right tutorial page about set up
+<!-- make sure you installed the requirements of an agent as the terminal may crash: link to the right tutorial page about set up -->
 
 
 <p align="center">

@@ -3,7 +3,7 @@
 > This page focuses on configuration and parameterization needed to run a Summoner server locally. Routing and higher-level orchestration are covered elsewhere.
 
 <p align="center">
-  <img width="240px" src="../../assets/img/summoner_fund_servers_rounded.png" />
+  <img width="240px" src="../../assets/img/summoner_fund_server_rounded.png" />
 </p>
 
 ## Philosophy: Servers Are Relays

@@ -1,7 +1,7 @@
 # Open a Server to the Internet
 
 
-Router setup to open a NAT server
+<!-- Router setup to open a NAT server
 
 Explain NAT
 
@@ -9,7 +9,7 @@ Firewall
 
 What can happen (bots, hackers)
 
-DID for protection
+DID for protection -->
 
 
 <p align="center">

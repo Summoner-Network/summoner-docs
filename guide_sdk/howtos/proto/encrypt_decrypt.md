@@ -1,12 +1,9 @@
 # Encrypt and Decrypt Messages
 
-
-
-
+<!-- 
 This would need a handshake (see next section)
 
-
-Refer to FHE for the future?
+Refer to FHE for the future? -->
 
 <p align="center">
 <a href="validation.md">&laquo; Previous: Validate Messages and Build a Reputation System

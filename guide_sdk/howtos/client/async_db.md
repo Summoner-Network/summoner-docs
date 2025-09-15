@@ -1,7 +1,6 @@
 # Set up an Asynchronous Database
 
-
-queues, asqlite, etc.
+<!-- queues, asqlite, etc.
 
 use the agent examples in the library
 
@@ -13,7 +12,7 @@ Give an alternative using some global list variable
 asqlite and queue run in parallel
 
 
-Make remark on starved message: try to account for failure
+Make remark on starved message: try to account for failure -->
 
 
 

@@ -1,4 +1,4 @@
-# Summoner Official Documentation
+# The Official Documentation for Summoner
 
 <p align="center">
   <img width="300px" src="assets/img/img_intro_rounded.png" />

@@ -1,15 +1,12 @@
 # Integrate and Connect Your Own Agent Stack
 
-Give examples of some function and then organize it as a FSM.
-
+<!-- Give examples of some function and then organize it as a FSM.
 
 E.g. travel.
-
-
 - Explain MCP
 - Explain A2A (competitor)
 
-- Any other agent: use COnnector agent (refer to database of agents)
+- Any other agent: use COnnector agent (refer to database of agents) -->
 
 
 <p align="center">

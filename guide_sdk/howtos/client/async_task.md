@@ -1,6 +1,6 @@
 # Define Agent Behavior as Asynchronous Tasks
 
-
+<!-- 
 What should be async and what should not?
 
 Every thing should be async but things should be divided in block that make sense
@@ -17,7 +17,7 @@ Some division would hurt the code more than anything else because they need to b
 Receive and send are run in parallel (not sequentially)
 
 
-IMPORTANT HERE: Make remark on starved message: try to account for failure
+IMPORTANT HERE: Make remark on starved message: try to account for failure -->
 
 
 

@@ -1,13 +1,13 @@
 # Multiparty Interactions
 
-Take trading as an inpiration
+<!-- Take trading as an inpiration
 
 Memory: need upload and download
 
 
 Explain `from` and `to`
 
-talk about client versus agent
+talk about client versus agent -->
 
 
 <p align="center">
