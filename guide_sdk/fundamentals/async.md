@@ -28,7 +28,7 @@ Summoner's CLI entrypoints (`run_client`, `run_server`) create and run an `async
 - **Handles shutdown** on signals (SIGINT/SIGTERM)  
 
 > **Sample copy:**  
-> “You rarely need to call `asyncio.get_event_loop()` directly. Instead, override lifecycle hooks—Summoner will call them inside the managed loop.”
+> "You rarely need to call `asyncio.get_event_loop()` directly. Instead, override lifecycle hooks—Summoner will call them inside the managed loop."
 
 ---
 
@@ -112,7 +112,7 @@ loop.run_until_complete(main_coroutine())
 * **Graceful shutdown:** implement `async def teardown(self):` in your agent to close resources (e.g., database connections, file handles).
 
 > **Sample copy:**
-> “Summoner calls your agent's `teardown()` when the loop is stopping. Use it to cancel any background tasks and clean up state.”
+> "Summoner calls your agent's `teardown()` when the loop is stopping. Use it to cancel any background tasks and clean up state."
 
 ---
 

@@ -53,7 +53,7 @@ python first_server.py
 This will launch the default Python server on `127.0.0.1:8888`. The output should look like:
 
 ```text
-[DEBUG] Config file not found: 
+[DEBUG] Config file not found: `None`
 2025-07-17 00:53:38.149 - first_server - INFO - Python server listening on 127.0.0.1:8888
 ```
 

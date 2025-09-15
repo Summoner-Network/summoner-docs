@@ -101,7 +101,7 @@ cargo --version     # Should print the Cargo package manager version
 ```
 
 
-## 🔧 Build the SDK with a Custom `build.txt`
+## Build the SDK with a Custom `build.txt`
 
 Once Python and Rust are installed, you can define your SDK composition and install it.
 

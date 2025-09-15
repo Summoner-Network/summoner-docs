@@ -393,7 +393,7 @@ client.run(
 * Builds a batch of `(route, sender)`
 
   * **Non-reactive**: always eligible each cycle.
-  * **Reactive**: eligible only if any pending activation both **route-accepts** and **responds\_to(event)**.
+  * **Reactive**: eligible only if any pending activation both **route-accepts** and **responds_to(event)**.
 * Warns when the pending puts would exceed 80% of queue capacity (back-pressure).
 * Queues work into `send_queue`. Workers consume, apply **SEND hooks**, wrap with `wrap_with_types(version=core_version)`, and write to the socket.
 * Consecutive worker failures ≥ `max_worker_errors` cause a controlled shutdown of the sender loop.

@@ -323,8 +323,8 @@ class Sender:
 | ---------- | ------------------------- | -------- | ------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `fn`       | `Callable[[], Awaitable]` | yes      | —       | Async callable to execute when eligible. No arguments.                           |                                                                                                                     |
 | `multi`    | `bool`                    | yes      | —       | Whether multiple instances may run or be scheduled. Semantics defined by caller. |                                                                                                                     |
-| `actions`  | \`set\[type]              | None\`   | yes     | —                                                                                | Allowed event classes, for example `{Action.MOVE, Action.TEST}`. `None` means allow all. Empty set matches nothing. |
-| `triggers` | \`set\[Signal]            | None\`   | yes     | —                                                                                | Allowed signals. `None` means allow all. Empty set matches nothing.                                                 |
+| `actions`  | \`set[type]              | None\`   | yes     | —                                                                                | Allowed event classes, for example `{Action.MOVE, Action.TEST}`. `None` means allow all. Empty set matches nothing. |
+| `triggers` | \`set[Signal]            | None\`   | yes     | —                                                                                | Allowed signals. `None` means allow all. Empty set matches nothing.                                                 |
 
 **Method: `responds_to`**
 
@@ -363,7 +363,7 @@ class Receiver:
 
 | Name       | Type              | Required                | Default  | Description                                                                         |   |                                                                                    |
 | ---------- | ----------------- | ----------------------- | -------- | ----------------------------------------------------------------------------------- | - | ---------------------------------------------------------------------------------- |
-| `fn`       | \`Callable\[\[str | dict], Awaitable\[Event | None]]\` | yes                                                                                 | — | Async handler. Receives the decoded message payload. Returns an `Event` or `None`. |
+| `fn`       | \`Callable[[str | dict], Awaitable[Event | None]]\` | yes                                                                                 | — | Async handler. Receives the decoded message payload. Returns an `Event` or `None`. |
 | `priority` | `tuple[int, ...]` | yes                     | —        | Lexicographic priority used for batch ordering. Empty tuple means default priority. |   |                                                                                    |
 
 **Example**
@@ -449,7 +449,7 @@ summoner.protocol.process.StateTape(
 
 | Name          | Type   | Required | Default | Description                                                            |                      |            |     |      |           |
 | ------------- | ------ | -------- | ------- | ---------------------------------------------------------------------- | -------------------- | ---------- | --- | ---- | --------- |
-| `states`      | `Any`  | no       | `None`  | One of: `None`, `str`, `Node`, \`list\[Node                            | str]`, or `dict\[str | None, Node | str | list | tuple]\`. |
+| `states`      | `Any`  | no       | `None`  | One of: `None`, `str`, `Node`, \`list[Node                            | str]`, or `dict[str | None, Node | str | list | tuple]\`. |
 | `with_prefix` | `bool` | no       | `True`  | If mapping input is given, add the `prefix` to keys as `"tape:<key>"`. |                      |            |     |      |           |
 
 **Attributes**

@@ -1,95 +1,211 @@
-# Basic Setup Guide for Windows
+# Installation on Windows (PowerShell)
 
-This guide walks through how to set up the [`summoner-core`](https://github.com/Summoner-Network/summoner-core) SDK on Windows.
+Because the Summoner SDK spans multiple repositories, we **do not** ship a one-line `pip install`. On Windows we provide a **PowerShell installer** that mirrors our POSIX flow and composes the SDK for you.
+
+Use the script in the SDK template repo: **[`build_sdk_on_windows.ps1`](https://github.com/Summoner-Network/summoner-sdk/blob/main/build_sdk_on_windows.ps1)**. It orchestrates cloning the right repos, creating a virtual environment, installing dependencies, and wiring modules listed in your `build.txt`.
 
 <p align="center">
   <img width="340px" src="../../assets/img/windows_install_rounded.png"/>
 </p>
 
 > [!WARNING]
-> This tutorial covers only the `summoner-core` repository. Installing the full SDK (i.e., [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk)) follows a similar structure but requires additional Git commands to download and configure other components such as agent modules and tool extensions from our other repositories.
+> The **Rust/Tokio** server is **not available on Windows**. Any `version: "rust"` in your config is ignored on Windows and the server runs with the **Python backend**.
+> If you want to experiment with the Rust server, see **WSL2** notes below.
+
+For Linux/macOS users, see the POSIX installer [here](installation.md).
 
 
-## Recommended Shells
+## A Template-Based SDK (Windows edition)
 
-We recommend using one of the following terminal environments:
+The **[`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk)** repository is a **GitHub template**. You do not modify it in place: click **Use this template** to generate your own SDK repo that contains only the installer and composition logic.
 
-* Git Bash (installed with Git for Windows)
-* PowerShell (integrated in Windows)
-* VS Code’s built-in terminal (set to Git Bash or PowerShell)
+You decide which features to include by editing **`build.txt`** in your new repo. The Windows installer then composes your SDK accordingly—pulling in the **SDK core** and any modules you list.
 
-
-## 1. Clone the Repository
-
-Open your terminal and navigate to a directory where you'd like to install the SDK:
-
-```bash
-git clone https://github.com/Summoner-Network/summoner-core.git
-cd summoner-core
-```
-
-## 2. Set Up a Python Virtual Environment
-
-To avoid interfering with system-wide packages, it's best to create a Python virtual environment.
-
-### Create the virtual environment:
-
-```bash
-python -m venv .venv
-```
-
-This creates a folder named `.venv` inside the project.
-
-### Activate the environment:
-
-* In Git Bash:
-
-  ```bash
-  source .venv/Scripts/activate
-  ```
-
-* In PowerShell:
-
-  ```powershell
-  .\.venv\Scripts\Activate.ps1
-  ```
-
-* In Command Prompt (if needed):
-
-  ```cmd
-  .venv\Scripts\activate.bat
-  ```
-
-Once activated, your prompt will show something like:
-
-```
-(.venv) C:\Users\You\summoner-core>
-```
-
-## 3. Install the Package
-
-From inside the project directory (with the virtual environment activated), run:
-
-```bash
-pip install -e .
-```
-
-This installs `summoner-core` in "editable mode," meaning any code changes you make in the local directory will immediately apply when you run the SDK — no need to reinstall.
-
-If you prefer a one-time install without linking to local files:
-
-```bash
-pip install .
-```
-
-This installs a static copy of the package and does not reflect local edits.
-
-
-## 4. Notes on Server Configuration
-
-By default, the current implementation of the `summoner-core` server uses the Python-only backend. Although Rust support is integrated into the project structure, it is currently not enable used on Windows — the server will automatically default to the Python version, and no Rust compilation or dependencies are required.
+> [!NOTE]
+> The template's default `build.txt` references:
+>
+> * `summoner-agentclass` (public)
+> * `summoner-smart-tools` (paused for now)
 
 <p align="center">
-  <a href="installation.md">&laquo; Previous: Back to Installation</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="quickstart/index.md">Next: Quickstart &raquo;</a>
+  <img width="220px" src="../../assets/img/summoner_arch.png" />
 </p>
 
+
+## Required Tools and What the Script Runs
+
+On Windows, the PowerShell script [`build_sdk_on_windows.ps1`](https://github.com/Summoner-Network/summoner-sdk/blob/main/build_sdk_on_windows.ps1) replaces the POSIX script [`build_sdk.sh`](https://github.com/Summoner-Network/summoner-sdk/blob/main/build_sdk.sh) and drives the same high-level steps:
+
+* Clone **summoner-core** and requested modules
+* Create a Python **`venv/`**
+* Install Python dependencies
+* Adjust imports for Windows paths
+* **Skip** building the Rust server (not supported on Windows)
+
+**Install these first:**
+
+* **PowerShell** (Windows Terminal or PowerShell 7+ recommended)
+* **Git for Windows** – [https://git-scm.com/download/win](https://git-scm.com/download/win)
+* **Python 3.9+** available as `python` or via the launcher `py -3`
+
+  ```powershell
+  python --version    # or: py -3 --version
+  ```
+
+> [!TIP]
+> You can run all steps from **VS Code's integrated terminal** (PowerShell profile).
+
+
+## Build the SDK with a Custom `build.txt`
+
+### Step 1: Create your SDK repository
+
+1. Open the **[`summoner-sdk` template](https://github.com/Summoner-Network/summoner-sdk)**
+2. Click **Use this template → Create a new repository**
+3. Name your project and confirm
+
+<p align="center">
+  <img width="450px" src="../../assets/img/use_template_2_rounded.png" />
+</p>
+
+Clone your new repository:
+
+```powershell
+git clone https://github.com/<your-account>/<your-sdk-repo>.git
+cd <your-sdk-repo>
+```
+
+
+### Step 2: Choose features in `build.txt` (optional)
+
+Edit **`build.txt`** to list modules you want pulled into your SDK. Example:
+
+```txt
+https://github.com/Summoner-Network/summoner-agentclass.git:
+aurora
+```
+
+> [!WARNING]
+> **Aurora** is coming soon. You can keep it listed now or add it later and re-run setup.
+
+You can modify `build.txt` any time and re-run the installer.
+
+
+### Step 3: Run the Windows installer
+
+Allow script execution **for this session only**:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+Run setup:
+
+```powershell
+.\build_sdk_on_windows.ps1 setup
+```
+
+This will:
+
+* Detect Python/Git
+* Create `venv/`
+* Clone **summoner-core** and modules from `build.txt`
+* Install Python dependencies
+* Adjust imports for Windows paths
+* **Skip** Rust server build on Windows
+
+Activate the environment:
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+Your prompt should show `(venv)`.
+
+> *🔁 The demo below was run on POSIX; the Windows flow is analogous.*
+>
+> <p align="center">
+>   <img width="750px" src="../../assets/gifs/sdk_installation.gif" />
+> </p>
+
+
+### Step 4: Quick server check (Python backend)
+
+Start a minimal local server:
+
+```powershell
+.\build_sdk_on_windows.ps1 test_server
+```
+
+You should see it listening on `127.0.0.1:8888`.
+Open another terminal (activate `venv`) and connect with your client; messages will broadcast to other connected clients.
+
+> [!NOTE]
+> On Windows, this always uses the **Python server**.
+
+
+## Script commands (PowerShell)
+
+```text
+.\build_sdk_on_windows.ps1 <action> [variant]
+```
+
+* `setup [build|test_build]` — Compose/install the SDK (default: `build`)
+* `deps` — Reinstall Python dependencies into the existing `venv/`
+* `test_server` — Launch a minimal local server (Python backend)
+* `delete` — Remove generated artifacts (`venv/`, temp clones, etc.)
+* `reset` — Strong clean + re-setup
+* `clean` — Light cleanup of caches/temp files
+
+> [!TIP]
+> Edit `build.txt` any time and re-run `setup`. The installer is **idempotent**.
+
+
+## Optional: Using WSL2 to try the Rust server
+
+If you require Rust/Tokio parity with Linux/macOS:
+
+1. Install Ubuntu on WSL2:
+
+   ```powershell
+   wsl --install -d Ubuntu
+   ```
+2. In the **Ubuntu** terminal, follow the **Linux/macOS** guide exactly (install Python + Rust with `rustup`, then run `build_sdk.sh`).
+3. Networking usually forwards `localhost` between Windows and WSL2. If needed, bind to `0.0.0.0` or find your WSL IP:
+
+   ```bash
+   hostname -I
+   ```
+
+> [!WARNING]
+> WSL2 works well for many setups but isn't fully certified across environments yet.
+
+
+## Troubleshooting
+
+If you see **"Script is blocked by policy"**, then run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+If you see **"Python 3 not found"**, then install Python 3.9+ and ensure `python` or `py` is on `PATH`. Restart the terminal and verify:
+
+```powershell
+python --version    # or: py -3 --version
+```
+
+If you see **"Dependency build errors"**, then upgrade packaging tools and retry:
+
+```powershell
+python -m pip install -U pip wheel
+```
+
+If the error mentions a C/C++ compiler on Windows, install the Microsoft C++ Build Tools and re-run the installer.
+
+If you see **"Port already in use"**, then change the port in your config or stop the conflicting process.
+
+
+<p align="center">
+  <a href="installation.md">&laquo; Previous: Installation (Linux/macOS)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="quickstart/index.md">Next: Quickstart &raquo;</a>
+</p>

@@ -16,7 +16,7 @@ Decorator-based, async client runtime for Summoner. It handles connection lifecy
 | Register handlers to receive/send messages | `client.client` |
 | Validate/transform payloads before recv/send | `client.client` → `@hook` |
 | Use flow-aware routing (Nodes/Routes/Triggers) | `client.client` + `protocol.*` |
-| Export the client’s handlers as DNA | `client.client#dna()` |
+| Export the client's handlers as DNA | `client.client#dna()` |
 | Merge several clients into a single one | `client.merger#ClientMerger` |
 | Reconstruct a client from saved DNA | `client.merger#ClientTranslation` |
 

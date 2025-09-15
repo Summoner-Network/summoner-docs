@@ -182,13 +182,13 @@ Thank you for the correction. Here is a slightly more concise version with the c
 This diagram shows how our core server functions call one another **top-to-bottom**, and exactly how data moves between them:
 
 - **Nodes** are functions in `mod.rs`, from `start_tokio_server` down to low-level helpers.
-- **Arrows** show “A → B” when **A** directly calls **B**.
+- **Arrows** show "A → B" when **A** directly calls **B**.
 - **Edge labels** explain three kinds of data movement on each call:
   - **give_up:** ownership is moved from caller to callee (caller can no longer use it).
   - **lend:** caller retains ownership but lends a borrow (mutable or immutable) to callee.
   - **pass:** caller passes along a reference it itself borrowed.
 
-Knowing “who owns what” at each step makes it easier to reason about lifetimes, avoid accidental clones, and ensure thread-safe access across `async` tasks.
+Knowing "who owns what" at each step makes it easier to reason about lifetimes, avoid accidental clones, and ensure thread-safe access across `async` tasks.
 
 ```mermaid
 graph TD

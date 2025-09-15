@@ -55,7 +55,7 @@ ClientMerger.__init__(
 
 ### Handler replay
 
-Each `initiate_*` scans the donor’s captured DNA lists (`_dna_hooks`, `_dna_receivers`, `_dna_senders`), **clones** the original function object, and registers it on the merged client using the same decorator parameters.
+Each `initiate_*` scans the donor's captured DNA lists (`_dna_hooks`, `_dna_receivers`, `_dna_senders`), **clones** the original function object, and registers it on the merged client using the same decorator parameters.
 
 #### `initiate_hooks()`
 
@@ -81,7 +81,7 @@ ClientMerger.initiate_senders(self) -> None
 
 Replays all `@send` handlers with original `route`, `multi`, `on_triggers`, and `on_actions`.
 
-> In `ClientMerger` the donors’ `on_triggers` / `on_actions` are **live objects** (e.g., `set[Signal]`, `{Action.MOVE}`) because they’re taken from the in-memory DNA (not the JSON). No conversion is needed.
+> In `ClientMerger` the donors' `on_triggers` / `on_actions` are **live objects** (e.g., `set[Signal]`, `{Action.MOVE}`) because they're taken from the in-memory DNA (not the JSON). No conversion is needed.
 
 ### Internal: `_clone_handler`
 
@@ -89,7 +89,7 @@ Replays all `@send` handlers with original `route`, `multi`, `on_triggers`, and 
 ClientMerger._clone_handler(self, fn: types.FunctionType, original_name: str) -> types.FunctionType
 ```
 
-Clones `fn` so it shares its **module globals** and **closure**, but updates the function’s module namespace to bind `original_name` to the **merged client** (`self`). Metadata (`__doc__`, `__annotations__`) is preserved.
+Clones `fn` so it shares its **module globals** and **closure**, but updates the function's module namespace to bind `original_name` to the **merged client** (`self`). Metadata (`__doc__`, `__annotations__`) is preserved.
 
 **Raises**: logs a warning if the global rebinding fails but still returns a function.
 
@@ -169,7 +169,7 @@ ClientTranslation.initiate_senders(self) -> None
 * **Actions** are reconstructed via `getattr(Action, name)`.
 * **Signals** are reconstructed as `{Signal[t] for t in names} or None`.
 
-> **Important**: The provided `Signal[...]` lookup implies your environment exposes a **name→Signal** mapping via `Signal["NAME"]`. If you build triggers at runtime, you may need to adapt this resolution (e.g., `{getattr(Trigger, n) for n in names}`) to match your project’s trigger loading. See the note below.
+> **Important**: The provided `Signal[...]` lookup implies your environment exposes a **name→Signal** mapping via `Signal["NAME"]`. If you build triggers at runtime, you may need to adapt this resolution (e.g., `{getattr(Trigger, n) for n in names}`) to match your project's trigger loading. See the note below.
 
 ### Overrides for graceful shutdown
 

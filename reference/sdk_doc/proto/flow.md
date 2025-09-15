@@ -196,7 +196,7 @@ Flow.triggers(self, json_dict: dict[str, Any] | None = None) -> type
 
 | Name        | Type              | Required | Default | Description |                                                                                                                                            |
 | ----------- | ----------------- | -------- | ------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `json_dict` | \`dict\[str, Any] | None\`   | no      | `None`      | If provided, builds the `Trigger` class directly from this nested mapping. Otherwise reads from `triggers_file` or the default `TRIGGERS`. |
+| `json_dict` | \`dict[str, Any] | None\`   | no      | `None`      | If provided, builds the `Trigger` class directly from this nested mapping. Otherwise reads from `triggers_file` or the default `TRIGGERS`. |
 
 **Returns**
 
@@ -253,7 +253,7 @@ Flow.parse_route(self, route: str) -> ParsedRoute
 
 * Ensures regex patterns are prepared.
 * Tries each labeled pattern, then unlabeled patterns for every `ArrowStyle`.
-* On match, splits `source`, `label`, `target` using the style`s `separator`with`get\_token\_list`, validates tokens with `\_TOKEN\_RE`, and builds a `ParsedRoute\`.
+* On match, splits `source`, `label`, `target` using the style`s `separator`with`get_token_list`, validates tokens with `_TOKEN_RE`, and builds a `ParsedRoute\`.
 * If none match, treats the input as a standalone object list separated by commas and validates with `_TOKEN_RE`.
 
 **Raises**

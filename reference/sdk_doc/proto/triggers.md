@@ -420,7 +420,7 @@ summoner.protocol.triggers.build_triggers(tree: dict[str, Any]) -> type
 | --------------- | ---------------------------- | -------------------------------------------- | ------------------------------------------------ |
 | `<signal_name>` | `Signal`                     | One attribute per signal with the same name. |                                                  |
 | `_path_to_name` | `dict[tuple[int, ...], str]` | Map from path to name.                       |                                                  |
-| `name_of`       | \`Callable\[..., str         | None]\`                                      | `staticmethod` that maps a path tuple to a name. |
+| `name_of`       | \`Callable[..., str         | None]\`                                      | `staticmethod` that maps a path tuple to a name. |
 
 **Raises**
 
@@ -493,7 +493,7 @@ summoner.protocol.triggers.load_triggers(
 | --------------- | ----------------- | -------- | ------- | ------------ | ---------------------------------------------------------------- |
 | `triggers_file` | \`str             | None\`   | no      | `"TRIGGERS"` | File name resolved relative to `WORKING_DIR` when used.          |
 | `text`          | \`str             | None\`   | no      | `None`       | Inline TRIGGERS content. Highest priority when provided.         |
-| `json_dict`     | \`dict\[str, Any] | None\`   | no      | `None`       | Nested mapping already in parsed form. Used if `text` is `None`. |
+| `json_dict`     | \`dict[str, Any] | None\`   | no      | `None`       | Nested mapping already in parsed form. Used if `text` is `None`. |
 
 **Returns**
 

@@ -42,7 +42,7 @@ More about this model is available in [Getting Started with Summoner Clients and
 
 Agents scale through composition. Rather than hardwiring every condition, branch, and outcome, you declare logic in a structured way.
 
-Summoner lets you define agent behavior as flows: graphs of reactions based on **triggers**, **signals**, and **events**.
+Summoner lets you define agent behavior as flows: graphs of reactions based on **triggers**, **actions**, and **events**.
 
 ### A minimal reactive flow
 
@@ -65,12 +65,13 @@ async def handle_finish(ctx):
 
 ### Vocabulary of reaction
 
-| Concept     | Role                                      | In the example         |
+| Concept     | Description                               | In the example         |
 | ----------- | ----------------------------------------- | ---------------------- |
-| **Signal**  | Named state or input                      | `"OK"`, `"done"`       |
-| **Trigger** | Signal bound to a route                   | `Trigger.OK`, `Trigger.done` |
-| **Event**   | Emission from a handler                   | `Move(Trigger.OK)`         |
-| **Action**  | Intent or transition declared in an event | `Move`, `Stay`, `Test` |
+| **Signal**  | Plain outcome name wrapped into a python object   | `done`, `in_progress`, `OK`       |
+| **Trigger** | Signal-typed attribute bound to a `Trigger` instance       | `Trigger.OK`, `Trigger.done` |
+| **Action**  | Transition intent declared in an event | `Move`, `Stay`, `Test` |
+| **Event**   | Action-Trigger emission from a handler     | `Move(Trigger.OK)`     |
+
 
 You can think of each route (`@receive(...)`) as a node in a **finite state machine**. Flows define how events move between nodes, providing structure, traceability, and composability.
 

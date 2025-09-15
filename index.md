@@ -5,9 +5,14 @@
 - [ ] This documentation is actively being worked on
 - [ ] Preparing for the **Aurora release**:
     - [ ] Update [What Does the Summoner SDK Do?](guide_sdk/getting_started/what_is.md)
+    - [ ] Check [Update Installation](guide_sdk/getting_started/installation.md)
+    - [ ] Check [Windows Installation](guide_sdk/getting_started/windows_install.md)
     - [ ] Update [server's basics](guide_sdk/getting_started/quickstart/basics_server.md)
     - [ ] Update [client's basics](guide_sdk/getting_started/quickstart/basics_client.md)
     - [ ] Update [Getting started: Server](guide_sdk/getting_started/quickstart/begin_server.md)
+    - [ ] Update [server's beginner guide](guide_sdk/getting_started/quickstart/begin_server.md)
+    - [ ] Update [client's beginner guide](guide_sdk/getting_started/quickstart/basics_client.md)
+    - [ ] Update [reference](reference/index.md)
 
 ## 📚 Documentation Overview
 

@@ -1,6 +1,6 @@
 # <code style="background: transparent;">Summoner<b>.protocol</b></code>
 
-The **protocol** layer defines how messages, routes, and state transitions are expressed and processed. It’s the glue between user code (client/server) and the routing model (signals, events, nodes, and arrows).
+The **protocol** layer defines how messages, routes, and state transitions are expressed and processed. It's the glue between user code (client/server) and the routing model (signals, events, nodes, and arrows).
 
 ## Modules
 

@@ -7,7 +7,7 @@ A lightweight TCP broadcast server with two interchangeable backends:
 
 Pick the backend in your **server config** with `version: "python" | "rust"`. On Windows, the Rust backend is unavailable and the server runs in Python regardless of `version`.
 
-> 📎 The full configuration guide (every parameter with examples) lives in **[server\_config.md](./server_config.md)**.
+> 📎 The full configuration guide (every parameter with examples) lives in **[server_config.md](./server_config.md)**.
 
 ---
 
@@ -100,7 +100,7 @@ Start the server with the provided config.
 * **Host/port precedence**
 
   * **Rust backend**: uses `server_config["host"]`/`["port"]` if present; otherwise falls back to `run(host, port)`.
-  * **Python backend**: uses the **`host`/`port` passed to `run()`** (the config’s `host`/`port` are not applied in the Python path).
+  * **Python backend**: uses the **`host`/`port` passed to `run()`** (the config's `host`/`port` are not applied in the Python path).
 * Cleanly handles cancellation and shutdown.
 
 #### `async def run_server(host: str = '127.0.0.1', port: int = 8888)`

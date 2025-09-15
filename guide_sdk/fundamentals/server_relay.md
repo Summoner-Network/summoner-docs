@@ -77,14 +77,14 @@ The relay uses agent identities to route and monitor traffic securely:
 * **Authentication hooks**
 
   * Optional pre-connect validations (e.g., token or certificate)
-  * Custom logic in a “handshake” plugin (see advanced contribution guide)
+  * Custom logic in a "handshake" plugin (see advanced contribution guide)
 * **Metrics & quotas**
 
   * Track per-agent message rates and connection durations
   * Enforce limits from config (e.g., `max_connections_per_agent`)
 
 > **Sample copy:**
-> “Each agent must present a unique name. For sensitive deployments, implement a handshake plugin to verify tokens before accepting messages.”
+> "Each agent must present a unique name. For sensitive deployments, implement a handshake plugin to verify tokens before accepting messages."
 
 ---
 
@@ -153,7 +153,7 @@ The relay can validate both its own config and all inbound message payloads agai
   ```
 
 > **Sample copy:**
-> “Enable schema validation to catch misconfigured clients or malformed messages before they disrupt your system. Validation errors appear in the server log with detailed diagnostics.”
+> "Enable schema validation to catch misconfigured clients or malformed messages before they disrupt your system. Validation errors appear in the server log with detailed diagnostics."
 
 ---
 
@@ -165,7 +165,6 @@ The relay can validate both its own config and all inbound message payloads agai
 
 
 
-
 <p align="center">
-  <a href="client_agent.md">&laquo; Previous: Clients and Agents </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="traveling.md">Next: Traveling Between Servers &raquo;</a>
+  <a href="index.md">&laquo; Previous: Fundamentals </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="client_agent.md">Next: Clients and Agents &raquo;</a>
 </p>

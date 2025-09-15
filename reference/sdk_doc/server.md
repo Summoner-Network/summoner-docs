@@ -48,13 +48,13 @@ server.run(
 ### Rust backend (Tokio)
 
 * Accept loop + per-client tasks.
-* **Backpressure monitor** collects “fan-out size” reports and issues:
+* **Backpressure monitor** collects "fan-out size" reports and issues:
 
   * **Throttle**: add small delay before handling next message.
   * **FlowControl**: pause reads for a longer delay.
   * **Disconnect**: forcefully drop misbehaving clients and **quarantine** them.
 * **Rate limiter**: cap messages per client per minute.
-* **Idle timeout**: drop clients that don’t send anything for N seconds.
+* **Idle timeout**: drop clients that don't send anything for N seconds.
 * **Graceful shutdown**: Ctrl+C notifies all clients before closing.
 
 ---
@@ -79,7 +79,7 @@ Start the server with the provided config.
 **Errors & shutdown**
 
 * Handles `KeyboardInterrupt` / cancellation cleanly.
-* Always waits for client tasks to finish; logs “Server exited cleanly.”
+* Always waits for client tasks to finish; logs "Server exited cleanly."
 
 **Example**
 
@@ -118,7 +118,7 @@ Cancels all loop tasks to drive a clean exit.
 ## Choosing your backend
 
 * Use **Rust** for production loads, fairness under fan-out spikes, and stronger safety (backpressure, rate limiting, quarantine).
-* Use **Python** for quick prototypes or on Windows where Rust module isn’t available.
+* Use **Python** for quick prototypes or on Windows where Rust module isn't available.
 
 ---
 
@@ -245,7 +245,7 @@ Below each parameter lists: **Type**, **Default**, **Applies** (Python/Rust), **
 * **Type**: `int`
 * **Default**: `128`
 * **Applies**: **Rust**
-* **What**: Capacity of the channel that buffers “queue size” reports from clients into the backpressure monitor.
+* **What**: Capacity of the channel that buffers "queue size" reports from clients into the backpressure monitor.
 * **Interactions**: If you expect large fan-out (thousands of clients), increase this to avoid dropped reports.
 * **Example**: Massive broadcast hub:
 
@@ -267,14 +267,14 @@ Below each parameter lists: **Type**, **Default**, **Applies** (Python/Rust), **
 * **Default**: `8`
 * **Applies**: **Rust**
 * **What**: Buffer depth of the **per-client** control channel that carries throttle/flow-control commands.
-* **Interactions with client**: Higher values resist bursts of commands; doesn’t require any client-side change.
+* **Interactions with client**: Higher values resist bursts of commands; doesn't require any client-side change.
 
 #### `queue_monitor_capacity`
 
 * **Type**: `int`
 * **Default**: `100`
 * **Applies**: **Rust**
-* **What**: Local queue where each client task stages the **fan-out size** it’s about to broadcast.
+* **What**: Local queue where each client task stages the **fan-out size** it's about to broadcast.
 * **Insight**: If your broadcast size changes rapidly (clients joining/leaving), larger capacity improves accuracy.
 
 #### `client_timeout_secs`
@@ -282,8 +282,8 @@ Below each parameter lists: **Type**, **Default**, **Applies** (Python/Rust), **
 * **Type**: `int | null`
 * **Default**: `300` (5 minutes)
 * **Applies**: **Rust**
-* **What**: Disconnect clients that **don’t send any line** for this duration.
-* **Important**: The timer resets **only when the client sends something**. A pure “listener” client will be considered idle.
+* **What**: Disconnect clients that **don't send any line** for this duration.
+* **Important**: The timer resets **only when the client sends something**. A pure "listener" client will be considered idle.
 * **Client interplay**:
 
   * If your client is primarily a receiver, either:
@@ -303,7 +303,7 @@ Below each parameter lists: **Type**, **Default**, **Applies** (Python/Rust), **
 * **What**: Per-client rate limit. Exceeding it prompts a warning back to the client; the message is **not** broadcast.
 * **Client interplay**:
 
-  * Client’s `concurrency_limit` + batching can burst; if you routinely send >300/min, raise this or reduce client concurrency.
+  * Client's `concurrency_limit` + batching can burst; if you routinely send >300/min, raise this or reduce client concurrency.
 * **Examples**:
 
   * Chatty agents: `"rate_limit_msgs_per_minute": 1200`
@@ -329,7 +329,7 @@ Below each parameter lists: **Type**, **Default**, **Applies** (Python/Rust), **
 * **Default**: `300`
 * **Applies**: **Rust**
 * **What**: Ban duration after a **forced** disconnect (from backpressure policy).
-* **Client interplay**: A quarantined client’s reconnect attempt is ignored until cooldown expires.
+* **Client interplay**: A quarantined client's reconnect attempt is ignored until cooldown expires.
 
 #### `quarantine_cleanup_interval_secs`
 
@@ -363,7 +363,7 @@ Below each parameter lists: **Type**, **Default**, **Applies** (Python/Rust), **
 
 ### Backpressure policy (`hyper_parameters.backpressure_policy`)
 
-These thresholds react to the **fan-out size** (how many peers a message would be sent to right now). That’s a pragmatic proxy for “how much work is queued.”
+These thresholds react to the **fan-out size** (how many peers a message would be sent to right now). That's a pragmatic proxy for "how much work is queued."
 
 > In the Rust code, each message reports `queue_size = number_of_other_clients` prior to broadcast. The monitor applies the policy against this number.
 
@@ -455,7 +455,7 @@ These thresholds react to the **fan-out size** (how many peers a message would b
   * Backpressure: lower thresholds, `enable_disconnect: true`, `quarantine_cooldown_secs`: 900
 * **Client**
 
-  * Ensure heartbeats if you’re mostly a listener (or set timeout to `null`).
+  * Ensure heartbeats if you're mostly a listener (or set timeout to `null`).
 
 ---
 
@@ -544,7 +544,7 @@ client.run(port=8888, config_dict={"logger": {"log_level": "INFO"}})
 ## Notes & gotchas
 
 * **Windows**: Rust backend is not available; Python backend runs even if `version: "rust"`.
-* **Idle listeners** (Rust): if your client mostly **receives** and doesn’t send, it will hit `client_timeout_secs` unless you:
+* **Idle listeners** (Rust): if your client mostly **receives** and doesn't send, it will hit `client_timeout_secs` unless you:
 
   * send a periodic heartbeat; or
   * set `client_timeout_secs: null`.

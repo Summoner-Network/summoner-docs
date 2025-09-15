@@ -125,7 +125,7 @@ This page documents **every** server setting with practical advice, client inter
 
 * **Type**: `null | [] | [string, ...]`
 * **Default**: `null` (log full JSON content)
-* **Rust backend behavior**: Server parses the **client’s JSON `content`** once, prunes to the listed keys for logging, but **broadcasts the original content unchanged**.
+* **Rust backend behavior**: Server parses the **client's JSON `content`** once, prunes to the listed keys for logging, but **broadcasts the original content unchanged**.
 * **Examples**
 
   * Full payload:
@@ -178,7 +178,7 @@ This page documents **every** server setting with practical advice, client inter
 ### `client_timeout_secs`
 
 * **Type**: `int | null` · **Default**: `300` · **Applies**: Rust
-* **Meaning**: Disconnect a client if it hasn’t sent anything for this many seconds.
+* **Meaning**: Disconnect a client if it hasn't sent anything for this many seconds.
 * **Client tip**: For receive-only clients, either send a heartbeat or set to `null`.
 
 ### `rate_limit_msgs_per_minute`
@@ -200,7 +200,7 @@ This page documents **every** server setting with practical advice, client inter
 ### `quarantine_cooldown_secs`
 
 * **Type**: `int` · **Default**: `300` · **Applies**: Rust
-* **Meaning**: After policy-driven disconnect, the client’s address is **banned** for this long.
+* **Meaning**: After policy-driven disconnect, the client's address is **banned** for this long.
 
 ### `quarantine_cleanup_interval_secs`
 
@@ -226,7 +226,7 @@ This page documents **every** server setting with practical advice, client inter
 
 ## Backpressure policy
 
-Thresholds compare against **current fan-out size** (how many peers would receive a message *now*). That’s a practical proxy for queued work.
+Thresholds compare against **current fan-out size** (how many peers would receive a message *now*). That's a practical proxy for queued work.
 
 ### `enable_throttle`
 

@@ -4,7 +4,7 @@ The Core API is three pieces that snap together:
 
 * **client** — register async handlers with `@receive`, `@send`, `@hook`; manage sessions, concurrency, and DNA export/merge.
 * **server** — a relay that accepts client TCP connections and rebroadcasts messages; Python (**asyncio**) or Rust (**Tokio**) backends with backpressure, rate limits, and quarantine.
-* **protocol** — the “wiring”: triggers (typed signals), routes/flows (`A --[x]--> B`), and state tapes that link `@receive` → `@send`.
+* **protocol** — the "wiring": triggers (typed signals), routes/flows (`A --[x]--> B`), and state tapes that link `@receive` → `@send`.
 
 ## What should I open first?
 
@@ -63,7 +63,7 @@ async def validate(payload):
 @agent.receive("/all")  # any incoming payload
 async def on_any(payload):
     print("got:", payload)
-    # return an Event (protocol) only if you’re using flow-aware senders
+    # return an Event (protocol) only if you're using flow-aware senders
 
 @agent.send("A --> B")
 async def heartbeat():
@@ -72,7 +72,7 @@ async def heartbeat():
 agent.run(host="127.0.0.1", port=8888)
 ```
 
-Run the server, then the client. You’ll see the client send and (on broadcasts) receive.
+Run the server, then the client. You'll see the client send and (on broadcasts) receive.
 
 ---
 
