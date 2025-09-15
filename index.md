@@ -46,9 +46,9 @@
                 - [Agent behaviour as flows](guide_sdk/getting_started/quickstart/begin_flow.md)
                 - [Async programming and event loops](guide_sdk/getting_started/quickstart/begin_async.md) -->
     - [***Fundamentals***](guide_sdk/fundamentals/index.md)
-        - [Servers and relay](guide_sdk/server_relay.md) 
-        - [Clients and agents](guide_sdk/client_agent.md)
-        - [Traveling between servers](guide_sdk/traveling.md)
+        - [Servers and relay](guide_sdk/fundamentals/server_relay.md) 
+        - [Clients and agents](guide_sdk/fundamentals/client_agent.md)
+        - [Traveling between servers](guide_sdk/fundamentals/traveling.md)
     - [***How-tos***](guide_sdk/howtos/index.md)
         * **Client**
             - [Design and create agents](guide_sdk/howtos/client/design_create.md)
