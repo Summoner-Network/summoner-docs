@@ -59,8 +59,8 @@ The **Advanced Usage** section is intended primarily for internal development, b
 
 * [Mix agent behaviors](advanced_usage/merge.md)
 * [Advanced server setup](advanced_usage/server_setup.md)
-* [Advanced client setup](advanced_usage/client_setup.md)
-* [Create a game using Summoner](advanced_usage/game_event.md)
+* [Advanced agent setup](advanced_usage/agent_setup.md)
+* [Create a safe sandbox server](advanced_usage/sandbox.md)
 * [Build your own agent framework on top of Summoner](advanced_usage/agent_framework.md)
 
 ---

@@ -70,12 +70,12 @@
             - [Encrypt and decrypt messages](guide_sdk/howtos/proto/encrypt_decrypt.md)
             - [Create handshake with your collaborators](guide_sdk/howtos/proto/handshakes.md)
     - [***Advanced usage***](guide_sdk/advanced_usage/index.md)
-        - [Mix agent behaviors](guide_sdk/advanced_usage/merge.md)
-        - [Advanced server setup](guide_sdk/advanced_usage/server_setup.md)
-        - [Advanced client setup](guide_sdk/advanced_usage/client_setup.md)
-        - [Create a game using Summoner](guide_sdk/advanced_usage/game_event.md)
-        - [Create your own agent framework using Summoner](guide_sdk/advanced_usage/agent_framework.md)
-
+        - [Advanced agent setup](agent_setup.md)
+        - [Mix agent behaviors](merge.md)
+        - [Advanced server setup](server_setup.md)
+        - [Create a safe sandbox server](sandbox.md)
+        - [Create your own agent framework using Summoner](agent_framework.md)
+        
 - [**💻 Desktop App Guide**](guide_app/index.md)
     - [What Does the Desktop App Do?](guide_app/what_is.md)
     - [Installation](guide_app/installation.md)
