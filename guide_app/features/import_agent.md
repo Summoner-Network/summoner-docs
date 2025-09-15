@@ -3,6 +3,9 @@
 
 
 
+<p align="center">
+  <img width="350px" src="../../assets/screenshots/import_agent_rounded.png"/>
+</p>
 
 
 <p align="center">

@@ -1,7 +1,7 @@
 # Remy's
-ignore_*
 *.old
 .DS_Store
+mov2gif
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
