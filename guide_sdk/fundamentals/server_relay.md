@@ -77,49 +77,42 @@ Summoner accepts configuration from three places. Think of them as layers that r
    A Python `dict` with the same keys you would put in JSON. This is the most direct way to inject settings programmatically. It is ideal for notebooks, launchers, or apps that synthesize config from a GUI. Because it is already an in-memory object, it bypasses file I/O and wins over `config_path`.
 
 
-### Deployment Tips
+<details>
+<summary><b>Deployment Tips</b> </summary>
 
-  <details>
-  <summary><b>(Tip #1) Precedence in practice</b> </summary>
+  #### Precedence in practice
 
   * If you pass a **`config_dict`**, it is used and any `config_path` is ignored.
   * Else, if you pass a **`config_path`**, the file is loaded.
   * Else, built-in defaults apply.
 
   This resolution is intentional. A dict is the most explicit representation since your code constructs it. A file is next, because you named it. Defaults come last.
-  </details>
-
-  <details>
-  <summary><b>(Tip #2) Host and port resolution depend on the implementation</b> </summary>
+  
+   #### Host and port resolution depend on the implementation
 
   * The **Python server** takes `host` and `port` only from `.run(host=..., port=...)`. If you also provide a config file or dict, the Python path still uses the arguments for binding. The `logger` section is applied from config.
   * The **Rust server** reads `host` and `port` from config when present. If they are missing, it falls back to the `.run(...)` arguments. The `logger` section and all `hyper_parameters` apply to Rust.
 
   There is no hot reload. Restart the process to apply changes. If you want to make changes safely during development, prefer small, isolated edits and restart quickly to confirm behavior.
-  </details>
-
-  <details>
-  <summary><b>(Tip #3) Platform note</b> </summary>
+  
+   #### Platform note
 
   On Windows, the Rust implementation is unavailable. If you set `"version": "rust"`, the Python server runs instead. Keep this in mind when sharing configs across platforms.
-  </details>
-
-  <details>
-  <summary><b>(Tip #4) Data types and validation</b> </summary>
+  
+   #### Data types and validation
 
   * `host` is a string. Examples: `"127.0.0.1"`, `"0.0.0.0"`.
   * `port` is an integer and must fit in an unsigned 16-bit range. Typical user ports are above 1024.
   * JSON does not allow comments, so keep files clean and minimal. If you want inline notes, generate the dict in Python where comments are allowed in code.
-  </details>
-
-  <details>
-  <summary><b>(Tip #5) Operational guidance</b> </summary>
+  
+  ####  Operational guidance
 
   If you plan to switch between Python and Rust often, choose one of these patterns to avoid surprises:
 
   * Keep `host` and `port` only in `.run(...)` and omit them from the config file. Rust will use the arguments when the keys are absent, and Python already uses the arguments.
   * Or, keep `host` and `port` only in the config and call `.run()` without those arguments. This matches Rust cleanly. For Python, be explicit in your docs that it does not read these keys from config.
-  </details>
+
+</details>
 
 
 ### How to Run With Each Source
@@ -176,7 +169,7 @@ SummonerServer(name="local").run(config_dict=cfg)
 A dict overrides a file if both are provided. For `host` and `port`, Rust reads them from the dict when present. Python still binds using the `.run(...)` arguments.
 
 <details>
-<summary><b>Expert tips</b> </summary>
+<summary><b>Deployment tips</b> </summary>
 
 * Always log the source of truth. Keep the startup log line that shows whether a file was loaded or a dict was used. This avoids ambiguity when someone reproduces your run later.
 * For LAN testing, widen `host` to `0.0.0.0` and pick a port above 1024. Pair this with a moderate `rate_limit_msgs_per_minute` in Rust so a single peer cannot saturate your session.
@@ -717,3 +710,8 @@ A simple way to deploy locally is to start with defaults, verify that messages f
 
 If you widen `host` to `0.0.0.0`, keep rate limiting and backpressure enabled so a single peer cannot monopolize the server.
 
+
+
+<p align="center">
+  <a href="index.md">&laquo; Previous: Essentials on Summoner's intended coding style </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="client_agent.md">Next: Clients and Agents &raquo;</a>
+</p>
