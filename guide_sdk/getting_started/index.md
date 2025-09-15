@@ -25,7 +25,7 @@ The SDK is modular by design. It is built around a core library (`summoner-core`
 
 ### 1. Understanding the SDK's role in the Summoner ecosystem
 
-* [What Does the Summoner SDK Do?](what_is.md)
+* [What does the Summoner SDK do?](what_is.md)
 
 ### 2. Setting up your development environment
 

@@ -21,5 +21,5 @@
 
 
 <p align="center">
-  <a href="../fundamentals/async.md">&laquo; Previous: Async Programming and Event Loops </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="client/design_create.md">Next: Design and Create Agents &raquo;</a>
+  <a href="../fundamentals/design.md">&laquo; Previous: Agent Design Principles </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="client/design_create.md">Next: Design and Create Agents &raquo;</a>
 </p>

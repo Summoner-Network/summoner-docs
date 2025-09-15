@@ -8,7 +8,7 @@ We begin with an introduction to the SDK, its core principles, and installation 
 
 [**Getting Started**](getting_started/index.md)
 
-* [What Does the Summoner SDK Do?](getting_started/what_is.md)
+* [What does the Summoner SDK do?](getting_started/what_is.md)
 * [Prerequisites](getting_started/prerequisites.md)
 * [Installation](getting_started/installation.md)
 * [Quickstart](getting_started/quickstart/index.md)
@@ -17,11 +17,9 @@ To deepen your understanding, the next section explains the core concepts needed
 
 [**Fundamentals**](fundamentals/index.md)
 
-* [Clients and agents](fundamentals/client_agent.md)
 * [Servers and relays](fundamentals/server_relay.md)
-* [Traveling between servers](fundamentals/traveling.md)
-* [Agent behavior as flows](fundamentals/flow.md)
-* [Async programming and event loops](fundamentals/async.md)
+* [Clients and agents](fundamentals/client_agent.md)
+* [Agent design principles](fundamentals/design.md)
 
 The **How-tos** provide step-by-step guides to apply the fundamentals in practical settings and extend your own stack:
 

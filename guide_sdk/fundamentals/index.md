@@ -6,7 +6,7 @@ Some messages are starved and listenning needs to be a loop until it triggers
 
 - [Servers and relay](server_relay.md) 
 - [Clients and agents](client_agent.md)
-- [Traveling between servers](traveling.md)
+- [Agent design principles](design.md)
 
 
 

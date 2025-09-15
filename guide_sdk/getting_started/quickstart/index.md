@@ -26,7 +26,7 @@ Next, we examine how the components interact within the broader system and how c
 ### 3. **Agent Behavior and Execution Model**  
    We then introduce agent orchestration concepts and execution models:  
    * [Agent Behavior as Flows](begin_flow.md) — *introduces flows as finite-state models of agent behavior*
-   * [Async Programming and Event Loops](begin_async.md) — *explains how asynchronous execution keeps agents and servers responsive*
+   * [Working with Asynchronous Programming](begin_async.md) — *explains how asynchronous execution keeps agents and servers responsive*
 
 By completing this section, you will understand how to build and coordinate agents using the Summoner SDK — starting from raw network connections up to autonomous, flow-driven logic.
 

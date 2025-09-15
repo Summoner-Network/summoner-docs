@@ -1,18 +1,27 @@
 # Summoner Official Documentation
 
-## 📝 Recent updates or active progress
+<p align="center">
+  <img width="300px" src="assets/img/img_intro_rounded.png" />
+</p>
 
-- [ ] This documentation is actively being worked on
-- [ ] Preparing for the **Aurora release**:
-    - [ ] Update [What Does the Summoner SDK Do?](guide_sdk/getting_started/what_is.md)
+<details>
+<summary><b>📝 Todos</b></summary>
+
+- [x] Docs for launch
+- [ ] To be updated at the **Aurora update**:
+    - [ ] Update [What does the Summoner SDK do?](guide_sdk/getting_started/what_is.md)
     - [ ] Check [Update Installation](guide_sdk/getting_started/installation.md)
     - [ ] Check [Windows Installation](guide_sdk/getting_started/windows_install.md)
     - [ ] Update [server's basics](guide_sdk/getting_started/quickstart/basics_server.md)
     - [ ] Update [client's basics](guide_sdk/getting_started/quickstart/basics_client.md)
     - [ ] Update [Getting started: Server](guide_sdk/getting_started/quickstart/begin_server.md)
-    - [ ] Update [server's beginner guide](guide_sdk/getting_started/quickstart/begin_server.md)
-    - [ ] Update [client's beginner guide](guide_sdk/getting_started/quickstart/basics_client.md)
+    - [ ] Update [Getting started: clients & agents](guide_sdk/getting_started/quickstart/basics_client.md)
     - [ ] Update [reference](reference/index.md)
+    - [ ] Update [Advanced usage: server](guide_sdk/advanced_usage/server_setup.md)
+    - [ ] Update [Advanced usage: server](guide_sdk/advanced_usage/agent_setup.md)
+    - ...
+
+</details>
 
 ## 📚 Documentation Overview
 
@@ -31,25 +40,23 @@
 
 - [**🚀 Summoner SDK Guides**](guide_sdk/index.md)
     - [***Getting started***](guide_sdk/getting_started/index.md)
-        - [What Does the Summoner SDK Do?](guide_sdk/getting_started/what_is.md)
+        - [What does the Summoner SDK do?](guide_sdk/getting_started/what_is.md)
         - [Prerequisites](getting_started/prerequesites.md)
         - [Installation](guide_sdk/getting_started/installation.md)
         - [Quickstart](guide_sdk/getting_started/quickstart/index.md)
-            <!-- - [Prerequisites](guide_sdk/getting_started/quickstart/prerequesites.md)
-            - [Basics](guide_sdk/getting_started/quickstart/basics.md)
-                - [Client](guide_sdk/getting_started/quickstart/basics_client.md)
-                - [Agent](guide_sdk/getting_started/quickstart/basics_agent.md)
-                - [Server](guide_sdk/getting_started/quickstart/basics_server.md)
-            - [Beginner guide](guide_sdk/getting_started/quickstart/begin.md)
-                - [Clients versus agents](guide_sdk/getting_started/quickstart/begin_client.md)
-                - [Servers versus clients](guide_sdk/getting_started/quickstart/begin_server.md)
-                - [Agent behaviour as flows](guide_sdk/getting_started/quickstart/begin_flow.md)
-                - [Async programming and event loops](guide_sdk/getting_started/quickstart/begin_async.md) -->
+            * [Basics](guide_sdk/getting_started/quickstart/basics.md) 
+                * [Server](guide_sdk/getting_started/quickstart/basics_server.md)
+                * [Client](guide_sdk/getting_started/quickstart/basics_client.md)
+            * [Beginners guide to Summoner](guide_sdk/getting_started/quickstart/begin.md)
+                * [Getting started with servers](guide_sdk/getting_started/quickstart/begin_server.md)
+                * [Getting started with clients & agents](guide_sdk/getting_started/quickstart/begin_client.md)  
+                * [Agent behavior as flows](guide_sdk/getting_started/quickstart/begin_flow.md)
+                * [Working with asynchronous programming](guide_sdk/getting_started/quickstart/begin_async.md)
     - [***Fundamentals***](guide_sdk/fundamentals/index.md)
         - [Servers and relay](guide_sdk/fundamentals/server_relay.md) 
         - [Clients and agents](guide_sdk/fundamentals/client_agent.md)
-        - [Traveling between servers](guide_sdk/fundamentals/traveling.md)
-    - [***How-tos***](guide_sdk/howtos/index.md)
+        - [Agent design principles](guide_sdk/fundamentals/design.md)
+    <!-- - [***How-tos***](guide_sdk/howtos/index.md)
         * **Client**
             - [Design and create agents](guide_sdk/howtos/client/design_create.md)
             - [Configure agent identity](guide_sdk/howtos/client/id.md)
@@ -72,7 +79,7 @@
         - [Mix agent behaviors](guide_sdk/advanced_usage/merge.md)
         - [Advanced server setup](guide_sdk/advanced_usage/server_setup.md)
         - [Create a safe sandbox server](guide_sdk/advanced_usage/sandbox.md)
-        - [Create your own agent framework using Summoner](guide_sdk/advanced_usage/agent_framework.md)
+        - [Create your own agent framework using Summoner](guide_sdk/advanced_usage/agent_framework.md) -->
 
 - [**💻 Desktop App Guide**](guide_app/index.md)
     - [What Does the Desktop App Do?](guide_app/what_is.md)
