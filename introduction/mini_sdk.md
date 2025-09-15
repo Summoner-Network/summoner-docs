@@ -81,7 +81,7 @@ Note that the `send()` operation can be delayed arbitrarily after `receive()`. I
 In the previous section, we introduced a minimal `Agent` class with a single behavior function and implicit memory. While it demonstrated the core idea, it had two main limitations:
 
 * The behavior for sending and receiving messages was fixed.
-* Memory was managed “behind the scenes,” not visible to the user.
+* Memory was managed "behind the scenes," not visible to the user.
 
 In many real-world scenarios, send and receive logic differ substantially, and you might want to receive multiple messages before replying, or process data differently on each side. To support this flexibility, we now refactor the `Agent` class to let **you** define custom behavior for both `send()` and `receive()` independently, via decorators.
 
@@ -233,7 +233,7 @@ agent1.receive_behavior(msg2)
 agent2.receive_behavior(msg1)
 ```
 
-This handcrafted protocol simulates a very simple “server” in which:
+This handcrafted protocol simulates a very simple "server" in which:
 
 * Agent 2 constantly issues sorting requests.
 * Agent 1 holds those requests in memory, processes them, and returns results.

@@ -50,7 +50,7 @@ class Agent:
 
 ## Defining the state transition graph
 
-We encode the FSM for our sorter (Agent 1) in a simple lookup table. Each entry maps the current state and the “event” (the return value of a receive handler) to the next state.
+We encode the FSM for our sorter (Agent 1) in a simple lookup table. Each entry maps the current state and the "event" (the return value of a receive handler) to the next state.
 
 ```python
 state_graph = {

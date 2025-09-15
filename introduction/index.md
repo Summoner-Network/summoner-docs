@@ -56,6 +56,6 @@ While decentralized, Summoner does not require the cloud. You can deploy agents 
 
 
 <p align="center">
-  <a href="../prologue.md">&laquo; Previous: Prologue</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why_summoner.md">Next: Why Summoner specifically? &raquo;</a>
+  <a href="../prologue/index.md">&laquo; Previous: Prologue</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="why_summoner.md">Next: Why Summoner specifically? &raquo;</a>
 </p>
 

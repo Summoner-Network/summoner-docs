@@ -32,5 +32,5 @@ def round_corners_with_border(input_path, output_path, radius=50, border_size=10
     bordered_img.save(output_path, format="PNG")
 
 # Usage
-for s in ["assets/img/mini_sdk_conclusion"]:
-    round_corners_with_border(f"{s}.png", f"{s}_rounded.png", radius=150, border_size=4)
+for s in ["assets/img/begin_async_summoner"]:
+    round_corners_with_border(f"{s}.png", f"{s}_rounded.png", radius=50, border_size=4)
