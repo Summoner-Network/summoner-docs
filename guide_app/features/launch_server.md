@@ -3,7 +3,7 @@
 
 
 <p align="center">
-  <img width="350px" src="../../assets/screenshots/launch_server_rounded.png"/>
+  <img width="550px" src="../../assets/screenshots/launch_server_rounded.png"/>
 </p>
 
 

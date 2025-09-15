@@ -3,7 +3,7 @@
 The desktop app allows you to do operational (DevOps) that would be more cumbersome with the SDK. In addition, it provides more visual features such as analytics.
 
 <p align="center">
-  <img width="350px" src="../assets/screenshots/logged_in_rounded.png"/>
+  <img width="550px" src="../assets/screenshots/logged_in_rounded.png"/>
 </p>
 
 

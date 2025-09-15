@@ -2,11 +2,11 @@
 
 
 <p align="center">
-  <img width="350px" src="../assets/screenshots/login_rounded.png"/>
+  <img width="550px" src="../assets/screenshots/login_rounded.png"/>
 </p>
 
 <p align="center">
-  <img width="350px" src="../assets/screenshots/logged_in_rounded.png"/>
+  <img width="550px" src="../assets/screenshots/logged_in_rounded.png"/>
 </p>
 
 

@@ -4,7 +4,7 @@
 - create IDs for the agent
 
 <p align="center">
-  <img width="350px" src="../../assets/screenshots/build_agent_rounded.png"/>
+  <img width="550px" src="../../assets/screenshots/build_agent_rounded.png"/>
 </p>
 
 

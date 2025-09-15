@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <img width="350px" src="../../assets/screenshots/launch_agent_rounded.png"/>
+  <img width="550px" src="../../assets/screenshots/launch_agent_rounded.png"/>
 </p>
 
 <p align="center">
