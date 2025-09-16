@@ -1,10 +1,12 @@
 # Agent Libraries
 
-Handle specific identities versions, validation and reputation operations
-
-Agents were names of creature denomination `SummonerAgent`.
-
-Can only be installed via the SDK repo
+<p align="center" style="font-size: 64px;">🛠️</p>
+<p align="center">
+  <strong>Work in progress</strong>
+</p>
+<p align="center">
+  <em>Thanks for your patience — we're polishing things up ✨</em>
+</p>
 
 
 <p align="center">
