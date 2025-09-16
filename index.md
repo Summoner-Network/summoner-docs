@@ -1,7 +1,7 @@
 # The Official Documentation for Summoner
 
 <p align="center">
-  <img width="300px" src="assets/img/img_intro_rounded.png" />
+  <img width="300px" src="assets/img/img_intro_2_rounded.png" />
 </p>
 
 <details>
