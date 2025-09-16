@@ -1,216 +1,104 @@
 # Contributing to the Rust Server Codebase
 
-<p align="center">
-<img width="350px" src="../img/protocol_v2.png" />
-</p>
+The Rust server powers high-performance messaging and orchestration. Its design, security boundaries, and release process are maintained by the internal team.
 
-This guide is intended for developers who want to contribute to the Rust-based server implementations that power our agent platform. The diagram above provides a high-level overview of the architecture: clients written in Python (and powered by our core SDK) communicate with a server that can run on either a Rust or Python backend, all coordinated through a Python wrapper.
+> [!IMPORTANT]
+> **Scope**
+>
+> * Direct changes to the Rust server are **internal-only**.
+> * There is **no server plugin or extension API** at this time.
+> * Community input is welcome through **issues** and focused **design discussions**.
 
-If you are looking to understand how the Rust components integrate into the broader system, or you plan to extend, optimize, or patch the server logic, this document will walk you through the process step by step.
+## What you can do today
 
-## Overview
+* **Report bugs** with a minimal reproduction and logs.
+* **Propose behavior changes** via a short design note in an issue.
+* **Discuss performance findings** with reproducible benchmarks.
+* **Contribute examples and modules** on the client side. See [Creating an Agent Class](agent_framework.md).
 
-The Rust server logic is located under the `summoner/` directory, which also houses the Python core SDK for client agents. While client interactions are handled purely in Python, the server logic supports two interchangeable implementations:
+> [!NOTE]
+> If your idea adds functionality rather than changing core protocol or I/O, deliver it as a client-side module or example. This keeps the server surface small and easier to secure.
 
-- A **Python-based server** (`summoner/server/server.py`) designed for experimentation and testing.
-- A **Rust-based server** (`summoner/rust/`) designed for high performance and production readiness.
+## Reporting a server bug
 
-These Rust modules are exposed to Python via [PyO3](https://pyo3.rs/), allowing seamless integration with the core SDK. You can switch between server implementations by specifying an option when launching the server.
+Provide enough detail to reproduce the issue. Use this checklist:
 
-**Guideline**: All features available in the Python server should also be implemented (and extended upon) in the Rust version.
+```markdown
+### Summary
+Short description of the failure.
 
-### Project Structure
+### Steps to Reproduce
+1) ...
+2) ...
+3) ...
 
-```bash
-summoner
-├── client             # Agent core SDK (Python)
-├── protocol
-├── rust               # Rust server implementations
-│   ├── rust_server_v1_0_0
-│   └── rust_server_v1_1_3
-│   └── rust_server_v1_2_8
-└── server             # Python server
+### Expected vs Actual
+Expected: ...
+Actual: ...
+
+### Environment
+- OS and kernel
+- rustc and cargo versions (from `rustup`)
+- Server commit or tag
+- Config used (attach sanitized json/toml)
+- Client SDK and Python versions
+- Network conditions (localhost, WAN, container)
+
+### Logs
+Relevant lines only. Redact secrets.
+
+### Notes
+Throughput, connection count, or timing details if performance related.
 ```
 
-By default, the agent core SDK operates with Python. However, the server supports both Python and Rust backends, selectable via an option:
+> [!NOTE]
+> Reproduce with a clean toolchain from `rustup`, a fresh build, and default configuration where possible. If the bug depends on specific `.env` or firewall settings, describe those explicitly.
 
-```python
-myserver = SummonerServer(name="MyServer", option=args.option)
+## Proposing a behavior change
+
+Server changes can affect protocol compatibility, replay protection, or security posture. Keep proposals narrow.
+
+```markdown
+### Problem
+What cannot be achieved with the current server.
+
+### Proposed Direction
+Smallest change that solves it. Mention config flags or defaults.
+
+### Compatibility
+On-the-wire impact and migration notes.
+
+### Alternatives
+Other approaches you considered.
+
+### Measurement
+How we can verify correctness or performance.
 ```
 
-When contributing a new Rust server implementation, choose a unique identifier for it. You can then launch the server using that identifier:
+If you can prototype the idea on the client side first, link the repo. Real usage helps us evaluate the need and risk.
 
-```python
-myserver = SummonerServer(name="MyServer", option="my_new_rust_patch")
-```
+## Out of scope for external PRs
 
-The following sections guide you through setting up and integrating your custom Rust implementation.
+* Protocol definitions and envelope formats
+* Cryptography, key handling, and replay protection
+* Core networking, concurrency model, and shutdown semantics
+* Release tooling and deployment pipeline
 
+Use issues to discuss these areas. Attach measurements or traces where relevant.
 
-## Prerequisites
+## Security reports
 
-Ensure Python is installed. To install Rust:
+> [!IMPORTANT]
+> Do **not** file public issues for vulnerabilities or credential exposure.
+> Email **[info@summoner.org](mailto:info@summoner.org)** with steps to reproduce, affected versions, and impact. We will coordinate a fix and disclosure.
 
-### On macOS (via Homebrew)
-```bash
-brew install rustup
-```
+## Internal process (for awareness)
 
-### On macOS/Linux (via installer script)
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
+* Changes include tests, benchmarks when relevant, and upgrade notes.
+* Performance regressions are treated as bugs.
+* The server aims for parity with the Python reference behavior while prioritizing safety and observability.
 
-Restart your terminal, then verify the installation:
-```bash
-rustc --version   # ✅ Should print the version
-cargo --version
-```
-
-If you have just cloned the repository, run the setup script:
-```bash
-source setup.sh
-```
-
-This will:
-- Set up a Python virtual environment (`venv`)
-- Create a `.env` file
-- Install all active Rust server implementations
-
-More details are available in the [Installation Guide](doc_installation.md).
-
-
-## Creating a New Rust Server Module
-
-To begin development on a new Rust server implementation:
-
-1. **Identify a base module**  
-   Navigate to `summoner/rust/` and locate the most recent module (e.g. `rust_server_v2_8_1`).
-
-2. **Duplicate and rename**  
-   Copy the folder and rename it (e.g. `awesome_rust_server`).
-
-3. **Update `Cargo.toml`**  
-   Modify the package and library names:
-   ```toml
-   [package]
-   name = "awesome_rust_server"
-   version = "0.1.0"
-   edition = "2024"
-
-   [lib]
-   name = "awesome_rust_server"
-   crate-type = ["cdylib"]
-
-   [dependencies]
-   # Add required dependencies
-   ```
-
-4. **Update `lib.rs`**  
-   At the bottom of `src/lib.rs`, define the exported Python module with the correct name:
-   ```rust
-   #[pymodule]
-   fn awesome_rust_server(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
-       m.add_function(wrap_pyfunction!(start_tokio_server, m)?)?;
-       Ok(())
-   }
-   ```
-
-5. **Modify the codebase**  
-   You may now develop and test your implementation.
-
-6. **Reinstall your module**  
-   Use the helper script to (re)install your module:
-   ```bash
-   bash reinstall_rust_server.sh awesome_rust_server
-   ```
-
-7. **Register the module in Python**  
-   Edit `server.py` to import and register your implementation in `SummonerServer.run()`:
-   ```python
-   import awesome_rust_server as awesome_rust_server
-
-   # ... scroll down the code until you reach run() ...
-
-   def run(self, host='127.0.0.1', port=8888, config_path = ""):
-       server_config = load_config(config_path=config_path, debug=True)
-
-       rust_dispatch = {
-           "rust": lambda h, p: rust_server.start_tokio_server(self.name, h, p),
-           # .... previous Rust implementations here ...
-           "my_new_rust_patch": lambda h, p: awesome_rust_server.start_tokio_server(
-               self.name, 
-               {
-                   "host": h,
-                   "port": p,
-                   **server_config.get("hyper_parameters", {})
-               }),
-       }
-   ```
-
-Thank you for the correction. Here is a slightly more concise version with the correct filename:
-
-
-8. **Refresh the Python core SDK installation**  
-   By default, the `summoner` module is installed in _editable mode_, so changes to files like `server.py` take effect automatically. If you have modified `setup.sh` and removed the `--dev-core` flag from the call to `reinstall_python_sdk.sh`, editable mode will be disabled. In that case, reinstall the module manually:
-
-   ```bash
-   pip uninstall -y summoner
-   pip install .
-   ```
-
-9. **Test your server**  
-   Use the `myserver.py` script in `templates`:
-   ```bash
-   python templates/myserver.py --config server_config.json
-   ```
-
-   To launch clients for testing:
-   ```bash
-   python templates/myclient.py
-   ```
-
-10. **Optional: Add to setup script**  
-    If your module should be installed automatically via `setup.sh`, add:
-    ```bash
-    bash reinstall_python_sdk.sh awesome_rust_server --dev-core
-    ```
-    The `--dev-core` flag ensures the summoner module is installed in _editable mode_, which is recommended during development.
-
-## Module Documentation: `rust_server_v1_0_0`
-
-This diagram shows how our core server functions call one another **top-to-bottom**, and exactly how data moves between them:
-
-- **Nodes** are functions in `mod.rs`, from `start_tokio_server` down to low-level helpers.
-- **Arrows** show "A → B" when **A** directly calls **B**.
-- **Edge labels** explain three kinds of data movement on each call:
-  - **give_up:** ownership is moved from caller to callee (caller can no longer use it).
-  - **lend:** caller retains ownership but lends a borrow (mutable or immutable) to callee.
-  - **pass:** caller passes along a reference it itself borrowed.
-
-Knowing "who owns what" at each step makes it easier to reason about lifetimes, avoid accidental clones, and ensure thread-safe access across `async` tasks.
-
-```mermaid
-graph TD
-  start_tokio_server -->|give_up: server_config, logger; lend: –; pass: –| run_server
-  run_server -->|give_up: quarantine_list, logger; lend: –; pass: –| start_background_cleanup
-  run_server -->|give_up: shutdown_tx, logger; lend: –; pass: –| spawn_shutdown_listener
-  run_server -->|give_up: backpressure_rx, command_tx, logger, backpressure_policy; lend: –; pass: –| spawn_backpressure_monitor
-  run_server -->|give_up: listener, clients, shutdown_tx, shutdown_rx, backpressure_tx, command_rx, quarantine_list, config, logger; lend: –; pass: –| accept_connections
-
-  accept_connections -->|give_up: cmd; lend: clients, quarantine_list, logger; pass: –| handle_backpressure_command
-  accept_connections -->|give_up: stream, addr, connection_count; lend: clients, shutdown_tx, backpressure_tx, quarantine_list, config, logger; pass: –| handle_new_connection
-
-  handle_new_connection -->|give_up: reader_half, client, clients_for_task, shutdown_rx, backpressure_tx, control_rx; lend: config, logger; pass: –| handle_connection
-
-  handle_connection -->|give_up: rate_limiter, client_timeout, rate_limit, control_rx; lend: reader, client, clients, shutdown_rx, backpressure_tx, config, logger; pass: –| handle_client_messages
-
-  handle_client_messages -->|give_up: line, queue_tx; lend: sender, clients, rate_limiter, logger; pass: –| process_client_line
-  handle_client_messages -->|give_up: cmd; lend: sender, config, logger; pass: –| apply_client_command
-
-  process_client_line -->|give_up: queue_tx; lend: sender, clients, logger, payload; pass: –| broadcast_message
-```
-
+If you are unsure whether something belongs in the server or as a client-side extension, open an issue and describe the end goal. We will guide you toward the right path.
 
 <p align="center">
   <a href="issues.md">&laquo; Previous: Submitting an Issue </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="agent_framework.md">Next: Creating an Agent Class &raquo;</a>
