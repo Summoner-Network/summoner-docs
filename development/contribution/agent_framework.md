@@ -1,123 +1,203 @@
 # Creating an Agent Class
 
-You can contribute at two levels. Help improve our official `SummonerAgent` classes through issues in **summoner-agentclass**, or build your own agent module using **starter-template** and plug it into an SDK.
+There are two good paths. You can help shape the official `SummonerAgent` classes in the [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass) repository, or you can publish your own module built on `SummonerClient` using the [`starter-template`](https://github.com/Summoner-Network/starter-template) and include it in an SDK with [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk). If you are new to Summoner, start with a small module. It lets you move quickly while staying aligned with the core.
 
-> [!IMPORTANT]
-> **Scope and licensing**
->
-> * Core server changes are internal. Extend behavior on the client side.
-> * Repositories are public for evaluation. No license is published yet. Do not redistribute or use in production without written permission.
-> * For the release model and where agent updates land, see **Summoner Updates and Extensions**.
+**Shaping the official class.** Proposals land as issues in [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass). Make a clear case for the change, then show it working. A small fork or throwaway repo is perfect. A short screen recording that walks through the problem, the proposed behavior, and the outcome goes a long way. The core team curates the official class, so proposals that are narrowly scoped, compatible with Flow and our decorators, and focused on safety tend to be accepted.
 
-## Option A — contribute to official `SummonerAgent`
+## How to shape the official `SummonerAgent`
 
-Open focused issues in **summoner-agentclass**: [https://github.com/Summoner-Network/summoner-agentclass](https://github.com/Summoner-Network/summoner-agentclass).
-Propose improvements, report bugs, or suggest new capabilities. Include a minimal example and expected behavior. We keep each release in a dedicated folder so you can pin to a known behavior or move to the latest.
+Start by opening an issue in [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass) with a crisp problem statement and the smallest behavior change that solves it. Include:
 
-> [!NOTE]
-> If a feature fits better as an extension, prototype it as a module first. Link the repo in your issue so we can evaluate real usage.
+* **What hurts today.** A concrete scenario that fails or is awkward.
+* **What you propose.** Describe the smallest API surface or decorator shape that addresses it.
+* **Why it belongs here.** Explain why this should live in the official class rather than as a module. Think security, interop, or broad utility.
+* **Evidence.** Link a tiny fork or test repo and add a short video (2–5 minutes) that shows before and after. A terminal run or local UI is enough.
 
-## Option B — build your own module (How-To)
+A simple issue template you can paste:
 
-This path creates a module that provides one or more agent classes built on `SummonerClient`. You publish the module in your own repo, then include it in an SDK recipe.
+```markdown
+### Problem
+What fails or is awkward today. One paragraph and a tiny repro if possible.
 
-**1) Create a repo from the template**
+### Proposed change
+Smallest addition to the official class (API shape or decorator), expected behavior, and defaults.
 
-```bash
-# On GitHub: click "Use this template" on
-# https://github.com/Summoner-Network/starter-template
-git clone https://github.com/<you>/<your-module>.git
-cd <your-module>
-source install.sh setup
-bash install.sh test_server   # optional sanity check
+### Why official (vs module)
+Security, Flow integration, cross-agent consistency, or other reasons.
+
+### Demo
+Repo/fork link + 2–5 min screencast (before → after). Include exact commit or tag.
+
+### Compatibility & limits
+Flow/route notes, expected performance, edge cases, and what is explicitly out of scope.
 ```
 
-This prepares a venv, installs `summoner` in editable mode, and verifies imports.
+What happens next: we discuss scope in the issue, may ask for a tighter repro, and decide between integrating into the official class or recommending the module path. If it lands, we capture it in a new release folder so you can pin or upgrade cleanly.
 
-**2) Add your agent package under `tooling/`**
+## Why decorators are the center of the design
 
-```
-tooling/echo_agent/
-├── __init__.py        # from .agent import EchoAgent
-└── agent.py
-```
+In Summoner, an agent's behavior is attached to a client through **decorators**. The core already provides `@receive`, `@send`, and `@hook`. Your own framework should look and feel the same so that tools, logs, and the runtime treat your handlers just like native ones. Beyond message handling, similar patterns can be used to compose agent identities, apply cryptographic envelopes, and add validation or policy—see the API catalog for the full surface.
 
-Minimal sketch:
+A decorator in Python is just syntax sugar for “wrap this function with another function.” The minimal idea looks like this:
 
 ```python
-# tooling/echo_agent/agent.py
-from summoner.client import SummonerClient  # keep imports clean; installed by setup
-# Patterns in examples use decorators like @receive and @send(multi=True)
-
-class EchoAgent(SummonerClient):
-    def __init__(self, name="EchoAgent"):
-        super().__init__(name=name)
-
-    # Example pattern: receive a message, reply with the same payload
-    # The exact decorator import comes from the SDK you build.
-    # Replace with the decorator your SDK exposes, for example:
-    # @receive("echo")
-    async def on_echo(self, ctx, msg):
-        await ctx.reply(msg)
-
-if __name__ == "__main__":
-    agent = EchoAgent()
-    agent.run()
+def simple_decorator(fn):
+    async def wrapped(*args, **kwargs):
+        # do something before
+        result = await fn(*args, **kwargs)
+        # do something after
+        return result
+    return wrapped
 ```
 
-Export the class:
+With Summoner you usually do not replace the function object. Instead, you **register** it with the client so the runtime can route messages to it. That registration must happen safely on the client's event loop and with the same metadata the core uses.
+
+## The anatomy of a Summoner-style decorator
+
+When you create a new decorator for your framework, think in four steps.
+
+**First, validate the handler.** Use the core helper `_check_param_and_return` to check that the function is `async`, accepts the right parameters, and returns the expected types. This keeps your behavior consistent with `@receive` and `@send`.
+
+**Second, capture “DNA.”** Store a small record of the decorated function—route, priority, and the function's source—in `self._dna_receivers`, `self._dna_senders`, or `self._dna_hooks`. This allows tooling to serialize your agent, diff changes, and reconstruct handlers during SDK assembly.
+
+**Third, register the callable.** Create a `Receiver` (or `Sender`) and place it into the client's indexes. If Flow is enabled on the client, always normalize the route with `Flow.parse_route(...)` before you register it. Use the client's locks (`routes_lock`, `hooks_lock`) when touching shared state.
+
+**Fourth, schedule the registration.** Never mutate the routing tables directly from the call site. Wrap the registration in a small `async def register()` coroutine and submit it with `self._schedule_registration(register())`. The client will complete all scheduled registrations before it starts.
+
+These steps are already embodied in the core decorators. Reusing them gives you the same safety and observability without rewriting the runtime. The example below shows a **receive-like** decorator purely as an illustration; you can apply the same pattern to `@send`-style emitters, `@hook` transforms, identity or crypto helpers, and other extension points. For additional attributes, types, and helpers you can compose, see the API reference at [`summoner-docs › reference`](https://github.com/Summoner-Network/summoner-docs/blob/main/reference/index.md).
+
+## A minimal “receive-like” decorator
+
+This is the smallest useful template. It shows how to accept a route, validate the handler, capture DNA, register a `Receiver`, and schedule the registration. Replace the marked comments with your behavior, but keep the overall shape.
 
 ```python
-# tooling/echo_agent/__init__.py
-from .agent import EchoAgent
+import inspect
+from typing import Awaitable, Callable, Optional, Union, Any
+from summoner.client import SummonerClient
+from summoner.protocol.triggers import Event
+from summoner.protocol.process import Receiver
+from summoner.protocol.validation import _check_param_and_return
+
+class MyAgent(SummonerClient):
+    def my_receive(
+        self,
+        route: str,
+        *,
+        priority: Union[int, tuple[int, ...]] = (),
+    ):
+        route = route.strip()
+
+        def decorator(fn: Callable[[Union[str, dict, Any]], Awaitable[Optional[Event]]]):
+            # 1) Safety checks
+            if not inspect.iscoroutinefunction(fn):
+                raise TypeError(f"@my_receive handler '{fn.__name__}' must be async")
+
+            _check_param_and_return(
+                fn,
+                decorator_name="@my_receive",
+                allow_param=(str, dict, object),
+                allow_return=(type(None), Event),
+                logger=self.logger,
+            )
+
+            tuple_priority = (priority,) if isinstance(priority, int) else tuple(priority)
+
+            # 2) DNA capture
+            self._dna_receivers.append({
+                "fn": fn,
+                "route": route,
+                "priority": tuple_priority,
+                "source": inspect.getsource(fn),
+            })
+
+            # 3) Registration (wrap here if you add behavior)
+            async def register():
+                wrapped = fn  # replace with a wrapper if you enforce extra policy
+                receiver = Receiver(fn=wrapped, priority=tuple_priority)
+
+                if self._flow.in_use:
+                    parsed = self._flow.parse_route(route)
+                    norm = str(parsed)
+                    async with self.routes_lock:
+                        self.receiver_parsed_routes[norm] = parsed
+                        self.receiver_index[norm] = receiver
+                else:
+                    async with self.routes_lock:
+                        self.receiver_index[route] = receiver
+
+            # 4) Schedule onto the client loop
+            self._schedule_registration(register())
+            return fn
+
+        return decorator
 ```
 
-**3) Build an SDK that includes your module**
+This template is enough to get you started. You can register dozens of handlers this way and they will participate in routing, Flow, and logging like any built-in decorator.
 
-```bash
-git clone https://github.com/Summoner-Network/summoner-sdk sdk
-cd sdk
+## Adding behavior without changing the runtime
 
-cat > build.txt <<'EOF'
-summoner-agentclass
-<your-github-user>/<your-module>@main
-EOF
+Many useful frameworks add policy around the handler while leaving the runtime alone. Two common examples are per-entity serialization and replay protection.
 
-source build_sdk.sh setup
-source venv/bin/activate
-```
-
-Now your agent is importable alongside the core SDK:
+**Per-entity serialization** keeps only one handler running at a time for a given key, while allowing other keys to proceed. You implement it by computing a key from the payload, acquiring a per-key asynchronous lock, and releasing it when the handler completes. The lock lives on the agent instance so all handlers can share it.
 
 ```python
-from echo_agent import EchoAgent
+# inside register(), replace `wrapped = fn` with a tiny wrapper:
+
+async def wrapped(payload):
+    k = key_from(payload)         # for example: payload["account_id"]
+    async with self._mutex.lock(("my_receive", route, k)):
+        return await fn(payload)
 ```
 
-Use `source build_sdk.sh dev_setup` if you must target the core dev branch, then switch back to tags when available.
+**Replay protection** drops stale or duplicate messages. Extract a monotonic sequence number, compare it to the last one seen for `(route, key)`, and skip if it is not strictly newer. Keep this state in memory unless your design needs cross-process guarantees.
 
-**4) Run and iterate**
+```python
+async def wrapped(payload):
+    k = key_from(payload)
+    s = seq_from(payload)         # for example: payload["seq"]
+    last = self._last_seq.get((route, k))
+    if last is not None and s <= last:
+        return None
+    self._last_seq[(route, k)] = s
+    return await fn(payload)
+```
 
-* Keep dependencies minimal.
-* Configure via `.env` or CLI flags. No secrets in code.
-* Add a short README with a usage snippet.
+Both of these patterns sit entirely inside your wrapper. The rest of the decorator—validation, DNA, registration, scheduling—stays the same and continues to use the core machinery.
 
-**5) Publish and share**
+## Decorators that take arguments: the three-layer pattern
 
-* Tag releases and pin them in `build.txt`.
-* Open an issue linking your repo if you want feedback or would like it considered for discovery in the future web app.
+A decorator with arguments is a **factory**. It returns the actual decorator, which returns the wrapped function. In practice you will see three levels.
 
-> [!NOTE]
-> For a higher-level overview of extensions and release channels, see **Summoner Updates and Extensions**.
+1. The **factory** that captures options, for example `route`, `priority`, or your custom flags.
+2. The **decorator** that receives the handler function and performs validation and DNA capture.
+3. The **wrapper or register step** that wires the function into the client.
 
-## Submission and review expectations
+Here is the smallest clear example:
 
-* Clear problem statement and scope.
-* Small surface area with stable imports.
-* Works with Python 3.9 or newer. Examples validated on 3.11.
-* No hardcoded paths. Respect virtual environments.
-* One tiny test script or example that is runnable end to end.
+```python
+class MyAgent(SummonerClient):
+    def throttle(self, *, per_second: float):
+        # 1) factory level: capture options
+        def decorator(fn):
+            # 2) decorator level: validate and record DNA if you expose this as a receiver/sender
+            async def register():
+                # 3) registration level: wrap with behavior and register as needed
+                async def wrapped(*args, **kwargs):
+                    await self._rate_limiter.wait(per_second)
+                    return await fn(*args, **kwargs)
+                # register `wrapped` as a hook or use it inside a my_receive/send, depending on design
+            self._schedule_registration(register())
+            return fn
+        return decorator
+```
 
-If you are unsure whether something belongs in core or as a module, open an issue first and describe the end goal. We will guide you to the right path.
+Notice how the factory receives configuration once, while the inner wrapper runs on every call. Keep the wrapper tiny so it does not become a bottleneck.
+
+## Putting it all together
+
+Create a repository from the [`starter-template`](https://github.com/Summoner-Network/starter-template). Add your package under `tooling/`. Write one or two decorators that wrap the core behavior, following the four steps above. Assemble an SDK with [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) so you can import your package alongside the official agent classes. Write one minimal example that shows your decorator working in isolation. Keep configuration in `.env` or flags, avoid secrets in code, and tag releases so `build.txt` can pin versions.
+
+If you want a change to land in the official `SummonerAgent`, open a design issue in [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass) describing the problem, the smallest surface that solves it, and a link to your minimal example. We will help you decide whether it belongs in the core set or is better as a module.
 
 <p align="center">
   <a href="server_code.md">&laquo; Previous: Contributing to the Server Code Base </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../../faq/index.md">Next: Frequently Asked Questions &raquo;</a>
