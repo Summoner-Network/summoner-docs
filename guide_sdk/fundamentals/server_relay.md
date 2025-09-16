@@ -713,5 +713,5 @@ If you widen `host` to `0.0.0.0`, keep rate limiting and backpressure enabled so
 
 
 <p align="center">
-  <a href="index.md">&laquo; Previous: Essentials on Summoner's intended coding style </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="client_agent.md">Next: Clients and Agents &raquo;</a>
+  <a href="index.md">&laquo; Previous: The Zen of Summoner </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="client_agent.md">Next: Clients and Agents &raquo;</a>
 </p>

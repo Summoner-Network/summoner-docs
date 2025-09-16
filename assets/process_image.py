@@ -35,5 +35,5 @@ def round_corners_with_border(input_path, output_path, radius=50, border_size=10
 # for s in [f"assets/screenshots/{s}" for s in ["build_agent", "import_agent", "launch_agent", "launch_server", "logged_in", "login"]]:
 #     round_corners_with_border(f"{s}.png", f"{s}_rounded.png", radius=50, border_size=4)
 
-for s in [f"assets/img/{s}" for s in ["summoner_agent_design"]]:
+for s in [f"assets/img/{s}" for s in ["fundamentals"]]:
     round_corners_with_border(f"{s}.png", f"{s}_rounded.png", radius=50, border_size=4)

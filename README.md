@@ -52,7 +52,7 @@
                 * [Getting started with clients & agents](guide_sdk/getting_started/quickstart/begin_client.md)  
                 * [Agent behavior as flows](guide_sdk/getting_started/quickstart/begin_flow.md)
                 * [Working with asynchronous programming](guide_sdk/getting_started/quickstart/begin_async.md)
-    - [***Fundamentals***](guide_sdk/fundamentals/index.md)
+    - [***The Zen of Summoner***](guide_sdk/fundamentals/index.md)
         - [Servers and relay](guide_sdk/fundamentals/server_relay.md) 
         - [Clients and agents](guide_sdk/fundamentals/client_agent.md)
         - [Agent design principles](guide_sdk/fundamentals/design.md)
