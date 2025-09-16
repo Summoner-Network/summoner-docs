@@ -3,7 +3,7 @@
 > A principle-based guide to designing robust agents with the Summoner SDK.
 
 <p align="center">
-  <img width="260px" src="../../assets/img/summoner_agent_design_rounded.png" />
+  <img width="350px" src="../../assets/img/summoner_agent_design_rounded.png" />
 </p>
 
 This handbook is repository-agnostic. It explains principles first. When relevant, it includes **optional example links** to public implementations for reference only. Your own agents can live in any repository, provided each agent folder follows the `agent_<some_name>/agent.py` convention if you use the desktop app.
@@ -373,7 +373,7 @@ Summoner runs on `asyncio`, and each client owns its own event loop. Treat your 
 * **Task management.** Schedule background tasks on the client's loop. The SDK will cancel worker pools and active tasks cleanly on shutdown.
 * **Signal handling.** On non-Windows, SIGINT/SIGTERM handlers are installed for graceful termination.
 
-### Configuration & runtime defaults (useful, accurate)
+### Configuration & runtime defaults
 
 Configuration lives in JSON and drives the runtime. Treat it as the single source of truth for limits and addresses so code stays stable across environments.
 
