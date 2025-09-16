@@ -82,7 +82,7 @@ async def on_text(payload: Any) -> Optional["Event"]:
 
 > If flows are **on**, route tokens must be valid **Node** names (plain tokens like `opened`, `locked`, plus reserved forms such as `/all`, `/oneof(...)`, `/not(...)`). Avoid embedding `/` in ordinary node names. Slash-prefixed forms are reserved by the DSL. If flows are **off**, route strings are just labels and match exactly.
 
-**Sending.** Use `@send` for outbound paths. A send handler is `async`, takes **no arguments**, and **returns** either a single payload (str/dict) or, with `multi=True`, a **list** of payloads. Returning `None` means “stay quiet this tick.” Never `yield`. Generators are not supported by the SDK.
+**Sending.** Use `@send` for outbound paths. A send handler is `async`, takes **no arguments**, and **returns** either a single payload (str/dict) or, with `multi=True`, a **list** of payloads. Returning `None` means "stay quiet this tick." Never `yield`. Generators are not supported by the SDK.
 
 ```python
 @client.send(route="/msgs/text", multi=True)
@@ -111,6 +111,11 @@ Idioms that repeat across agents:
 * Keep parse/validate/format helpers **pure** so they are easy to test and reuse.
 
 ## State and flows: explicit automata over implicit flags
+
+<p align="center">
+  <img width="280px" src="../../assets/img/fundamentals_orchest_rounded.png" />
+</p>
+
 
 A flow turns your agent into a small, explicit automaton. Instead of sprinkling boolean flags, you **name nodes** and write **arrow routes** that say who runs when. Receivers **propose** moves or stays. A single consolidation point **commits** the winning node. This keeps behavior visible, debuggable, and safe to extend.
 
@@ -153,7 +158,7 @@ The mapping is shape-preserving:
 
 Keep `download` small and deterministic: pick **one** winner per key (or keep the current one), do any durable writes, and return. Commit exactly **once per key**.
 
-#### Single-key minimal example (prefer “exchange” over “ready”)
+#### Single-key minimal example (prefer "exchange" over "ready")
 
 ```python
 from typing import Any
@@ -226,7 +231,7 @@ async def on_exchange(payload) -> Optional["Event"]:
 
 ### Advanced route shapes (when you need more than simple arrows)
 
-* **Left-dangling** `--> target`: eligible on **every** inbound message (state-agnostic). Use it to bootstrap or “wake” a graph.
+* **Left-dangling** `--> target`: eligible on **every** inbound message (state-agnostic). Use it to bootstrap or "wake" a graph.
 * **Right-dangling** `source -->`: eligible only while in `source`. Returning `Move(...)` **prunes** that lane (contributes no nodes).
 * **Object routes** (no arrow) like `"opened,notify"` select by source only. They never propose a target.
 * `"/all --> /all"` hubs match **any complete arrow** (labeled or unlabeled) but **not** object or dangling routes.
@@ -247,7 +252,11 @@ This lets you keep receivers pure (just propose outcomes) while doing side effec
 
 ## Composing behaviors
 
-You rarely ship a single, monolithic “behavior.” Robust agents are **compositions**. You put transport-level guarantees (handshakes) *under* your domain decisions, and you put **gates** (explicit flow nodes and routes) *around* those decisions. The layers do not bleed into each other. Hooks harden the wire. Flows govern who may act and when. Business handlers stay thin. That clean separation is what keeps restarts, reconnections, and orchestration predictable.
+<p align="center">
+  <img width="280px" src="../../assets/img/fundamentals_compose_rounded.png" />
+</p>
+
+You rarely ship a single, monolithic "behavior." Robust agents are **compositions**. You put transport-level guarantees (handshakes) *under* your domain decisions, and you put **gates** (explicit flow nodes and routes) *around* those decisions. The layers do not bleed into each other. Hooks harden the wire. Flows govern who may act and when. Business handlers stay thin. That clean separation is what keeps restarts, reconnections, and orchestration predictable.
 
 ### Building on top of handshakes
 
@@ -305,7 +314,7 @@ Common command families you can gate this way:
 
 #### Addressing, travel, and the control surface (concrete patterns)
 
-Agents may switch servers at runtime and expose **self-commands** and **remote orders**. Treat location as state and gate remote orders via your flow. This is where the abstract “command gating” meets concrete methods (`quit()` / `travel_to(...)`) and careful routing so registrations do not collide.
+Agents may switch servers at runtime and expose **self-commands** and **remote orders**. Treat location as state and gate remote orders via your flow. This is where the abstract "command gating" meets concrete methods (`quit()` / `travel_to(...)`) and careful routing so registrations do not collide.
 
 > [!NOTE]
 > If you use arrow routes anywhere (e.g., `/all --> /all`), be sure you have **activated flows** and declared an arrow style *before* decorator registration:
@@ -431,6 +440,10 @@ Test under synthetic load. Verify that:
 * drops/backoffs are visible in logs with counts for sent, retried, and dropped frames.
 
 ## Best Practices
+
+<p align="center">
+  <img width="280px" src="../../assets/img/fundamentals_best_practices_rounded.png" />
+</p>
 
 A reliable agent is easy to **observe**, designed to **withstand failures**, avoids **known foot-guns**, and **scales** without changing its core rhythm. This section ties those threads together.
 

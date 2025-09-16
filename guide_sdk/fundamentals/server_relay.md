@@ -3,7 +3,7 @@
 > This page focuses on configuration and parameterization needed to run a Summoner server locally. Routing and higher-level orchestration are covered elsewhere.
 
 <p align="center">
-  <img width="240px" src="../../assets/img/summoner_fund_server_rounded.png" />
+  <img width="350px" src="../../assets/img/summoner_fund_server_rounded.png" />
 </p>
 
 ## Philosophy: Servers Are Relays
@@ -210,7 +210,7 @@ Advanced runtime controls for fairness and lifecycle. Common knobs:
 * Throughput and fairness: `rate_limit_msgs_per_minute`, `backpressure_policy.*`, `throttle_delay_ms`, `flow_control_delay_ms`.
 * Resource usage: `worker_threads`, internal channel capacities.
 * Robustness: `client_timeout_secs`, `timeout_check_interval_secs`, `quarantine_*`, `accept_error_backoff_ms`.
-  All fields are optional with safe defaults. For local work, the defaults are fine. For load tests, keep backpressure thresholds increasing (throttle < flow\_control < disconnect) and set `worker_threads` explicitly to match your CPU quota.
+  All fields are optional with safe defaults. For local work, the defaults are fine. For load tests, keep backpressure thresholds increasing (throttle < flow-control < disconnect) and set `worker_threads` explicitly to match your CPU quota.
 
 
 <details>

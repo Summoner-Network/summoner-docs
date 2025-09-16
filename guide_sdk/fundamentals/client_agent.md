@@ -3,7 +3,7 @@
 > This page focuses on configuration and parameterization needed to run a Summoner **client/agent** locally. Routing, flows, and advanced orchestration live on the adjacent pages.
 
 <p align="center">
-  <img width="240px" src="../../assets/img/summoner_fund_agent_rounded.png" />
+  <img width="350px" src="../../assets/img/summoner_fund_agent_rounded.png" />
 </p>
 
 ## Philosophy: Clients Become Agents
