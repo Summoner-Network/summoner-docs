@@ -1,11 +1,17 @@
 # Orchestrating Agent Behavior Using Flows
 
-<figure align="center">
-  <img width="300px" src="../../../assets/img/summoner_atom_rounded.png"/>
-  <figcaption>
-    <em>The Summoner, channeling his magic, peers into the hidden forces of the universe, the atom. He observes how an electron rests in a stable state until it <b>absorbs</b> a photon, leaping to a higher level. In time, it <b>emits</b> a photon and falls back, revealing the rhythm of energy and transition at the heart of matter.</em>
-  </figcaption>
-</figure>
+<p align="center">
+  <img width="300px" src="../../../assets/img/summoner_atom_rounded.png" alt="Summoner observing atomic transitions"/>
+</p>
+
+<p align="center">
+  <em>
+    The Summoner, channeling his magic, peers into the hidden forces of the universe, the atom.  
+    He observes how an electron rests in a stable state until it <b>absorbs</b> a photon, leaping to a higher level.  
+    In time, it <b>emits</b> a photon and falls back, revealing the rhythm of energy and transition at the heart of matter.
+  </em>
+</p>
+
 
 ## Overview
 
