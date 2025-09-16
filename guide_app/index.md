@@ -20,15 +20,15 @@ The Summoner Desktop App complements the SDK by providing a graphical environmen
 
 ## Table of contents (placeholders)
 
-* [What does the desktop app do?](guide_app/what_is.md)
-* [Installation](guide_app/installation.md)
+* [What does the desktop app do?](what_is.md)
+* [Installation](installation.md)
 * [Create an account and login](guide_app/login.md)
 * **By features**
 
-  * [Import an agent to the desktop app](guide_app/features/import_agent.md)
-  * [Build your agent dependencies](guide_app/features/build_agent.md)
-  * [Launch your agent](guide_app/features/launch_agent.md)
-  * [Launch a server](guide_app/features/launch_server.md)
+  * [Import an agent to the desktop app](features/import_agent.md)
+  * [Build your agent dependencies](features/build_agent.md)
+  * [Launch your agent](features/launch_agent.md)
+  * [Launch a server](features/launch_server.md)
 
 ---
 
