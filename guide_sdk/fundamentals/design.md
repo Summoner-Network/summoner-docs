@@ -364,7 +364,7 @@ async def on_remote_order(payload):
 
 **Reference example.** Orders over the wire (like `/travel` and `/quit`) are demonstrated in [agents/agent_ChatAgent_1](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_ChatAgent_1).
 
-Public implementations that demonstrate gated commands and control surfaces:
+For public agent implementations that demonstrate gated commands and control surfaces, see:
 
 * [agents/agent_ChatAgent_1](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_ChatAgent_1): remote orders like `/travel` and `/quit` over the wire.
 * [agents/agent_ChatAgent_2](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_ChatAgent_2): activates automaton routing via `@upload_states` to gate commands (`opened/locked`).
@@ -415,10 +415,17 @@ The sender warns when the queue is about to exceed **80%** capacity. Take that a
 Treat every inbound frame as untrusted until proven otherwise. Run a short, deterministic validation chain **before** any state change so downstream code never sees malformed input.
 
 * **Schema and type checks** for every field you will read later.
-* **Replay drop,** using a nonce or timestamp window. Keep a small in-memory LRU for fast paths. Persist when you need durability across restarts.
+* **Replay drop**, using a nonce or timestamp window. Keep a small in-memory LRU for fast paths. Persist when you need durability across restarts.
 * **Allowance/ban lists** keyed by peer identity with stable reason strings in logs.
 
 On the outbound side, centralize signing and (optional) encryption in a single helper so business handlers never juggle keys. Cache reads to avoid I/O in hot paths and fail closed when credentials are missing.
+
+For public agent implementations that illustrate validation hooks, replay handling, and basic reputation/ban mechanics, see:
+
+* [agents/agent_RecvAgent_1](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_RecvAgent_1): Early drop of bad frames with clear deny reasons.
+* [agents/agent_RecvAgent_2](https://github.com/Summoner-Network/summoner-agents/blob/main/agents/agent_RecvAgent_2): Adds reputation and ban outcomes to the same path.
+* [agents/agent_EchoAgent_2](https://github.com/Summoner-Network/summoner-agents/blob/main/agents/agent_EchoAgent_2): Validates on ingress and enforces signed egress for end-to-end policy.
+
 
 ### Queues, batching, and delayed work
 
@@ -428,6 +435,14 @@ Queues are your shock absorbers. Use them to decouple hot receive paths from hea
 * **Fan-out with backpressure.** Enqueue jobs and let a single sender task respect `multi=True` semantics and queue limits.
 
 Create queues at startup, own them on the agent object, and provide a `close()` that signals consumers, drains gently, and exits cleanly.
+
+For public agent implementations that apply queue-backed send/receive and state-gated flows, see:
+
+* [agents/agent_EchoAgent_0](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_EchoAgent_0): Decouples receive from send with a small queue.
+* [agents/agent_EchoAgent_1](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_EchoAgent_1): Introduces lightweight shaping before queuing to smooth bursts.
+* [agents/agent_EchoAgent_2](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_EchoAgent_2): Reuses the queue pattern with policy checks on both sides.
+* [agents/agent_ChatAgent_2](https://github.com/Summoner-Network/summoner-agents/blob/main/agents/agent_ChatAgent_2): Queues remote commands behind simple state gates.
+* [agents/agent_ChatAgent_3](https://github.com/Summoner-Network/summoner-agents/blob/main/agents/agent_ChatAgent_3): Tightens state transitions to control when queued work may run.
 
 ### Backpressure and rate limiting
 
