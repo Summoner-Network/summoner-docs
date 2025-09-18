@@ -591,7 +591,7 @@ Hooks are small functions that run around handlers: at RECEIVE (before a payload
 
 
 <p align="center">
-  <img width="450px" src="../../../assets/img/hook_illustration_rounded.png"/>
+  <img width="580px" src="../../../assets/img/hook_illustration_rounded.png"/>
 </p>
 
 Order can matter. Both hooks and receivers accept a priority tuple: the lower tuples run earlier. Keep hooks small and deterministic. They run on every message once before or after each batch of triggered `@receive` or `@send` handlers.
