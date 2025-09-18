@@ -202,12 +202,20 @@ obj.activated_nodes(None)  # ('opened','notify')
 ## Orchestrating Receive/Send with Flows
 
 <p align="center">
-  <img width="350px" src="../../../assets/img/flow_orchestration_rounded.png"/>
+  <img width="250px" src="../../../assets/img/flow_orchestration_rounded.png"/>
 </p>
 
 ### Upload & Download: State Negotiation
 
-Flows are driven by what you **upload** and what you then **commit** in **download**. Upload reports your current position in the graph; download is where you fold the engine's proposals back into your own state. The contract is simple and strict: upload may return one of four shapes, and download will mirror it with *Nodes* instead of strings.
+
+Flows are driven by what you **upload** and what you then **commit** in **download**. Upload reports your current position in the graph while download is where you fold the engine's proposals back into your own state.
+
+<p align="center">
+  <img width="450px" src="../../../assets/img/download_upload_flow_rounded.png"/>
+</p>
+
+
+The contract is simple and strict: upload may return one of four shapes, and download will mirror it with *Nodes* instead of strings.
 
 1. **Single**: a single node.
 
@@ -399,6 +407,10 @@ Here is the loop: the runtime calls **upload** to learn the current node, runs t
 
 ### Sending: Ticks vs. Hubs
 
+<p align="center">
+  <img width="400px" src="../../../assets/img/tick_hub_send_rounded.png"/>
+</p>
+
 There are two ways an agent emits. A **tick sender** runs every cycle and decides on each pass whether to return a payload (and therefore send) or `None` (and remain quiet). A **hub sender** is *event-driven*: it runs immediately after a receiver has returned an Event that matches the hub's filters. Tick is how you do heartbeats and maintenance; hubs are how you react *right after* specific outcomes.
 
 A tick sender is straightforward. Pace it with `await asyncio.sleep(...)`; return a value to send, or `None` to stay quiet.
@@ -577,7 +589,12 @@ With those two shapes in mind, the "stitched" minimal loop reads cleanly: advert
 
 Hooks are small functions that run around handlers: at RECEIVE (before a payload reaches any receiver) and at SEND (just before a payload is emitted). Use them for cross-cutting concerns that sit outside your flow logic: authentication, schema validation, deduplication, stamping identity, or rate limits.
 
-Order can matter. Both hooks and receivers accept a priority tuple; lower tuples run earlier. Keep hooks small and deterministic; they run on every tick around each handler.
+
+<p align="center">
+  <img width="450px" src="../../../assets/img/hook_illustration_rounded.png"/>
+</p>
+
+Order can matter. Both hooks and receivers accept a priority tuple: the lower tuples run earlier. Keep hooks small and deterministic. They run on every message once before or after each batch of triggered `@receive` or `@send` handlers.
 
 ```python
 from summoner.protocol import Direction
