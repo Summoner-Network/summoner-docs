@@ -211,7 +211,7 @@ obj.activated_nodes(None)  # ('opened','notify')
 Flows are driven by what you **upload** and what you then **commit** in **download**. Upload reports your current position in the graph while download is where you fold the engine's proposals back into your own state.
 
 <p align="center">
-  <img width="450px" src="../../../assets/img/download_upload_flow_rounded.png"/>
+  <img width="600px" src="../../../assets/img/download_upload_flow_rounded.png"/>
 </p>
 
 
@@ -408,7 +408,7 @@ Here is the loop: the runtime calls **upload** to learn the current node, runs t
 ### Sending: Ticks vs. Hubs
 
 <p align="center">
-  <img width="400px" src="../../../assets/img/tick_hub_send_rounded.png"/>
+  <img width="540px" src="../../../assets/img/tick_hub_send_rounded.png"/>
 </p>
 
 There are two ways an agent emits. A **tick sender** runs every cycle and decides on each pass whether to return a payload (and therefore send) or `None` (and remain quiet). A **hub sender** is *event-driven*: it runs immediately after a receiver has returned an Event that matches the hub's filters. Tick is how you do heartbeats and maintenance; hubs are how you react *right after* specific outcomes.
@@ -591,7 +591,7 @@ Hooks are small functions that run around handlers: at RECEIVE (before a payload
 
 
 <p align="center">
-  <img width="580px" src="../../../assets/img/hook_illustration_rounded.png"/>
+  <img width="680px" src="../../../assets/img/hook_illustration_rounded.png"/>
 </p>
 
 Order can matter. Both hooks and receivers accept a priority tuple: the lower tuples run earlier. Keep hooks small and deterministic. They run on every message once before or after each batch of triggered `@receive` or `@send` handlers.
