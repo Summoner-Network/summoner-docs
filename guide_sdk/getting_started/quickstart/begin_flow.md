@@ -202,7 +202,7 @@ obj.activated_nodes(None)  # ('opened','notify')
 ## Orchestrating Receive/Send with Flows
 
 <p align="center">
-  <img width="250px" src="../../../assets/img/flow_orchestration_rounded.png"/>
+  <img width="300px" src="../../../assets/img/flow_orchestration_rounded.png"/>
 </p>
 
 ### Upload & Download: State Negotiation
