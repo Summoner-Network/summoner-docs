@@ -1,6 +1,6 @@
 # Remy's
 *.old
-.DS_Store
+*/.DS_Store
 mov2gif
 
 # Byte-compiled / optimized / DLL files
