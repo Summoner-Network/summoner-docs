@@ -160,7 +160,7 @@ This time the server will **ignore the Python arguments** and use the config fil
 > If both code and config specify a host or port, the **config file takes precedence**. This makes it easier to manage server deployments with minimal code changes.
 
 
-📜 See [Server Fundamentals](../../fundamentals/server_relay.md) for additional configuration options (e.g. logging, developer flags).
+📜 See [Summoner server configuration](../../fundamentals/server_relay.md) for additional configuration options (e.g. logging, developer flags).
 
 
 ## Communication Model: Broadcast by Default

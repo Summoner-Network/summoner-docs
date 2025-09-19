@@ -15,7 +15,7 @@ We begin with an introduction to the SDK, its core principles, and installation 
 
 To deepen your understanding, the next section explains the core concepts needed to manage and orchestrate agent behavior effectively:
 
-[**Fundamentals**](fundamentals/index.md)
+[**The Zen of Summoner**](fundamentals/index.md)
 
 * [Servers and relays](fundamentals/server_relay.md)
 * [Clients and agents](fundamentals/client_agent.md)
