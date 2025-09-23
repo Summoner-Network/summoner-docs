@@ -1,6 +1,6 @@
 # Development and Infrastructure
 
-This page explains what to use depending on your goal, how the repositories fit together, and what is reserved to the internal team. It also clarifies the current licensing status.
+This page explains what to use depending on your goal, how the repositories fit together, and what is reserved to the internal team. It also clarifies the licensing status.
 
 ## Who uses what
 
@@ -54,15 +54,30 @@ This page explains what to use depending on your goal, how the repositories fit 
 
 ## Licensing and IP status
 
-As of today there is **no license file** in the public repositories. Code is available for reading and evaluation but remains protected by default copyright.
+Unless a repository states otherwise, Summoner public repositories are licensed under the **Apache License, Version 2.0**.
+The **controlling terms are the `LICENSE` file at the root of each repository**. If a repository lacks a `LICENSE`, no license is granted—open an issue.
 
 > [!IMPORTANT]
-> **Until a license is published**
+> **What Apache-2.0 allows**
 >
-> * You may clone and run locally for evaluation.
-> * Do not redistribute, relicense, or integrate code into production without written permission.
-> * Documentation, issue discussions, and APIs are public to enable design proposals and module development.
-> * A formal license and contributor terms are planned. The docs will be updated when they are finalized.
+> * Use, modify, and redistribute the code, including commercially.
+> * Patent license from contributors.
+>
+> **Your obligations**
+>
+> * Keep the repo `LICENSE` and any `NOTICE` files with your distributions.
+> * State significant changes you make.
+> * Respect third-party dependency licenses.
+>
+> **Scope**
+>
+> * Trademarks, logos, and brand names are **not** licensed.
+> * Security disclosure policies and secrets handling still apply.
+>
+> **Contributions**
+>
+> * By contributing, you agree your changes are provided under **Apache-2.0**.
+> * See `CONTRIBUTING.md` for DCO sign-off or CLA requirements.
 
 ## What is reserved to the internal team
 

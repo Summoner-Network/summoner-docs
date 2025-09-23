@@ -2,13 +2,20 @@
 
 Templates give you the right layout and the scripts you need. You should **not** create extra scripts. Use the ones that ship with the templates.
 
+> [!NOTE]
+> **Licensing for modules and SDKs**
+>
+> * Unless a repository states otherwise, Summoner public repositories are licensed under the **Apache License, Version 2.0**. The **controlling terms are the `LICENSE` file in each repository**.
+> * Modules you publish should use **Apache-2.0** or another permissive Apache-compatible license. Include a `LICENSE` and any `NOTICE` content in your module repo.
+> * When you assemble an SDK with `summoner-sdk`, the resulting build remains subject to the licenses of all included components.
+
 ## Template catalog
 
-* **starter-template**
+* **starter-template**  
   For building a native module that plugs into the SDK.
   Comes with `install.sh` to clone `summoner-core`, create a venv, reinstall the SDK and Rust server, and spin up a test server.
 
-* **summoner-sdk**
+* **summoner-sdk**  
   For assembling a full SDK from multiple modules.
   Comes with `build_sdk.sh` which reads `build.txt`, clones each source, merges their `tooling/` packages into the SDK, rewrites imports, creates a venv, installs deps, writes `.env`, and reinstalls the core.
 
@@ -103,7 +110,8 @@ If you need the core dev branch later:
 
 * Keep dependencies minimal and avoid secrets in code.
 * Pin versions in `build.txt` once you tag releases.
-* Public repos are visible for evaluation. There is no published license yet. Do not redistribute or use in production without written permission.
+* Keep the repo `LICENSE` and any `NOTICE` files with redistributions. Respect third-party licenses included in dependencies.
+* Trademarks, logos, and brand names are not licensed.
 
 <p align="center">
   <a href="github_infra.md">&laquo; Previous: GitHub Repo Organization </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="summoner_ext.md">Next: Summoner Updates and Extensions &raquo;</a>

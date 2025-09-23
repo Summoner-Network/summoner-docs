@@ -29,7 +29,24 @@ Updates will be announced on the website, on social media, and in the planned we
 
 > [!NOTE]
 > **Licensing**
-> Repos are public for evaluation. No license is published yet. Do not redistribute or use in production without written permission. This page will be updated once terms are finalized.
+> Unless a repository states otherwise, Summoner public repositories are licensed under the **Apache License, Version 2.0**.
+> The **controlling terms are the `LICENSE` file at the root of each repository**. If a repository lacks a `LICENSE`, no license is granted and you should open an issue.
+>
+> **What Apache-2.0 allows**
+>
+> * Use, modify, and redistribute the code, including commercially.
+> * Patent license from contributors.
+>
+> **Your obligations**
+>
+> * Keep the repo `LICENSE` and any `NOTICE` files with your distributions.
+> * State significant changes you make.
+> * Respect third-party dependency licenses.
+>
+> **Scope**
+>
+> * Trademarks, logos, and brand names are not licensed.
+> * Security disclosure policies and secrets handling still apply.
 
 ## Extend Summoner with modules
 
@@ -63,8 +80,8 @@ source venv/bin/activate
 ```
 
 > [!NOTE]
-> **Module listing in the future web app**
-> Community modules will be discoverable in the web app. Inclusion may require a light vetting pass for code quality and compatibility.
+> **Module licensing**
+> Community modules should use **Apache-2.0** or another permissive Apache-compatible license. Include a `LICENSE` and any `NOTICE` content in your module repository.
 
 ## Propose features and improvements
 
