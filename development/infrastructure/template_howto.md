@@ -30,7 +30,7 @@ Templates give you the right layout and the scripts you need. You should **not**
 ### A) Build a module (starter-template)
 
 ```bash
-# On GitHub: click “Use this template” on:
+# On GitHub: click "Use this template" on:
 # https://github.com/Summoner-Network/starter-template
 git clone https://github.com/<you>/<your-module>.git
 cd <your-module>

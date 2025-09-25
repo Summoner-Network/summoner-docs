@@ -36,7 +36,7 @@ This page explains what to use depending on your goal, how the repositories fit 
 
 **If you want to contribute**
 
-* Open issues in the relevant public repo. See “How to contribute” for scope and expectations.
+* Open issues in the relevant public repo. See "How to contribute" for scope and expectations.
 * Publish modules from the **starter-template** and reference them in `summoner-sdk` recipes.
 * For proposed changes to core behavior, open a design issue first. Direct code changes to core are internal.
 
