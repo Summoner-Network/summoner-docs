@@ -24,7 +24,7 @@ Additional agent-level libraries will layer orchestration, memory, and tool inte
 * **Aurora** (planned)
   - High-level patterns for orchestration, memory, and tools.
   - *Status:* Not yet available. This page will go live when Aurora ships.
-  - Link: [Aurora update](lib_proto/smart_tools.md)
+  - Link: [Aurora update](./lib_agent/aurora.md)
 
 ## Protocol Libraries
 
@@ -33,7 +33,7 @@ Protocol-level extensions are defined but not actively developed at this time.
 * **Smart tools** (paused)
   - Protocol-level tool calling and schema contracts.
   - *Status:* Paused. The page remains as a placeholder.
-  - Link: [Smart tools](lib_proto/smart_tools.md)
+  - Link: [Smart tools](./lib_proto/smart_tools.md)
 
 ---
 

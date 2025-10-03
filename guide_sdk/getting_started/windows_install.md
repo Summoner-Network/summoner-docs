@@ -23,9 +23,8 @@ You decide which features to include by editing **`build.txt`** in your new repo
 
 > [!NOTE]
 > The template's default `build.txt` references:
->
 > * `summoner-agentclass` (public)
-> * `summoner-smart-tools` (paused for now)
+> * ~~`summoner-smart-tools`~~ (removed and kept private for now)
 
 <p align="center">
   <img width="220px" src="../../assets/img/summoner_arch.png" />

@@ -25,8 +25,8 @@ You then customize your new SDK by editing the `build.txt` file to specify which
 
 > [!NOTE]
 > The default `build.txt` in the template includes:
->   * `summoner-smart-tools` (currently private)
 >   * `summoner-agentclass` (public)
+>   * ~~`summoner-smart-tools`~~ (removed and kept private for now)
 
 A best practice is to only publish new code or features specific to your SDK, and keep the actual installation logic clean and declarative through `build.txt`. For example, [`summoner-agents`](https://github.com/Summoner-Network/summoner-agents) is built from this template and contains only agent code — the SDK is installed via `build_sdk.sh` based on its own `build.txt`.
 
