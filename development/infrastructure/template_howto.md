@@ -96,7 +96,7 @@ If you need the core dev branch later:
 
 * **Lines ending with `.git`** clone that repo and merge **all** packages under `tooling/` into the SDK.
 * **Lines ending with `.git:`** start a block where the next indented lines name specific packages under `tooling/` to include.
-* During the merge, imports like `from tooling.pkg import X` or `from summoner.pkg import X` are **rewritten** to `from pkg import X`, so your code works cleanly after integration.
+* During the merge, imports like `from tooling.pkg import X` are **rewritten** to `from summoner.pkg import X`, so your code works cleanly after integration.
 
 ## When to use which script
 

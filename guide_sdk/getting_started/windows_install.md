@@ -38,7 +38,7 @@ On Windows, the PowerShell script [`build_sdk_on_windows.ps1`](https://github.co
 * Clone **summoner-core** and requested modules
 * Create a Python **`venv/`**
 * Install Python dependencies
-* Normalize composed-module imports (rewrites `from tooling.X` / `from summoner.X` to `from X`)
+* Normalize composed-module imports (rewrites `from tooling.X` to `from summoner.X`)
 * **Skip** building the Rust server (not supported on Windows)
 
 **Install these first:**
@@ -110,7 +110,7 @@ This will:
 * Create `venv/`
 * Clone **summoner-core** and modules from `build.txt`
 * Install Python dependencies
-* Normalize composed-module imports (rewrites `from tooling.X` / `from summoner.X` to `from X`)
+* Normalize composed-module imports (rewrites `from tooling.X` to `from summoner.X`)
 * **Skip** Rust server build on Windows
 
 Activate the environment:
