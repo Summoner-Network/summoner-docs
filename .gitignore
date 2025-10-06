@@ -1,7 +1,8 @@
 # Remy's
 *.DS_Store
 *.old
-mov2gif
+*.mov
+*_palette.png
 extras/
 database/
 

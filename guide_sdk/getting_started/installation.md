@@ -144,7 +144,7 @@ You can modify this file at any time to add or remove modules.
 
 
 <p align="center">
-  <img width="750px" src="../../assets/gifs/sdk_installation.gif" />
+  <img width="750px" src="../../assets/mov2gif/gifs/sdk_installation.gif" />
 </p>
 
 Once `build.txt` is configured, run the script:

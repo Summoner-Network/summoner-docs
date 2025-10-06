@@ -124,7 +124,7 @@ Your prompt should show `(venv)`.
 > *🔁 The demo below was run on POSIX; the Windows flow is analogous.*
 >
 > <p align="center">
->   <img width="750px" src="../../assets/gifs/sdk_installation.gif" />
+>   <img width="750px" src="../../assets/mov2gif/gifs/sdk_installation.gif" />
 > </p>
 
 
