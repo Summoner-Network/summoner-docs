@@ -11,7 +11,7 @@
 
 ### By role
 
-| Topic        | Level     | Page                                                                          |
+| Topic        | Level     | Page link                                                                          |
 | ------------ | --------- | ----------------------------------------------------------------------------- |
 | Server       | Beginner  | [miniSummoner perspective (gentle mockup)](introduction/mini_sdk.md)          |
 | Server       | Beginner  | [miniSummoner simulation (gentle mockup)](introduction/minisdk/multiparty.md) |
@@ -27,7 +27,7 @@
 
 ### By concept
 
-| Concept         | Level      | Page                                                                                                                          |
+| Concept         | Level      | Page link                                                                                                                          |
 | --------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | Receive / Send  | Beginner   | [miniSummoner perspective](introduction/mini_sdk.md)                                                                          |
 | Receive / Send  | Beginner   | [miniSummoner simulation](introduction/minisdk/multiparty.md)                                                                 |
