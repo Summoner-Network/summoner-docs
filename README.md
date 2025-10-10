@@ -18,12 +18,12 @@
 | Server       | Beginner  | [Basics](guide_sdk/getting_started/quickstart/basics_server.md)               |
 | Server       | Initiated | [Getting started](guide_sdk/getting_started/quickstart/begin_server.md)       |
 | Server       | Adept     | [Server configuration](guide_sdk/fundamentals/server_relay.md)                |
-| Client/Agent | Beginner  | [miniSummoner perspective (gentle mockup)](introduction/mini_sdk.md)          |
-| Client/Agent | Beginner  | [miniSummoner simulation (gentle mockup)](introduction/minisdk/multiparty.md) |
-| Client/Agent | Beginner  | [Basics](guide_sdk/getting_started/quickstart/basics_client.md)               |
-| Client/Agent | Initiated | [Getting started](guide_sdk/getting_started/quickstart/begin_client.md)       |
-| Client/Agent | Adept     | [Client configuration](guide_sdk/fundamentals/client_agent.md)                |
-| Client/Agent | Adept     | [Agent design](guide_sdk/fundamentals/design.md)                              |
+| Client / Agent | Beginner  | [miniSummoner perspective (gentle mockup)](introduction/mini_sdk.md)          |
+| Client / Agent | Beginner  | [miniSummoner simulation (gentle mockup)](introduction/minisdk/multiparty.md) |
+| Client / Agent | Beginner  | [Basics](guide_sdk/getting_started/quickstart/basics_client.md)               |
+| Client / Agent | Initiated | [Getting started](guide_sdk/getting_started/quickstart/begin_client.md)       |
+| Client / Agent | Adept     | [Client configuration](guide_sdk/fundamentals/client_agent.md)                |
+| Client / Agent | Adept     | [Agent design](guide_sdk/fundamentals/design.md)                              |
 
 ### By concept
 
