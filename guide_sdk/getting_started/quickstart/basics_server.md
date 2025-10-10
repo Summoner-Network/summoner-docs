@@ -30,6 +30,12 @@ Summoner servers bind to a specific host and port. Clients initiate connections 
 <p align="center">
   <img width="240px" src="../../../assets/img/TCP_illustration_rounded.png"/>
 </p>
+<p align="center">
+  <em><strong>Handshake establishes the connection — both sides then send and receive in parallel.</strong><br>
+  <strong>SYN</strong>: open start • <strong>ACK</strong>: confirm • <strong>FIN</strong>: close politely • <strong>Socket</strong>: TCP endpoint (IP, port, state)</em>
+</p>
+
+
 
 ## Sample Code: Binding to Host and Port
 
@@ -37,7 +43,7 @@ To better understand how TCP connections are established in practice, it helps t
 
 <!-- To accept connections, a server must first bind to an address: a combination of IP and port. This reserves a communication channel where clients can connect and send messages. -->
 
-Below are two simple echo server examples: one written in Python using `asyncio`, and one in Rust using the `tokio` async runtime. Both demonstrate the same principles: 
+Below are two simple "echo servers" (servers that respond by sending back exactly what they receive). One written in Python using `asyncio`, and one in Rust using the `tokio` async runtime. Both demonstrate the same principles: 
 - listening on a port, 
 - accepting client connections, 
 - and responding to received messages.
@@ -45,14 +51,25 @@ Below are two simple echo server examples: one written in Python using `asyncio`
 ### Python (asyncio)
 
 ```python
-async def handle_client(reader, writer):
-    data = await reader.read(100)
-    writer.write(data)
-    await writer.drain()
-    writer.close()
+import asyncio
 
+# This function runs once per client connection
+async def handle_client(reader, writer):
+    # Wait to receive up to 100 bytes from the client
+    data = await reader.read(100)
+
+    # Send the same data back to the client
+    writer.write(data)
+    await writer.drain()  # Ensure the data is sent
+
+    writer.close()  # Close the connection
+
+# Main server loop
 async def main():
+    # Start server on localhost, port 8000
     server = await asyncio.start_server(handle_client, '127.0.0.1', 8000)
+
+    # Keep server running and accepting new clients
     async with server:
         await server.serve_forever()
 
@@ -62,15 +79,26 @@ asyncio.run(main())
 ### Rust (Tokio)
 
 ```rust
+use tokio::net::TcpListener;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
 #[tokio::main]
 async fn main() -> tokio::io::Result<()> {
+    // Bind server to localhost:8000
     let listener = TcpListener::bind("127.0.0.1:8000").await?;
 
     loop {
+        // Wait for a client to connect
         let (mut socket, _) = listener.accept().await?;
+
+        // Handle the client in a separate async task
         tokio::spawn(async move {
             let mut buf = [0; 1024];
+
+            // Read data from the client
             let n = socket.read(&mut buf).await.unwrap();
+
+            // Echo the same data back
             socket.write_all(&buf[0..n]).await.unwrap();
         });
     }

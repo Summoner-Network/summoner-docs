@@ -100,7 +100,7 @@ Summoner accepts configuration from three places. Think of them as layers that r
 
 This order reflects explicitness: dict (constructed in code) > file (named by you) > defaults.
 
-**Note.** Keys present but set to `null` are treated as "unset" and do **not** override `.run(...)` arguments. Use `null` intentionally when you want the code’s `host`/`port` to win.
+**Note.** Keys present but set to `null` are treated as "unset" and do **not** override `.run(...)` arguments. Use `null` intentionally when you want the code's `host`/`port` to win.
 
 #### Address precedence for the client
 
@@ -437,7 +437,7 @@ How the client behaves if the server disconnects or refuses the connection: how 
   * **Type**: string, integer
   * **Default**: inherits from `host`/`port` if unset
   * **What they do**: The fallback server.
-  * **Consequence**: If they inherit the same values, there is no real failover—set a distinct address to truly test fallback.
+  * **Consequence**: If they inherit the same values, there is no real failover — set a distinct address to truly test fallback.
 
 * **`default_retry_limit`**
 

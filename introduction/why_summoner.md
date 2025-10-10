@@ -11,7 +11,7 @@ When people first hear about Summoner, they often ask:
 
 > _How is this different from other agent frameworks like Google's A2A or Anthropic's MCP?_
 
-It's a fair question. Many frameworks today offer support for **multi-agent systems**, **function calling**, and even **agent-to-agent** messaging. But here is the key difference: Summoner moves away from treating agents as cloud functions. Instead, it treats them as entities in a shared, persistent world (more like an MMO game, rather than a suite of microservices waiting to be used). 
+It's a fair question. Many frameworks today offer support for **multi-agent systems**, **function calling**, and even **agent-to-agent** messaging. But here is the key difference: Summoner moves away from treating agents as cloud functions. Instead, it treats them as entities in a shared, persistent world (more like an [MMO game](https://en.wikipedia.org/wiki/Massively_multiplayer_online_game), rather than a suite of microservices waiting to be used). 
 
 <p align="center">
 <img width="350px" src="../assets/img/comic_mmo.png" />
@@ -57,10 +57,10 @@ Imagine you want to build a team of AI agents to assist researchers across labs,
 This is the architecture used by:
 
 * **Anthropic's MCP**, where a _host LLM_ orchestrates tools via `@mcp.tool()` decorators.
-* **Google's A2A**, where an `AgentExecutor` manages agents that declare capabilities through an _Agent Card_ and communicate via task-based requests.
+* **Google's A2A**, where an `AgentExecutor` manages agents that declare capabilities through an _Agent Card_ and communicate via task-based requests. Identity and sessions rely on **OAuth credentials** and **ContextIDs**, centrally issued and scoped by Google.
 
 These systems are optimized for control, governance, and single-session conversations. Typically, they work like this:
-   > You launch an agent, connect it to some APIs, and maybe deploy it to the cloud. All requests flow through a single orchestrator or *host*. If you want two agents to interact, they must go through the orchestrator's registry or approval. Want to add a third team's network? Now you need to set up permissions, register new credentials, and merge catalogs by hand.
+  > You launch an agent, connect it to some APIs, and maybe deploy it to the cloud. All requests flow through a single orchestrator or *host*. If you want two agents to interact, they must go through the orchestrator's registry or approval. Want to add a third team's network? Now you need to set up permissions, register new credentials, and merge catalogs by hand.
 
 Now imagine the same problem, but with agents that:
 
@@ -69,8 +69,10 @@ Now imagine the same problem, but with agents that:
 * Form peer-to-peer relationships.
 * Operate on the open internet without a central coordinator.
 
-This is Summoner's design. There's no central orchestrator, no need to merge permissions, no host mediating every action. The world is the network; ownership is local; trust is earned through direct interaction. Summoner typically works like this:
-   > Here, every agent is an independent *inhabitant* of the network. Agents have identities they assign themselves. If two agents meet — perhaps because one *travels* from its home server to a conference server — they can exchange messages immediately. If two research groups bring their agent graphs to a workshop and even one node overlaps, their systems become one larger network: conversations and collaboration begin instantly.
+This is Summoner's design. There is no central orchestrator, no need to pre-register permissions, and no host mediating every interaction. Instead, security emerges through cryptographic trust, not central approval. Each agent carries a **self-assigned decentralized identity (DID)**, and relationships are built through **verifiable interaction histories**. Agents are not bound to any provider, registry, or host, but they belong to themselves. **Ownership is truly local: identities, logic, and access policies travel with the agent**. Privacy is preserved by design, and trust is earned — not assumed — through signed messages, nonce protection, and direct exchange.
+
+Summoner typically works like this:
+  > Here, every agent is an independent *inhabitant* of the network. Agents have identities they assign themselves. If two agents meet — perhaps because one *travels* from its home server to a conference server — they can exchange messages immediately. If two research groups bring their agent graphs to a workshop and even one node overlaps, their systems become one larger network: conversations and collaboration begin instantly.
 
 
 ## Summoner: a new Architecture for distributed agents

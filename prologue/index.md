@@ -7,7 +7,7 @@
 Summoner is a framework for deploying, connecting, and orchestrating multi-agent systems across multiple machines. With its desktop app, you can effortlessly configure, launch, and monitor agents from a unified interface, supporting the emerging infrastructure of the internet of intelligent, autonomous programs.
 
 <p align="center">
-<img width="450px" src="../assets/img/summoner_user.png" />
+<img width="450px" src="../assets/img/summoner_user_rounded.png" />
 </p>
 
 

@@ -12,7 +12,7 @@ Summoner servers act as untrusted relays. They accept TCP connections, read inpu
 
 The wire format is intentionally simple: the protocol is line based, so each payload should end with `\n`. If a client forgets the trailing newline, the server adds it when broadcasting. Broadcasts exclude the original sender, which means every client receives the message set it did not originate and must decide what to process or ignore.
 
-Each outbound frame is a single JSON line with a trailing `\n`, carrying the sender’s `remote_addr` and the original `content`. E.g.: 
+Each outbound frame is a single JSON line with a trailing `\n`, carrying the sender's `remote_addr` and the original `content`. E.g.: 
 ```python
 '{"remote_addr":"<ip:port>","content":"<line minus trailing \\n>"}\n'
 ```
@@ -438,7 +438,7 @@ A standard `strftime` pattern. Increase fractional precision if you want finer t
 * **Default**: `null`
 * **Used by**: **Python/Rust**
 
-When set, the logger prunes the client’s JSON content to these keys before recording it. This reduces accidental leakage of large payloads or private data in logs. If the incoming line is not JSON, the original text is logged.
+When set, the logger prunes the client's JSON content to these keys before recording it. This reduces accidental leakage of large payloads or private data in logs. If the incoming line is not JSON, the original text is logged.
 
 **Reasonable values**
 Start with a small set such as `["route", "type", "id"]`. Expand only when you need more detail.
@@ -449,7 +449,7 @@ Start with a small set such as `["route", "type", "id"]`. Expand only when you n
 * **Default**: ANSI-colored pattern (see Python defaults)
 * **Used by**: **Python**
 
-Controls the console text layout and coloring for the Python logger’s stdout handler.
+Controls the console text layout and coloring for the Python logger's stdout handler.
 
 ### `logger.log_format` *(Python only)*
 
@@ -457,7 +457,7 @@ Controls the console text layout and coloring for the Python logger’s stdout h
 * **Default**: `'%(asctime)s - %(name)s - %(levelname)s - %(message)s'`
 * **Used by**: **Python**
 
-Controls the file text layout (and JSON preamble fields) for the Python logger’s file handler.
+Controls the file text layout (and JSON preamble fields) for the Python logger's file handler.
 
 ### `logger.max_file_size` *(Python only)*
 
@@ -613,7 +613,7 @@ Duration of the throttling pause when applied.
 * **Defaults**: `true`, `300`
 * **Used by**: **Rust**
 
-Flow control pauses the sender’s reads for a longer period. Use this when throttling alone cannot keep queues small.
+Flow control pauses the sender's reads for a longer period. Use this when throttling alone cannot keep queues small.
 
 #### `flow_control_delay_ms`
 

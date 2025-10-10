@@ -122,7 +122,7 @@ merger.run(config_dict={"logger": {"level": "INFO"}})
 
 **Notes**
 
-* If two donors refer to **the same module-level name** in the **same module**, the rebinding targets the **same global**—be mindful of collisions.
+* If two donors refer to **the same module-level name** in the **same module**, the rebinding targets the **same global** — be mindful of collisions.
 * Donor-specific module state (counters, caches) remains shared per module due to cloning with the same `__globals__` and closures.
 
 ---

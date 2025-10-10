@@ -4,24 +4,124 @@
   <img width="300px" src="assets/img/img_intro_2_rounded.png" />
 </p>
 
-<details>
-<summary><b>📝 Todos</b></summary>
 
-- [x] Docs for launch
-- [ ] To be updated at the **Aurora update**:
-    - [ ] Update [What does the Summoner SDK do?](guide_sdk/getting_started/what_is.md)
-    - [ ] Check [Update Installation](guide_sdk/getting_started/installation.md)
-    - [ ] Check [Windows Installation](guide_sdk/getting_started/windows_install.md)
-    - [ ] Update [server's basics](guide_sdk/getting_started/quickstart/basics_server.md)
-    - [ ] Update [client's basics](guide_sdk/getting_started/quickstart/basics_client.md)
-    - [ ] Update [Getting started: Server](guide_sdk/getting_started/quickstart/begin_server.md)
-    - [ ] Update [Getting started: clients & agents](guide_sdk/getting_started/quickstart/basics_client.md)
-    - [ ] Update [reference](reference/index.md)
-    - [ ] Update [Advanced usage: server](guide_sdk/advanced_usage/server_setup.md)
-    - [ ] Update [Advanced usage: server](guide_sdk/advanced_usage/agent_setup.md)
-    - ...
+## 🔎 Technical Index (quick search by keywords)
+
+<details><summary>See list of keywords</summary>
+
+### By role
+
+| Topic        | Level     | Page                                                                          |
+| ------------ | --------- | ----------------------------------------------------------------------------- |
+| Server       | Beginner  | [miniSummoner perspective (gentle mockup)](introduction/mini_sdk.md)          |
+| Server       | Beginner  | [miniSummoner simulation (gentle mockup)](introduction/minisdk/multiparty.md) |
+| Server       | Beginner  | [Basics](guide_sdk/getting_started/quickstart/basics_server.md)               |
+| Server       | Initiated | [Getting started](guide_sdk/getting_started/quickstart/begin_server.md)       |
+| Server       | Adept     | [Server configuration](guide_sdk/fundamentals/server_relay.md)                |
+| Client/Agent | Beginner  | [miniSummoner perspective (gentle mockup)](introduction/mini_sdk.md)          |
+| Client/Agent | Beginner  | [miniSummoner simulation (gentle mockup)](introduction/minisdk/multiparty.md) |
+| Client/Agent | Beginner  | [Basics](guide_sdk/getting_started/quickstart/basics_client.md)               |
+| Client/Agent | Initiated | [Getting started](guide_sdk/getting_started/quickstart/begin_client.md)       |
+| Client/Agent | Adept     | [Client configuration](guide_sdk/fundamentals/client_agent.md)                |
+| Client/Agent | Adept     | [Agent design](guide_sdk/fundamentals/design.md)                              |
+
+### By concept
+
+| Concept         | Level      | Page                                                                                                                          |
+| --------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Receive / Send  | Beginner   | [miniSummoner perspective](introduction/mini_sdk.md)                                                                          |
+| Receive / Send  | Beginner   | [miniSummoner simulation](introduction/minisdk/multiparty.md)                                                                 |
+| Receive / Send  | Initiated  | [Simple agents](guide_sdk/getting_started/quickstart/begin_client.md#building-interactive-agents)                             |
+| Receive / Send  | Apprentice | [Flows for receive/send](guide_sdk/getting_started/quickstart/begin_flow.md#orchestrating-receivesend-with-flows)             |
+| Receive / Send  | Adept      | [Messaging primitives and idioms](guide_sdk/fundamentals/design.md#messaging-primitives-and-idioms)                           |
+| Routes & States | Beginner   | [miniSummoner finite-state mockup](introduction/minisdk/mini_fsm_agents.md)                                                   |
+| Routes & States | Beginner   | [Knowledge requirements](guide_sdk/getting_started/prerequisites.md#knowledge-requirements)                                   |
+| Routes & States | Beginner   | [Basics (graph logic)](guide_sdk/getting_started/quickstart/basics_client.md#graphs-of-endpoints)                             |
+| Routes & States | Initiated  | [Composition in capabilities](guide_sdk/getting_started/quickstart/begin_client.md#composition-thinking-in-capabilities)      |
+| Routes & States | Apprentice | [Advanced route shapes](guide_sdk/getting_started/quickstart/begin_flow.md#advanced-route-shapes)                             |
+| Routes & States | Adept      | [State and flows (explicit automata)](guide_sdk/fundamentals/design.md#state-and-flows-explicit-automata-over-implicit-flags) |
+| Hooks           | Apprentice | [Hooks & priorities](guide_sdk/getting_started/quickstart/begin_flow.md#hooks--priorities-prepost-processing)                 |
+| Travel          | Adept      | [Command-gating your agent](guide_sdk/fundamentals/design.md#command-gating-your-agent)                                       |
+| Events          | Apprentice | [Route DSL & semantics](guide_sdk/getting_started/quickstart/begin_flow.md#route-dsl--semantics)                              |
+
+### Aurora (upcoming release)
+
+* [What does the Summoner SDK do?](guide_sdk/getting_started/what_is.md)
+* [Update Installation](guide_sdk/getting_started/installation.md)
+* [Windows Installation](guide_sdk/getting_started/windows_install.md)
+* [server's basics](guide_sdk/getting_started/quickstart/basics_server.md)
+* [client's basics](guide_sdk/getting_started/quickstart/basics_client.md)
+* [Getting started: Server](guide_sdk/getting_started/quickstart/begin_server.md)
+* [Getting started: clients & agents](guide_sdk/getting_started/quickstart/basics_client.md)
+* [reference](reference/index.md)
+* [Advanced usage: server](guide_sdk/advanced_usage/server_setup.md)
+* [Advanced usage: server](guide_sdk/advanced_usage/agent_setup.md)
+
+
+<!-- 
+**Server**  
+
+* [Beginner] [miniSummoner perspective (very gentle mock up)](introduction/mini_sdk.md)
+* [Beginner] [miniSummoner simulation (gentle mock up)](introduction/minisdk/multiparty.md)
+* [Beginner] [Basics](guide_sdk/getting_started/quickstart/basics_server.md)
+* [Initiated] [Getting Started](guide_sdk/getting_started/quickstart/begin_server.md)
+* [Adept] [Server configutation](guide_sdk/fundamentals/server_relay.md)
+
+**Client / Agent**  
+
+* [Beginner] [miniSummoner perspective (very gentle mock up)](introduction/mini_sdk.md)
+* [Beginner] [miniSummoner simulation (gentle mock up)](introduction/minisdk/multiparty.md)
+* [Begginer] [Basics](guide_sdk/getting_started/quickstart/basics_client.md)
+* [Initiated] [Getting Started](guide_sdk/getting_started/quickstart/begin_client.md)
+* [Adept] [Client configuration](guide_sdk/fundamentals/client_agent.md)
+* [Adept] [Agent design](guide_sdk/fundamentals/design.md)
+
+
+**Receive / Send**  
+
+* [Beginner] [miniSummoner perspective (very gentle mock up)](introduction/mini_sdk.md)
+* [Beginner] [miniSummoner simulation (gentle mock up)](introduction/minisdk/multiparty.md)
+* [Initiated] [Getting Started (simple agents)](guide_sdk/getting_started/quickstart/begin_client.md#building-interactive-agents)
+* [Apprentice] [Build your agents with flow logic](guide_sdk/getting_started/quickstart/begin_flow.md#orchestrating-receivesend-with-flows)
+* [Adept] [Agent design](guide_sdk/fundamentals/design.md#messaging-primitives-and-idioms)
+
+**Routes & States** 
+
+* [Beginner] [miniSummoner perspective (gentle mock up)](introduction/minisdk/mini_fsm_agents.md)
+* [Beginner] [Knowledge requirements](guide_sdk/getting_started/prerequisites.md#knowledge-requirements)
+* [Begginer] [Basics (graph logic)](guide_sdk/getting_started/quickstart/basics_client.md#graphs-of-endpoints)
+* [Initiated] [Getting Started (compositional advantage)](guide_sdk/getting_started/quickstart/begin_client.md#composition-thinking-in-capabilities)
+* [Apprentice] [Build your agents with flow logic](guide_sdk/getting_started/quickstart/begin_flow.md#advanced-route-shapes)
+* [Adept] [Agent design](guide_sdk/fundamentals/design.md#state-and-flows-explicit-automata-over-implicit-flags)
+
+**Hooks**  
+
+* [Apprentice] [Build your agents with flow logic](guide_sdk/getting_started/quickstart/begin_flow.md#hooks--priorities-prepost-processing)
+
+**Travel**  
+
+* [Adept] [Agent design](guide_sdk/fundamentals/design.md#command-gating-your-agent)
+
+**Events** 
+
+* [Apprentice] [Build your agents with flow logic](guide_sdk/getting_started/quickstart/begin_flow.md#route-dsl--semantics)
+
+**Aurora (Upcoming Release)**
+
+* [What does the Summoner SDK do?](guide_sdk/getting_started/what_is.md)
+* [Update Installation](guide_sdk/getting_started/installation.md)
+* [Windows Installation](guide_sdk/getting_started/windows_install.md)
+* [server's basics](guide_sdk/getting_started/quickstart/basics_server.md)
+* [client's basics](guide_sdk/getting_started/quickstart/basics_client.md)
+* [Getting started: Server](guide_sdk/getting_started/quickstart/begin_server.md)
+* [Getting started: clients & agents](guide_sdk/getting_started/quickstart/basics_client.md)
+* [reference](reference/index.md)
+* [Advanced usage: server](guide_sdk/advanced_usage/server_setup.md)
+* [Advanced usage: server](guide_sdk/advanced_usage/agent_setup.md) -->
 
 </details>
+
+
 
 ## 📚 Documentation Overview
 

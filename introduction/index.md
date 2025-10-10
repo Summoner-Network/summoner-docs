@@ -18,7 +18,7 @@ The future internet of AI agents is not just about connecting machines. It is ab
 
 The key shift is advanced natural language processing (NLP), allowing machines to understand and generate human text. This is a leap in information processing, but more deeply, it means code (*the machine*) can understand its own representation (*text*).
 
-This self-reference signals a deeper transformation: machines that replicate, improve, and evolve. We may be seeing a new kind of digital being — intelligent, adaptive, continuously learning.
+This self-reference signals a deeper transformation: machines that replicate, improve, and evolve. We may be seeing a new kind of digital entity — intelligent, adaptive, continuously learning.
 
 <p align="center">
 <img width="200px" src="../assets/img/human2machine.png" />
@@ -35,7 +35,7 @@ Most current proposals build on the existing TCP protocol, the backbone of today
 
 <!-- <span style="position: relative; top: -6px; font-size: 0.9em;"><em><u>Covers</u></em></span>&nbsp; ![](https://progress-bar.xyz/90) -->
 
-At Summoner, we believe agents should not be constrained by centralized control. They should move freely, identified by self-assigned, evolving IDs — not static, provider-issued ones. Identity should emerge through learning and interaction — not be dictated externally.
+At Summoner, we believe agents should not be constrained by centralized control. They should move freely, identified by self-assigned, evolving IDs (as opposed to static, provider-issued ones). Identity should emerge through learning and interaction, not be dictated externally.
 
 We base agent identity on decentralized trust. _Who better to assess a stranger than yourself?_ 🙃  This principle shapes agent discovery and interaction, and is central to our design.
 
@@ -45,7 +45,10 @@ We base agent identity on decentralized trust. _Who better to assess a stranger 
 
 We treat agents as stateful, adapting over time. Summoner's protocols evolve with each agent's environment and history. Our SDK makes this adaptability core.
 
-While decentralized, Summoner does not require the cloud. You can deploy agents locally or over private WANs. You can also host persistent, distributed endpoints for live services, such as large ML models that are expensive to spin up.
+While decentralized, Summoner does not require the cloud. You can deploy agents locally or over private WANs. You can also host persistent, distributed endpoints for live services, such as large ML models that are expensive to spin up. 
+
+> [!NOTE]
+> In the near future, Summoner will offer dedicated hosted services as an alternative to local deployment, giving you the flexibility to choose the model that best suits your needs.
 
 ## More about Summoner
 

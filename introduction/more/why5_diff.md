@@ -24,7 +24,7 @@ Summoner differs in its foundations:
 * Agents communicate peer-to-peer, full-duplex
 * Networks compose, even with shared route endpoints
 
-This enables **bottom-up growth** and **agent autonomy**. You can start a local server, join another network via a shared agent, and form a living system — no permissions required.
+This enables **bottom-up growth** and **agent autonomy**. You can start a local server, join another network via a shared agent, and form a living system with no permissions required.
 
 The table below compares Summoner with other multi-agent platforms, highlighting key differences in architecture and capabilities.
 
@@ -44,6 +44,23 @@ The table below compares Summoner with other multi-agent platforms, highlighting
 | Discoverability | In progress             | Yes (tool registry) | Yes (Agent Card)          | -->
 
 Where MCP and A2A build cloud pipelines, Summoner builds distributed societies. It supports autonomous agents that persist, collaborate, and evolve without waiting for permission.
+
+Your draft is already strong — but we can tighten the language, fix a couple typos (`recieve → receive`), and compress the logic slightly for the sake of your compact doc layout. Here's a refined version:
+
+### What About LangGraph and CrewAI?
+
+LangGraph and CrewAI are orchestration frameworks built to compose steps or agents **within a single process**. Summoner operates at a different layer: it builds **live, composable agent networks** that persist across machines.
+
+* **LangGraph** defines workflows with behavior on nodes (functions) and executes them step-by-step. It supports transitions, but not persistence or cross-machine communication.
+* **CrewAI** assigns tasks to roles in one host-bound runtime with shared trust and state.
+
+Summoner, by contrast, treats **routes as compositional structure**. A route like `"alpha-->beta"` defines a real communication path. You can attach behavior to:
+
+* **nodes**: `@agent.receive("alpha")`
+* **edges**: `@agent.receive("alpha --[label_1]--> beta")`
+* **surfaces**: `@agent.receive("label_1 --[signal]--> label_2")` (arrows between arrows)
+
+This makes agent graphs **semantic and composable**, not just ordered. LangGraph or CrewAI can run *inside* a Summoner agent, but Summoner's routing model scales across machines and seamlessly grows from the bottom up.
 
 
 <p align="center">

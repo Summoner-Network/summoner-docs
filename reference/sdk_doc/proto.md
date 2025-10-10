@@ -53,7 +53,7 @@ tape = StateTape({"k0": ["A"]})
 activations_by_prio = tape.collect_activations(receiver_index, parsed_routes)
 ````
 
-> **Tip:** `str(ParsedRoute)` is a canonical, whitespace-free form—use it as the map key across your indices.
+> **Tip:** `str(ParsedRoute)` is a canonical, whitespace-free form — use it as the map key across your indices.
 
 ## Route grammar (cheat sheet)
 

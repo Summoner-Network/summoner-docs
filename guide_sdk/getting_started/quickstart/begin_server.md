@@ -165,7 +165,7 @@ This time the server will **ignore the Python arguments** and use the config fil
 
 ## Communication Model: Broadcast by Default
 
-As of July 2025, Summoner servers use **broadcast messaging**:
+Summoner servers are designed to support multiple communication modes — including broadcast, dedicated relays, and hosted routing — through a programmable interface. The default behavior (when no specific configuration is applied) is broadcast messaging:
 
 * Every message is sent to all connected clients **except** the sender
 * Clients must decide whether to process or ignore what they receive
@@ -194,7 +194,7 @@ This model simplifies transport and encourages openness, but it also means each 
 
 ## Roadmap: Server Modes and Routing Models
 
-The current broadcast model works well for open interaction. But depending on your use case, different routing topologies may be more appropriate. These are under active development.
+Broadcast works well for open-ended interaction. But depending on your use case, different routing topologies may be more appropriate. These are part of the evolving runtime.
 
 | Mode          | Description                               | Example Use Case                     |
 | ------------- | ----------------------------------------- | ------------------------------------ |

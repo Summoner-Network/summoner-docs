@@ -55,7 +55,7 @@ This page explains what to use depending on your goal, how the repositories fit 
 ## Licensing and IP status
 
 Unless a repository states otherwise, Summoner public repositories are licensed under the **Apache License, Version 2.0**.
-The **controlling terms are the `LICENSE` file at the root of each repository**. If a repository lacks a `LICENSE`, no license is granted—open an issue.
+The **controlling terms are the `LICENSE` file at the root of each repository**. If a repository lacks a `LICENSE`, no license is granted — open an issue.
 
 > [!IMPORTANT]
 > **What Apache-2.0 allows**

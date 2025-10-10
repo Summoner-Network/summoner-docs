@@ -36,7 +36,7 @@ What happens next: we discuss scope in the issue, may ask for a tighter repro, a
 
 ## Why decorators are the center of the design
 
-In Summoner, an agent's behavior is attached to a client through **decorators**. The core already provides `@receive`, `@send`, and `@hook`. Your own framework should look and feel the same so that tools, logs, and the runtime treat your handlers just like native ones. Beyond message handling, similar patterns can be used to compose agent identities, apply cryptographic envelopes, and add validation or policy—see the API catalog for the full surface.
+In Summoner, an agent's behavior is attached to a client through **decorators**. The core already provides `@receive`, `@send`, and `@hook`. Your own framework should look and feel the same so that tools, logs, and the runtime treat your handlers just like native ones. Beyond message handling, similar patterns can be used to compose agent identities, apply cryptographic envelopes, and add validation or policy — see the API catalog for the full surface.
 
 A decorator in Python is just syntax sugar for "wrap this function with another function." The minimal idea looks like this:
 
@@ -58,7 +58,7 @@ When you create a new decorator for your framework, think in four steps.
 
 **First, validate the handler.** Use the core helper `_check_param_and_return` to check that the function is `async`, accepts the right parameters, and returns the expected types. This keeps your behavior consistent with `@receive` and `@send`.
 
-**Second, capture "DNA."** Store a small record of the decorated function—route, priority, and the function's source—in `self._dna_receivers`, `self._dna_senders`, or `self._dna_hooks`. This allows tooling to serialize your agent, diff changes, and reconstruct handlers during SDK assembly.
+**Second, capture "DNA."** Store a small record of the decorated function — route, priority, and the function's source — in `self._dna_receivers`, `self._dna_senders`, or `self._dna_hooks`. This allows tooling to serialize your agent, diff changes, and reconstruct handlers during SDK assembly.
 
 **Third, register the callable.** Create a `Receiver` (or `Sender`) and place it into the client's indexes. If Flow is enabled on the client, always normalize the route with `Flow.parse_route(...)` before you register it. Use the client's locks (`routes_lock`, `hooks_lock`) when touching shared state.
 
@@ -162,7 +162,7 @@ async def wrapped(payload):
     return await fn(payload)
 ```
 
-Both of these patterns sit entirely inside your wrapper. The rest of the decorator—validation, DNA, registration, scheduling—stays the same and continues to use the core machinery.
+Both of these patterns sit entirely inside your wrapper. The rest of the decorator — validation, DNA, registration, scheduling — stays the same and continues to use the core machinery.
 
 ## Decorators that take arguments: the three-layer pattern
 

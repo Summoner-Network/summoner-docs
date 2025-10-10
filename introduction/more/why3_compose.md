@@ -44,7 +44,7 @@ If two agents (or entire networks) share a common node — represented by the sa
 <img width="220px" src="../../assets/img/agent_comp2_rounded.png" />
 </p>
 
-Summoner's model of composition is not merely a technical mechanism. It reflects a broader vision of agents as **self-contained entities**</strong>** with their own structure and behavior. This allows networks to grow _organically_. 
+Summoner's model of composition is not merely a technical mechanism. It reflects a broader vision of agents as **self-contained entities** with their own structure and behavior. This allows networks to grow _organically_. 
 
 When collaboration arises, there is no need for permission or rewiring — the graphs simply extend. This bottom-up, permissionless model mirrors how real systems collaborate in practice: through shared structure and mutual context.
 

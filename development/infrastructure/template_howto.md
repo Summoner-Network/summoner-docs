@@ -22,7 +22,7 @@ Templates give you the right layout and the scripts you need. You should **not**
 ## No custom scripts needed
 
 * When you start from **starter-template**, run **its** `install.sh`.
-* When you assemble an SDK, run **summoner-sdk’s** `build_sdk.sh`.
+* When you assemble an SDK, run **summoner-sdk's** `build_sdk.sh`.
 * Do not add a `build_sdk` function to your own `install.sh`. It duplicates what `build_sdk.sh` already does.
 
 ## Two standard workflows

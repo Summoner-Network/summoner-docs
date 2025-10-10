@@ -1,6 +1,6 @@
 # The Zen of Summoner
 
-> Essentials of Summoner’s coding style.
+> Essentials of Summoner's coding style.
 
 <p align="center">
   <img width="350px" src="../../assets/img/fundamentals_rounded.png" />

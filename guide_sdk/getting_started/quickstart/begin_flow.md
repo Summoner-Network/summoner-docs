@@ -202,7 +202,7 @@ obj.activated_nodes(None)  # ('opened','notify')
 ## Orchestrating Receive/Send with Flows
 
 <p align="center">
-  <img width="300px" src="../../../assets/img/flow_orchestration_rounded.png"/>
+  <img width="400px" src="../../../assets/img/flow_orchestration_rounded.png"/>
 </p>
 
 ### Upload & Download: State Negotiation
@@ -211,7 +211,7 @@ obj.activated_nodes(None)  # ('opened','notify')
 Flows are driven by what you **upload** and what you then **commit** in **download**. Upload reports your current position in the graph while download is where you fold the engine's proposals back into your own state.
 
 <p align="center">
-  <img width="600px" src="../../../assets/img/download_upload_flow_rounded.png"/>
+  <img width="700px" src="../../../assets/img/download_upload_flow_rounded.png"/>
 </p>
 
 
@@ -408,7 +408,7 @@ Here is the loop: the runtime calls **upload** to learn the current node, runs t
 ### Sending: Ticks vs. Hubs
 
 <p align="center">
-  <img width="540px" src="../../../assets/img/tick_hub_send_rounded.png"/>
+  <img width="640px" src="../../../assets/img/tick_hub_send_rounded.png"/>
 </p>
 
 There are two ways an agent emits. A **tick sender** runs every cycle and decides on each pass whether to return a payload (and therefore send) or `None` (and remain quiet). A **hub sender** is *event-driven*: it runs immediately after a receiver has returned an Event that matches the hub's filters. Tick is how you do heartbeats and maintenance; hubs are how you react *right after* specific outcomes.
@@ -585,13 +585,13 @@ With those two shapes in mind, the "stitched" minimal loop reads cleanly: advert
 
 **Remember:** returning `None` from a sender means "no message this cycle", and labels let you hang hubs without forcing a node change.
 
-## Hooks & Priorities: Pre/Post Processing
+<!-- ## Hooks & Priorities: Pre/Post Processing
 
 Hooks are small functions that run around handlers: at RECEIVE (before a payload reaches any receiver) and at SEND (just before a payload is emitted). Use them for cross-cutting concerns that sit outside your flow logic: authentication, schema validation, deduplication, stamping identity, or rate limits.
 
 
 <p align="center">
-  <img width="680px" src="../../../assets/img/hook_illustration_rounded.png"/>
+  <img width="780px" src="../../../assets/img/hook_illustration_rounded.png"/>
 </p>
 
 Order can matter. Both hooks and receivers accept a priority tuple: the lower tuples run earlier. Keep hooks small and deterministic. They run on every message once before or after each batch of triggered `@receive` or `@send` handlers.
@@ -622,7 +622,125 @@ async def stamp_identity(payload):
     if isinstance(payload, dict):
         payload.setdefault("from", AGENT_ID)
     return payload
+``` -->
+
+
+## Hooks & Priorities: Pre/Post Processing
+
+Hooks are small functions that run around receivers. A **receiving hook** runs before a payload reaches any receiver. A **sending hook** runs just before a payload is emitted. Use hooks for cross-cutting concerns that do not belong in flow logic: authentication, schema validation, deduplication, stamping identity, rate limiting, and similar tasks.
+
+<p align="center">
+  <img width="780px" src="../../../assets/img/hook_illustration_rounded.png"/>
+</p>
+
+A hook can inspect or modify messages **before** your main logic runs, or **after**, just before emitting a message to the server. For example, this simple receiving hook drops any non-dictionary payloads:
+
+```python
+from summoner.protocol import Direction
+
+@client.hook(direction=Direction.RECEIVE)
+async def require_dict(msg):
+    if not isinstance(msg, dict):
+        return  # drop silently
+    return msg
 ```
+
+The main point of receiving hooks is to contain preliminary steps that apply across multiple routes. Specifically, receiving hooks run **once per message**. After they complete, the message is delivered to all matching receivers.
+
+> [!NOTE]
+> If those preliminary steps were implemented inside each receiver, the work would be repeated for every receiver. Parallel execution can help, but in practice worker queues limit the actual concurrency.
+
+Here is an example that extracts shared logic into a receiving hook so receivers stay focused:
+
+```python
+# selective_echo.py
+from summoner.client import SummonerClient
+from summoner.protocol import Direction
+
+client = SummonerClient()
+
+@client.hook(direction=Direction.RECEIVE)
+async def require_dict(msg):
+    # Drop non-dict payloads early so receivers stay simple.
+    if not isinstance(msg, dict) or "from" not in msg or "content" not in msg:
+        print("Dropped payload:", msg)
+        return
+    return msg
+
+@client.receive("echo")
+async def echo_handler(msg):
+    # If we reach here, the message passed the hook.
+    sender_id = msg["from"]
+    content = msg["content"]
+    print(f"You received a message from {sender_id}:", content)
+
+client.run()
+```
+
+This agent logs messages only if they pass the `require_dict` filter. It is a simple way to enforce structure or permissions before routing logic runs. Moving common checks into hooks keeps receivers small and focused. As a rule of thumb, prefer hooks for validation and stamping, and use receivers to implement task-specific behavior.
+
+**Order and priorities**
+
+Both hooks and receivers accept a `priority` tuple; lower values run earlier. Use priorities to build a clear preprocessing chain. For example:
+
+```python
+@client.hook(direction=Direction.RECEIVE, priority=(0,))
+async def validate_schema(msg): ...
+
+@client.hook(direction=Direction.RECEIVE, priority=(1,))
+async def deduplicate(msg): ...
+
+@client.hook(direction=Direction.RECEIVE, priority=(2,))
+async def rate_limit(msg): ...
+```
+
+All receiving hooks run (in priority order) before the batch of triggered `@client.receive(...)` receivers. Likewise, sending hooks run (in priority order) after any `@client.send(...)` logic and immediately before emission. In practice, a receiving hook is a good place to block unwanted messages early, while a sending hook is a reliable place to stamp identity.
+
+A more complete example:
+
+```python
+from summoner.protocol import Direction
+
+BANNED = {"agent:badwolf"}
+AGENT_ID = "agent:123"
+
+@client.hook(direction=Direction.RECEIVE, priority=(0,))
+async def reject_banned(msg):
+    # Drop messages from banned senders before any receiver runs.
+    if isinstance(msg, dict) and msg.get("from") in BANNED:
+        return  # drop
+    return msg
+
+@client.hook(direction=Direction.RECEIVE, priority=(1,))
+async def require_content(msg):
+    # Basic schema check; prevents receivers from handling invalid shapes.
+    if not isinstance(msg, dict) or "content" not in msg:
+        return  # drop
+    return msg
+
+@client.hook(direction=Direction.SEND, priority=(0,))
+async def stamp_identity(payload):
+    # Attach identity once, centrally; senders stay pure.
+    if isinstance(payload, dict):
+        payload.setdefault("from", AGENT_ID)
+    return payload
+```
+
+**Best practices**
+
+* Prefer hooks for validation, filtering, stamping, and other cross-cutting concerns.
+* Keep hooks small and deterministic.
+* Use receivers for task-specific behavior.
+* Use `priority` tuples to control ordering when multiple hooks are needed.
+
+By moving validation, policy, and stamping into hooks, you keep receivers and senders small, consistent, composable, and easier to reason about.
+
+> [!TIP]
+> Minimal representative examples of agents using hooks to filter or sign messages:
+>
+> * [`EchoAgent_1`](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_EchoAgent_1/agent.py): Demonstrates a receiving hook used to validate and filter incoming messages before buffering.
+> * [`EchoAgent_2`](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_EchoAgent_2/agent.py): Demonstrates both receiving and sending hooks to validate incoming messages and sign outgoing ones.
+
 
 ## Semantics & Best Practices
 

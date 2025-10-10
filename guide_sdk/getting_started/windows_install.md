@@ -19,7 +19,7 @@ For Linux/macOS users, see the POSIX installer [here](installation.md).
 
 The **[`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk)** repository is a **GitHub template**. You do not modify it in place: click **Use this template** to generate your own SDK repo that contains only the installer and composition logic.
 
-You decide which features to include by editing **`build.txt`** in your new repo. The Windows installer then composes your SDK accordingly—pulling in the **SDK core** and any modules you list.
+You decide which features to include by editing **`build.txt`** in your new repo. The Windows installer then composes your SDK accordingly — pulling in the **SDK core** and any modules you list.
 
 > [!NOTE]
 > The template's default `build.txt` references:
