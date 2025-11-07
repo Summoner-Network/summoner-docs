@@ -10,7 +10,7 @@ from summoner.protocol.flow import Flow
 flow = Flow().activate()
 flow.add_arrow_style(stem='-', brackets=('[', ']'), separator=',', tip='>')
 flow.add_arrow_style(stem='=', brackets=('{', '}'), separator=';', tip=')')
-flow.ready()  # optional; `parse_route` will prepare automatically
+flow.compile_arrow_patterns()  # Optional: precompile arrow style(s) listed above
 
 r1 = flow.parse_route('A --[ f, g ]--> B, C')
 assert str(r1) == 'A--[f,g]-->B,C' and r1.is_arrow
@@ -106,7 +106,7 @@ summoner.protocol.flow.Flow(triggers_file: str | None = None)
 
 | Name     | Type              | Access     | Description                                              |
 | -------- | ----------------- | ---------- | -------------------------------------------------------- |
-| `in_use` | `bool`            | read write | When `True`, `ready()` will compile regexes immediately. |
+| `in_use` | `bool`            | read write | When `True`, `compile_arrow_patterns()` will compile regexes immediately. |
 | `arrows` | `set[ArrowStyle]` | read write | Registered arrow styles used to build the parser.        |
 
 **Methods**
@@ -211,12 +211,12 @@ Trigger2 = flow.triggers(json_dict={"OK": None})
 
 ---
 
-### `ready`
+### `compile_arrow_patterns`
 
 **Signature**
 
 ```python
-Flow.ready(self) -> None
+Flow.compile_arrow_patterns(self) -> None
 ```
 
 **Description**
@@ -226,7 +226,9 @@ If `in_use` is `True`, compile regex patterns for all registered arrow styles. I
 **Example**
 
 ```python
-flow.activate(); flow.add_arrow_style('-', ('[', ']'), ',', '>'); flow.ready()
+flow.activate() 
+flow.add_arrow_style('-', ('[', ']'), ',', '>')
+flow.compile_arrow_patterns()
 ```
 
 ---

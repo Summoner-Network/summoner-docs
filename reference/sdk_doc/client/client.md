@@ -137,7 +137,7 @@ client.initialize() -> None
 ```
 
 * `flow()` exposes the internal `Flow` instance. To enable **route normalization** and **reactive senders**, call `client.flow().activate()` and add at least one `ArrowStyle` before `run()`.
-* `initialize()` calls `Flow.ready()`; if the flow is not `in_use`, parsing still works but normalization/reactivity features are not enabled.
+* `initialize()` calls `Flow.compile_arrow_patterns()`; if the flow is not `in_use`, parsing still works but normalization/reactivity features are not enabled.
 
 **Example**
 

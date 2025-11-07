@@ -37,7 +37,7 @@ error
   minor
   major
 """)
-flow.ready()
+flow.compile_arrow_patterns()
 
 # 2) Parse a route (normalized string form works as a stable key)
 r = flow.parse_route("A, C --[ f, g ]--> B, K")

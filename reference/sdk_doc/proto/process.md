@@ -506,7 +506,9 @@ assert isinstance(st2.revert(), list)
 from summoner.protocol.process import StateTape, Receiver
 from summoner.protocol.flow import Flow
 
-flow = Flow(); flow.activate(); flow.ready()
+flow = Flow() 
+flow.activate() 
+flow.compile_arrow_patterns()
 route = str(flow.parse_route("A --[ f ]--> B"))
 
 async def rcvr(payload):

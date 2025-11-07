@@ -53,7 +53,6 @@ from summoner.client import SummonerClient, Direction
 agent = SummonerClient(name="demo-client")
 flow  = agent.flow().activate()  # enable protocol parsing if you want routes
 flow.add_arrow_style(stem="-", brackets=("[", "]"), separator=",", tip=">")
-flow.ready()
 
 @agent.hook(Direction.RECEIVE, priority=0)
 async def validate(payload):
@@ -112,7 +111,9 @@ from summoner.protocol.flow import Flow
 
 Trigger = load_triggers(text="OK\n  acceptable\nerror\n  major")
 assert Trigger.OK > Trigger.acceptable
-flow = Flow().activate(); flow.add_arrow_style("-", ("[", "]"), ",", ">"); flow.ready()
+flow = Flow().activate() 
+flow.add_arrow_style("-", ("[", "]"), ",", ">") 
+flow.compile_arrow_patterns() # Optional: precompile arrow style(s) listed above
 route = flow.parse_route("A --[ f ]--> B")
 ```
 

@@ -63,7 +63,7 @@ import threading
 def launch(client, host, port, cfg):
     def boot():
         # decorators must be imported before booting
-        # if you use flow arrows, define styles and call flow.ready() first
+        # if you use flow arrows, define styles and call flow.compile_arrow_patterns() first
         client.loop.run_until_complete(
             client.run_client(host=host, port=port, config_path=cfg)
         )
@@ -72,7 +72,7 @@ def launch(client, host, port, cfg):
     return t
 ```
 
-`.run(...)` adds "bookends" (config load, flow activation/`ready()`, signal handlers, graceful shutdown). If you call `run_client(...)` directly, perform whatever prep your client needs (especially `flow.add_arrow_style(...)` and `flow.ready()` if you use routes with arrows).
+`.run(...)` adds "bookends" (config load, flow activation, signal handlers, graceful shutdown). If you call `run_client(...)` directly, perform whatever prep your client needs (especially `flow.add_arrow_style(...)` and `flow.compile_arrow_patterns()` if you use routes with arrows).
 
 ## Fan-out safely with `gather`
 
@@ -238,7 +238,7 @@ Most problems come from blocking the loop or mismatched expectations about owner
 | Sync console I/O in hot paths (`BlockingIOError`, mixed logs) | Stdout/stderr are not awaitable                            | Use `aioconsole.aprint/ainput` **everywhere inside async handlers** (or the client's logger). Avoid `print` in coroutines.                                                                                                                                                                                                          |
 | "Queue 80% full" warnings                                     | You are producing faster than you can send                 | Pace tick senders, batch (`multi=True`), or lower per-tick fan-out.                                                                                                                                                                                                                                                                 |
 | Long transactions pin other work                              | Locks held across awaits                                  | Keep them short; avoid `await` while holding a lock when you can refactor.                                                                                                                                                                                                                                                          |
-| `asyncio.gather(client.run(...), ...)` across clients         | Each client owns its loop; `.run(...)` blocks that thread | Run each client in its own thread or process and call `.run(...)`. For an advanced setup, drive `client.run_client(...)` on that client's event loop inside a dedicated thread using `client.loop.run_until_complete(...)`. If you bypass `.run(...)`, replicate its setup and teardown: load configuration, define arrow styles, call `flow.ready()`, and install signal handlers. |
+| `asyncio.gather(client.run(...), ...)` across clients         | Each client owns its loop; `.run(...)` blocks that thread | Run each client in its own thread or process and call `.run(...)`. For an advanced setup, drive `client.run_client(...)` on that client's event loop inside a dedicated thread using `client.loop.run_until_complete(...)`. If you bypass `.run(...)`, replicate its setup and teardown: load configuration, define arrow styles, call `flow.compile_arrow_patterns()`, and install signal handlers. |
 | CPU-heavy work slows everything                               | Concurrency ≠ parallelism                                 | Offload with `asyncio.to_thread(...)` or a process pool; keep handlers I/O bound. Rust/Tokio code may run without the GIL, but that does not make Python handlers parallel.                                                                                                                                                          |
 | Long-running tasks ignore shutdown                            | Not handling `CancelledError`                             | Wrap long loops with `try/except asyncio.CancelledError: ...` and clean up (close DB cursors, flush queues).                                                                                                                                                                                                                        |
 <p align="center">

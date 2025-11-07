@@ -44,7 +44,7 @@ agents/
 
 **Utilities.** Restrict `utils.py` to pure helpers (parse, validate, format). Side effects should live in well-named modules that you can mock in tests.
 
-> **If you will use arrow-style flow routes later:** activate the flow, declare an arrow style, and call `flow.ready()` **before** any decorators that use arrow routes register. The dedicated [**State and flows**](#state-and-flows-explicit-automata-over-implicit-flags) section covers this in detail.
+> **If you will use arrow-style flow routes later:** activate the flow and declare an arrow style **before** any decorators that use arrow routes register. The dedicated [**State and flows**](#state-and-flows-explicit-automata-over-implicit-flags) section covers this in detail.
 
 ## Concurrency: cooperative I/O, bounded work
 
@@ -131,7 +131,7 @@ client = SummonerClient(name="Agent")
 
 flow = client.flow().activate()
 flow.add_arrow_style(stem="-", brackets=("[", "]"), separator=",", tip=">")
-flow.ready()
+
 Trigger = flow.triggers()  # e.g., Trigger.ok, Trigger.error
 
 # ... then register any @receive / @send that use arrows ...
@@ -285,7 +285,7 @@ Sometimes you want operators (or even other agents) to **control** an agent by s
 Self-commands (local control like `client.quit()` / `client.travel_to(...)`) are always available. **Remote** commands must consult the current gate and log a short reason when closed. After a transition is proposed, your `@download_states` commits exactly once per key so other receivers and hubs route correctly on the next tick.
 
 > [!NOTE]
-> The snippet below assumes flows are **activated**, an arrow style is **declared**, `flow.ready()` has been called, and `Trigger = flow.triggers()` is loaded. `@receive` returns `Move/Stay` (or `None` to drop). The engine aggregates proposals and then calls your `@download_states` to commit.
+> The snippet below assumes flows are **activated**, an arrow style is **declared**, and `Trigger = flow.triggers()` is loaded. `@receive` returns `Move/Stay` (or `None` to drop). The engine aggregates proposals and then calls your `@download_states` to commit.
 
 ```python
 from typing import Optional
@@ -322,7 +322,7 @@ Agents may switch servers at runtime and expose **self-commands** and **remote o
 > ```python
 > flow = client.flow().activate()
 > flow.add_arrow_style(stem="-", brackets=("[", "]"), separator=",", tip=">")
-> flow.ready()
+>
 > Trigger = flow.triggers()
 > ```
 
@@ -501,7 +501,7 @@ client = SummonerClient(name="Agent")
 # Optional: activate flows BEFORE registering any arrow routes
 flow = client.flow().activate()
 flow.add_arrow_style(stem="-", brackets=("[", "]"), separator=",", tip=">")
-flow.ready()
+
 Trigger = flow.triggers()
 
 # --- register hooks/receive/send/upload/download here ---

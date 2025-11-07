@@ -46,16 +46,12 @@ from summoner.client import SummonerClient
 client = SummonerClient()
 flow = client.flow().activate()
 flow.add_arrow_style(stem="-", brackets=("[", "]"), separator=",", tip=">")
-flow.ready()  # compiles the regexes; do this after declaring styles
+
 Trigger = flow.triggers()  # loads tokens from TRIGGERS (e.g., Trigger.ok, Trigger.error)
 ```
 
 > [!IMPORTANT]
-> If any `@receive`/`@send` uses an **arrow** (e.g. `"A --> B"`), you **must** call:
->
-> 1. `flow.add_arrow_style(...)`, then
-> 2. `flow.ready()`
->    **before** those decorators register. Otherwise, the arrow string will be parsed as a plain token and fail validation.
+> If any `@receive`/`@send` uses an **arrow** (e.g. `"A --> B"`), you **must** call `flow.add_arrow_style(...)` **before** those decorators register. Otherwise, the arrow string will be parsed as a plain token and fail validation.
 
 With flows active, `@receive(route=...)` uses the route DSL. See [Routes and Node Logic](#routes-and-node-logic-the-small-dsl-that-decides-who-runs) for the full syntax (arrows, labels, object routes).
 
@@ -147,7 +143,7 @@ from summoner.protocol import Move, Test, Stay, Flow
 
 flow = Flow().activate()
 flow.add_arrow_style(stem="-", brackets=("[", "]"), separator=",", tip=">")
-flow.ready()
+flow.compile_arrow_patterns() # Optional: precompile arrow style(s) listed above
 Trigger = flow.triggers()
 
 arr = flow.parse_route("A --[ guard ]--> B")
@@ -365,7 +361,7 @@ from summoner.protocol import Move, Stay, Node, Event
 client = SummonerClient()
 flow = client.flow().activate()
 flow.add_arrow_style(stem="-", brackets=("[", "]"), separator=",", tip=">")
-flow.ready()
+
 Trigger = flow.triggers()  # e.g., Trigger.ok, Trigger.error
 
 node = "A"
@@ -435,7 +431,7 @@ from summoner.protocol import Action, Move, Stay
 
 flow = client.flow().activate()
 flow.add_arrow_style(stem="-", brackets=("[", "]"), separator=",", tip=">")
-flow.ready()
+
 Trigger = flow.triggers()
 
 @client.receive(route="A --> B")
@@ -521,7 +517,7 @@ from summoner.protocol import Move, Stay, Node
 client = SummonerClient()
 flow   = client.flow().activate()
 flow.add_arrow_style(stem="-", brackets=("[", "]"), separator=",", tip=">")
-flow.ready()
+
 Trigger = flow.triggers()
 
 current = "cold"
