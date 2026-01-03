@@ -271,11 +271,16 @@ ParsedRoute.activated_nodes(event: Event | None) -> tuple[Node, ...]
 
 Routing rule:
 
-* If `is_object`, returns `source`.
-* If `is_arrow` and `event` is `Action.MOVE`, returns `label + target`.
-* If `is_arrow` and `event` is `Action.TEST`, returns `label`.
-* If `is_arrow` and `event` is `Action.STAY`, returns `source`.
-* Otherwise returns empty tuple.
+* If `is_object` (no arrow):
+  * If `event` is `Action.TEST`, returns empty tuple.
+  * If `event` is any other `Event`, returns `source`.
+  * If `event` is `None` (or not an `Event`), returns empty tuple.
+
+* If `is_arrow`:
+  * If `event` is `Action.MOVE`, returns `label + target`.
+  * If `event` is `Action.TEST`, returns `label`.
+  * If `event` is `Action.STAY`, returns `source`.
+  * Otherwise returns empty tuple.
 
 **Equality and hashing**
 
@@ -285,6 +290,7 @@ Two routes are equal if their canonical string representations match. `str(route
 
 ```python
 from summoner.protocol.process import Node, ArrowStyle, ParsedRoute
+from summoner.protocol.triggers import Signal, Action  # or wherever these live
 
 style = ArrowStyle('-', ('[', ']'), ',', '>')
 route = ParsedRoute(
@@ -293,8 +299,13 @@ route = ParsedRoute(
     target=(Node('B'),),
     style=style,
 )
-assert str(route) == 'A,C--[f,g]-->B'
-route.activated_nodes(Action.MOVE(Signal((0,), 'OK')))  # returns (f, g, B)
+
+event = Action.MOVE(Signal((0,), 'OK'))
+assert route.activated_nodes(event) == (Node('f'), Node('g'), Node('B'))
+
+obj = ParsedRoute(source=(Node('opened'), Node('notify')), label=(), target=(), style=None)
+assert obj.activated_nodes(Action.STAY(Signal((0,), 'OK'))) == (Node('opened'), Node('notify'))
+assert obj.activated_nodes(Action.TEST(Signal((0,), 'OK'))) == ()
 ```
 
 ---

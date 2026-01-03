@@ -189,11 +189,18 @@ obj = flow.parse_route("opened,notify")
 Object routes return their sources when activated.
 
 ```python
-obj.activated_nodes(None)  # ('opened','notify')
+from summoner.protocol import Move, Stay, Test
+
+obj = flow.parse_route("opened,notify")
+
+obj.activated_nodes(Move(Trigger.ok))  # (Node("opened"), Node("notify"))
+obj.activated_nodes(Stay(Trigger.ok))  # (Node("opened"), Node("notify"))
+obj.activated_nodes(Test(Trigger.ok))  # () 
 ```
 
 > [!TIP]
-> Object routes (no arrow, e.g., `opened,notify`) **do not express a transition**. When their receiver runs, they contribute **only their source tokens** to the proposals, regardless of whether the handler returns `Move`, `Stay`, or `Test`. Use labeled arrows when you actually need to change state.
+> Object routes (no arrow, e.g., `opened,notify`) **do not express a transition**. They are only used to **gate which receivers can run** based on the uploaded state. When such a receiver runs, it contributes **only its source tokens** to the proposals if it returns `Move(...)` or `Stay(...)`. If it returns `Test(...)`, it contributes **no nodes at all**, which is useful when you want to evaluate a condition or trigger a hub without proposing any state update. Use labeled arrows when you actually need to change state.
+
 
 ## Orchestrating Receive/Send with Flows
 
@@ -747,7 +754,7 @@ It helps to memorize the two core lookups that the engine performs at each tick.
 **Who receives?** The engine takes your uploaded state — a single node, a list, or a per-key mapping — and finds every `@receive` whose **source** gates *accept* any of those nodes for the same key. Receivers with no source but with a label/target (left-dangling) are considered *initial* and are eligible on every inbound message.
 
 
-**What becomes active next?** Each receiver returns an Event. For `Move`, the engine activates the route's label and target; for `Stay`, it keeps the source; for `Test`, it activates only the label. All these *possible* nodes are then presented to your `download` function, using the same shape as your upload. You choose what you actually become.
+**What becomes active next?** Each receiver returns an Event. For `Move`, the engine activates the route’s label and target. For `Stay`, it keeps the source. For `Test`, it activates only the label (and for object routes with no arrow, it activates nothing). The engine then aggregates these *possible* nodes and presents them to your `download` function, using the same shape as your upload. You choose what you actually become.
 
 Putting it together:
 
