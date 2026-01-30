@@ -8,7 +8,7 @@ Most users only touch this when they want to host a local relay or deploy a shar
 
 * [<code style="background: transparent;">Summoner<b>.server.server</b></code>](./server/server.md) → `SummonerServer` API reference: constructor, lifecycle methods, and end-to-end examples.
 
-* [<code style="background: transparent;">Summoner<b>.server</b></code> configuration guide](./server/config.md) → Configuration reference: keys, defaults, and how settings affect server behavior.
+* [<code style="background: transparent;">Summoner<b>.server</b></code> configuration guide](./server/configs.md) → Configuration reference: keys, defaults, and how settings affect server behavior.
 
 ## Pick the right page
 
