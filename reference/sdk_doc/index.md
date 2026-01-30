@@ -31,13 +31,11 @@ flowchart LR
   RELAY -- "receive" --> R
 
   %% protocol lives inside the client: it links receiver events to reactive senders
-  P["protocol:\ntriggers · flows · tape"]:::proto
+  P["protocol: triggers · flows · tape"]:::proto
   R -. "returns Event" .-> P
   P -. "triggers reactive senders" .-> S
 
   %% layout helpers: keep protocol close to client; push other agents lower
-  C --- P
-  RELAY --- P
   OC --- X[" "]:::spacer
 
   classDef proto fill:#f6f8fa,stroke:#d0d7de,stroke-width:1px;
