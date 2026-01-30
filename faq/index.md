@@ -1,8 +1,8 @@
 # Frequently Asked Questions
 
-## How does my terminal crashes when running the `agent.py` file?
+## Why does my terminal crashes when running the `agent.py` file?
 
-This behavior would arise where the environement is missing requirements for running the agent. This crash occurs with terminals that cannot handle such requirement errors.
+This behavior would arise where the environment is missing requirements for running the agent. This crash occurs with terminals that cannot handle such requirement errors.
 
 
 
