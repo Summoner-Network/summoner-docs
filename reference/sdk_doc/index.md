@@ -13,8 +13,8 @@ The Core SDK is the foundation of Summoner. It is split into three layers that a
 ```mermaid
 flowchart LR
   subgraph C[client]
-    S["@send handlers"]
     R["@receive handlers"]
+    S["@send handlers"]
   end
 
   subgraph SV[server]
@@ -25,15 +25,23 @@ flowchart LR
     OC["other agents"]
   end
 
+  %% network transport
   S -- "send" --> RELAY
   RELAY -- "rebroadcast" --> OC
   RELAY -- "receive" --> R
 
+  %% protocol lives inside the client: it links receiver events to reactive senders
   P["protocol:\ntriggers · flows · tape"]:::proto
+  R -. "returns Event" .-> P
+  P -. "triggers reactive senders" .-> S
+
+  %% layout helpers: keep protocol close to client; push other agents lower
   C --- P
-  P --- SV
+  RELAY --- P
+  OC --- X[" "]:::spacer
 
   classDef proto fill:#f6f8fa,stroke:#d0d7de,stroke-width:1px;
+  classDef spacer fill:transparent,stroke:transparent,color:transparent;
 ```
 
 ## Quick start in two files
