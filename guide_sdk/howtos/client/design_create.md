@@ -35,7 +35,7 @@ NOTE: Rely on the agent libraires to give easy examples and then link to the mor
 Make remark on starved message: try to account for failure (refer to async_db.md)
 
 
-I need to refer to `summoner-agent` here -- this is the right place. I would need to describe what agent demonstrate (what feature, and I might also refer to the API reference) -->
+I need to refer to `summoner-agent` here -- this is the right place. I would need to describe what agent demonstrate (what feature, and I might also refer to the SDK reference) -->
 
  <p align="center">
    <a href="../index.md">&laquo; Previous: How-tos (Intro) </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="id.md">Next: Configure your Agent Identity &raquo;</a>

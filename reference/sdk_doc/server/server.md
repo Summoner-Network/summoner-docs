@@ -1,19 +1,135 @@
 # <code style="background: transparent;">Summoner<b>.server.server</b></code>
 
-A lightweight TCP broadcast server with two interchangeable backends:
+This page documents the **Python SDK interface** for running a Summoner server via `SummonerServer`. It focuses on how to use the class and its methods, and what behavior to expect when you call them.
 
-* **Python (asyncio)** – simple, portable baseline for local dev and demos.
-* **Rust (Tokio via PyO3)** – production-grade event loop with backpressure, rate-limiting, quarantine, and graceful shutdown.
+A Summoner server is a TCP broadcast relay: clients connect to a host and port, send newline-delimited messages, and the server forwards each message to all other connected clients as a JSON envelope.
 
-Pick the backend in your **server config** with `version: "python" | "rust"`. On Windows, the Rust backend is unavailable and the server runs in Python regardless of `version`.
+`SummonerServer` is the primary SDK entry point for running a server process. It handles configuration loading (from a file path or in-memory dict), logger initialization, termination signal handling (where supported), and the overall server lifecycle (start, run, and shutdown).
 
-> 📎 The full configuration guide (every parameter with examples) lives in **[server_config.md](./server_config.md)**.
+## `SummonerServer.__init__`
 
----
+```python
+def __init__(self, name: Optional[str] = None) -> None
+```
 
-## Quick start
+### Behavior
 
-**server.py**
+Creates a server instance and prepares internal state for running the server.
+
+* Sets a logical `name` used for logging.
+* Creates a dedicated asyncio event loop for this server instance and sets it as the current loop.
+* Initializes internal registries:
+
+  * a set of connected clients (writers),
+  * a mapping of active handler tasks to client addresses,
+  * locks for safe concurrent access to those registries.
+
+### Inputs
+
+#### `name`
+
+* **Type:** `Optional[str]`
+* **Meaning:** A human-readable identifier for logs and diagnostics.
+* **Default behavior:** If `name` is not a string, a placeholder is used (`"<server:no-name>"`).
+
+### Outputs
+
+This constructor returns a `SummonerServer` instance.
+
+### Examples
+
+#### Basic initialization
+
+```python
+from summoner.server import SummonerServer
+
+server = SummonerServer(name="summoner:server")
+```
+
+## `SummonerServer.run`
+
+```python
+def run(
+    self,
+    host: str = "127.0.0.1",
+    port: int = 8888,
+    config_path: Optional[str] = None,
+    config_dict: Optional[dict[str, Any]] = None,
+) -> None
+```
+
+### Behavior
+
+Starts the server and blocks the calling thread until the server stops.
+
+At a high level, `run(...)` does four things:
+
+1. Loads the server configuration (from `config_dict` or `config_path`).
+2. Configures logging using the loaded config.
+3. Installs termination signal handlers (where supported).
+4. Runs the server until it is interrupted (Ctrl+C) or shut down.
+
+The server can run using different backend implementations selected by configuration. At the SDK level, you always start the server the same way (by calling `run(...)`); the backend selection is handled internally based on the loaded config and the platform.
+
+### Inputs
+
+#### `host`
+
+* **Type:** `str`
+* **Meaning:** The network interface address to bind to.
+* **Common values:**
+
+  * `"127.0.0.1"`: accept only local connections (development).
+  * `"0.0.0.0"`: accept connections from other machines (LAN/cloud).
+* **Default:** `"127.0.0.1"`
+
+#### `port`
+
+* **Type:** `int`
+* **Meaning:** The TCP port to listen on.
+* **Default:** `8888`
+
+#### `config_path`
+
+* **Type:** `Optional[str]`
+* **Meaning:** Path to a JSON configuration file.
+* **When used:** Used when `config_dict` is not provided.
+
+#### `config_dict`
+
+* **Type:** `Optional[dict[str, Any]]`
+* **Meaning:** In-memory configuration dictionary.
+* **Precedence:** If provided, it is used instead of `config_path`.
+* **Validation:** Must be a `dict` or `None`. Any other type raises `TypeError`.
+
+#### Configuration fields used by `run(...)`
+
+This method expects configuration keys such as:
+
+* `version` (optional): selects which backend to run.
+* `logger` (optional): logging configuration.
+* `hyper_parameters` (optional): backend tuning parameters.
+
+The full set of configuration keys is documented in the [configugration guide](./configs.md).
+
+### Outputs
+
+* Returns `None`.
+* This call **blocks** until the server exits.
+* The server attempts a clean shutdown on `KeyboardInterrupt` and cancellation.
+
+### Examples
+
+#### Minimal usage (no config file)
+
+```python
+from summoner.server import SummonerServer
+
+server = SummonerServer(name="summoner:server")
+server.run(host="127.0.0.1", port=8888)
+```
+
+#### Load from a JSON config file
 
 ```python
 from summoner.server import SummonerServer
@@ -22,128 +138,272 @@ server = SummonerServer(name="summoner:server")
 server.run(
     host="127.0.0.1",
     port=8888,
-    config_path="server.json",   # or pass config_dict=...
+    config_path="server.json",
 )
 ```
 
-**server.json (minimal)**
+#### Pass config as a dictionary
+
+```python
+from summoner.server import SummonerServer
+
+server = SummonerServer(name="summoner:server")
+server.run(
+    host="127.0.0.1",
+    port=8888,
+    config_dict={
+        "logger": {"log_level": "INFO", "enable_console_log": True},
+        "version": "python",
+    },
+)
+```
+
+#### Backend selection through config (SDK usage)
+
+```python
+from summoner.server import SummonerServer
+
+server = SummonerServer(name="summoner:server")
+server.run(
+    host="0.0.0.0",
+    port=8888,
+    config_dict={
+        "version": "python",  # or "rust" depending on your deployment
+        "logger": {"log_level": "INFO", "enable_console_log": True},
+    },
+)
+```
+
+## `SummonerServer.run_server`
+
+```python
+async def run_server(self, host: str = "127.0.0.1", port: int = 8888) -> None
+```
+
+### Behavior
+
+Async entry point that binds a TCP server and runs it forever (Python backend).
+
+* Creates the asyncio server via `asyncio.start_server(...)`.
+* Uses `handle_client(...)` for each incoming connection.
+* Logs the listening address.
+* Runs `serve_forever()` until cancelled.
+
+In typical SDK usage you should call `run(...)`, which handles configuration and lifecycle management. `run_server(...)` is primarily useful when embedding the server into an existing asyncio application.
+
+### Inputs
+
+#### `host`
+
+* **Type:** `str`
+* **Meaning:** Bind address.
+* **Default:** `"127.0.0.1"`
+
+#### `port`
+
+* **Type:** `int`
+* **Meaning:** Bind port.
+* **Default:** `8888`
+
+### Outputs
+
+An awaitable coroutine (the method is `async`). It does not return under normal operation because it runs the server forever.
+
+### Examples
+
+#### Embedding in an existing asyncio program
+
+```python
+import asyncio
+from summoner.server import SummonerServer
+
+async def main():
+    server = SummonerServer(name="summoner:server")
+    await server.run_server(host="127.0.0.1", port=8888)
+
+asyncio.run(main())
+```
+
+## `SummonerServer.handle_client`
+
+```python
+async def handle_client(
+    self,
+    reader: asyncio.streams.StreamReader,
+    writer: asyncio.streams.StreamWriter,
+) -> None
+```
+
+### Behavior
+
+Handles one client connection end-to-end.
+
+* Registers the client connection.
+* Repeatedly reads newline-delimited data (`await reader.readline()`).
+* For each received line:
+
+  * logs the incoming message,
+  * broadcasts a JSON envelope to all other connected clients.
+* On disconnect or error:
+
+  * removes the client from internal state,
+  * closes the socket,
+  * logs the disconnect.
+
+**Broadcast envelope**
+
+Receivers get:
 
 ```json
-{
-  "version": "rust",
-  "host": "127.0.0.1",
-  "port": 8888,
-  "logger": { "log_level": "INFO", "enable_console_log": true },
-  "hyper_parameters": { "rate_limit_msgs_per_minute": 300 }
-}
+{"remote_addr":"<ip:port>","content":"<line-without-trailing-\\n>"}
 ```
 
-**Manual test with `nc`**
+### Inputs
+
+#### `reader`
+
+* **Type:** `asyncio.StreamReader`
+* **Meaning:** Read side of the TCP connection.
+
+#### `writer`
+
+* **Type:** `asyncio.StreamWriter`
+* **Meaning:** Write side of the TCP connection.
+
+### Outputs
+
+An awaitable coroutine (the method is `async`). It returns when the client disconnects or the task is cancelled.
+
+### Examples
+
+This method is not typically called directly; it is provided as the callback to `asyncio.start_server(...)`.
+
+## `SummonerServer.set_termination_signals`
+
+```python
+def set_termination_signals(self) -> None
+```
+
+### Behavior
+
+Installs process termination signal handlers on non-Windows platforms.
+
+* Registers handlers for:
+
+  * SIGINT (Ctrl+C)
+  * SIGTERM (process termination)
+* Each handler triggers `shutdown()`.
+
+On Windows, signal handler installation is skipped.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+You normally do not call this directly because `run(...)` calls it as part of normal startup.
+
+## `SummonerServer.shutdown`
+
+```python
+def shutdown(self) -> None
+```
+
+### Behavior
+
+Triggers server shutdown by cancelling all tasks in the server's event loop.
+
+* Logs that shutdown has started.
+* Cancels all loop tasks to drive `serve_forever()` and client handlers to exit.
+
+This method is typically invoked through signal handlers or process interruption.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+#### Programmatic shutdown (advanced)
+
+```python
+from summoner.server import SummonerServer
+
+server = SummonerServer(name="summoner:server")
+
+# In a real program, you would call server.run(...) in another thread/process,
+# then call server.shutdown() when you want to stop it.
+server.shutdown()
+```
+
+## `SummonerServer.wait_for_tasks_to_finish`
+
+```python
+async def wait_for_tasks_to_finish(self) -> None
+```
+
+### Behavior
+
+Waits for all tracked client handler tasks to complete.
+
+* Takes a snapshot of the active tasks under a lock.
+* Awaits completion via `asyncio.gather(..., return_exceptions=True)`.
+
+This is used during shutdown to reduce the likelihood of leaving client handlers mid-cleanup.
+
+### Inputs
+
+None.
+
+### Outputs
+
+An awaitable coroutine (the method is `async`). Returns after pending tasks are complete.
+
+### Examples
+
+This method is usually called internally during shutdown sequencing in `run(...)`.
+
+## End-to-end example
+
+### Example: start server and test with netcat
+
+#### server.py
+
+```python
+from summoner.server import SummonerServer
+
+server = SummonerServer(name="summoner:server")
+server.run(host="127.0.0.1", port=8888)
+```
+
+#### terminal A
 
 ```bash
-# terminal A
 nc 127.0.0.1 8888
-
-# terminal B
-nc 127.0.0.1 8888
-
-# type in A; B receives:
-# {"remote_addr":"127.0.0.1:54321","content":"<your line>"}
 ```
 
----
+#### terminal B
 
-## Operational model
+```bash
+nc 127.0.0.1 8888
+```
 
-### Python backend (asyncio)
+#### behavior
 
-* Accepts clients, reads a **line** from each, and **broadcasts** it to all *other* clients.
-* Broadcast payload is a JSON envelope:
+* Type a line in terminal A.
+* Terminal B receives a JSON envelope containing:
 
-  ```json
-  {"remote_addr":"<ip:port>","content":"<original line without trailing \\n>"}
-  ```
-* Designed for clarity & portability; no built-in backpressure/limits.
-
-### Rust backend (Tokio)
-
-* Accept loop + per-client tasks.
-* **Backpressure monitor** issues:
-
-  * **Throttle** (small delay),
-  * **FlowControl** (pause reads),
-  * **Disconnect** (drop + quarantine).
-* **Rate limiter**: per-client messages/minute.
-* **Idle timeout**: disconnect if no activity for N seconds.
-* **Graceful shutdown**: Ctrl+C notifies clients, then closes.
-
----
-
-## API reference (Python front)
-
-### `class SummonerServer`
-
-#### `__init__(name: Optional[str] = None)`
-
-* **name**: logical name used by the logger.
-* Creates an event loop; sets up client and task bookkeeping.
-
-#### `run(host: str = "127.0.0.1", port: int = 8888, *, config_path: Optional[str] = None, config_dict: Optional[dict] = None) -> None`
-
-Start the server with the provided config.
-
-* Loads config from `config_dict` (if provided) otherwise `config_path`.
-* **Backend choice**
-
-  * On non-Windows with `version: "rust"` → dispatches to the Rust server (`rust_server_v1_0_0.start_tokio_server`).
-  * Otherwise runs the **Python** asyncio server.
-* **Host/port precedence**
-
-  * **Rust backend**: uses `server_config["host"]`/`["port"]` if present; otherwise falls back to `run(host, port)`.
-  * **Python backend**: uses the **`host`/`port` passed to `run()`** (the config's `host`/`port` are not applied in the Python path).
-* Cleanly handles cancellation and shutdown.
-
-#### `async def run_server(host: str = '127.0.0.1', port: int = 8888)`
-
-Async entry for **Python** backend. Binds and `serve_forever()`.
-
-#### `async def handle_client(reader, writer)`
-
-* Reads lines from a client.
-* Broadcasts a JSON envelope to all other clients:
-
-  ```python
-  {"remote_addr": "<ip:port>", "content": "<line-without-trailing-\\n>"}
-  ```
-* On disconnect, cleans up and (best effort) warns the client.
-
-#### `def set_termination_signals() -> None`
-
-Installs SIGINT/SIGTERM handlers (non-Windows).
-
-#### `def shutdown() -> None`
-
-Cancels all loop tasks to drive a clean exit.
-
----
-
-## Rust backend notes
-
-* Imported as `rust_server_v1_0_0` (PyO3 module). Build and ship it alongside the Python package.
-* Implements: backpressure monitor, per-client rate limiting, idle timeout, quarantine list, and graceful shutdown.
-* Emits structured logs when `logger.enable_json_log` is true (with optional field pruning via `logger.log_keys`).
-
----
-
-## Compatibility & gotchas
-
-* **Windows**: Rust backend not available; Python backend runs even if `version: "rust"`.
-* **Idle listeners** (Rust): If a client only receives and never sends, it will hit `client_timeout_secs` unless you:
-
-  * send a periodic heartbeat; or
-  * set `client_timeout_secs: null`.
-* **Disconnect ⇒ Quarantine** (Rust): Force-disconnected clients are temporarily banned; reconnect attempts are ignored during cooldown.
-* **Backpressure signal** (Rust): Thresholds are compared to *fan-out size* (how many peers would receive the message). Tune thresholds relative to expected room size.
+  * `remote_addr` (A's address as seen by the server),
+  * `content` (the typed line, without the trailing newline).
 
 ---
 

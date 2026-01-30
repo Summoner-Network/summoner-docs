@@ -78,7 +78,7 @@ A good proposal explains the problem, shows a small example, and describes the s
 What cannot be done today.
 
 ### Proposed Direction
-Smallest surface that solves it. API shape or CLI flag if applicable.
+Smallest surface that solves it. SDK shape or CLI flag if applicable.
 
 ### Example
 A short code or command snippet.

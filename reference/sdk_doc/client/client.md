@@ -1,468 +1,905 @@
-# Module: `summoner.client.client`
+# <code style="background: transparent;">Summoner<b>.client.client</b></code> (core v1.1.1)
 
-High-level asynchronous client for Summoner servers. Handles:
+This page documents the **Python SDK interface** for running a Summoner client via `SummonerClient`. It focuses on how to use the class and its methods, and what behavior to expect when you call them.
 
-* transport lifecycle (connect / run / retry / graceful shutdown)
-* decorator-based registration for **receivers**, **senders**, and **hooks**
-* optional **flow-aware routing** (Nodes/Routes/Triggers) and **reactive senders**
-* state tape upload/download
-* payload validation & typed (de)serialization
-* concurrency control and back-pressure
+A Summoner client connects to a Summoner server over TCP, continuously receives newline-delimited messages, runs user-defined handlers registered via decorators (for receive/send/hooks/state sync), and optionally emits messages back to the server. The client also supports **reconnection**, **fallback**, and **agent travel** (switching host/port at runtime) through the SDK surface.
 
-> **Quick start** — minimal, file-free flow
->
-> ```python
-> from summoner.client.client import SummonerClient
-> from summoner.protocol.triggers import Move
-> from summoner.protocol.flow import Flow
->
-> client = SummonerClient("demo-client")
->
-> # Enable flow parsing and arrow styles (optional but recommended)
-> client.flow().activate()
-> client.flow().add_arrow_style('-', ('[', ']'), ',', '>')
->
-> # Register a receiver on a route
-> @client.receive("/all --[ hello ]--> B", priority=(1,))
-> async def on_any(payload):
->     print("recv:", payload)
->     # return an Event to feed reactive senders; or None to do nothing
->     Trigger = client.flow().triggers(json_dict={"OK": {"minor": None}})
->     return Move(Trigger.minor)
->
-> # Register a sender that fires after Move(minor) on the same route
-> @client.send("/all --[ hello ]--> B", on_actions={Move})
-> async def say_hi():
->     return {"msg": "hi"}
->
-> client.run(host="127.0.0.1", port=8888, config_dict={"logger": {"level": "INFO"}})
-> ```
+`SummonerClient` is the primary SDK entry point for running a client process. It handles configuration loading (from a file path or in-memory dict), logger initialization, termination signal handling (where supported), handler registration, and the overall client lifecycle (connect, run loops, shutdown).
 
----
-
-## Public API surface
-
-* Exception: **`ServerDisconnected`**
-* Class: **`SummonerClient`**
-
-  * Lifecycle: `run`, `run_client`, `handle_session`, `shutdown`, `set_termination_signals`
-  * Flow: `flow`, `initialize`
-  * Intents: `travel_to`, `quit`
-  * State I/O decorators: `upload_states`, `download_states`
-  * Decorators: `receive`, `send`, `hook`
-  * Serialization: `dna`
-
----
-
-## Exception
-
-### `ServerDisconnected`
-
-Raised by the recv loop when the server closes the connection (clean EOF), and used by retry logic.
-
----
-
-## Class: `SummonerClient`
+## `SummonerClient.__init__`
 
 ```python
-class SummonerClient:
-    DEFAULT_MAX_BYTES_PER_LINE = 64 * 1024
-    DEFAULT_READ_TIMEOUT_SECONDS = None
-    DEFAULT_CONCURRENCY_LIMIT = 50
-
-    DEFAULT_RETRY_DELAY = 3
-    DEFAULT_PRIMARY_RETRY_LIMIT = 3
-    DEFAULT_FAILOVER_RETRY_LIMIT = 2
-
-    DEFAULT_EVENT_BRIDGE_SIZE = 1000
-    DEFAULT_MAX_CONSECUTIVE_ERRORS = 3
-
-    core_version = "1.0.0"
-
-    def __init__(self, name: str | None = None): ...
+def __init__(self, name: Optional[str] = None) -> None
 ```
 
-### Constructor
+### Behavior
 
-**Signature**
+Creates a client instance and prepares internal state for running client sessions.
+
+* Sets a logical `name` used for logging.
+
+* Creates a dedicated asyncio event loop for this client instance and sets it as the current loop.
+
+* Initializes internal registries and locks for:
+
+  * route registration (receivers and senders),
+  * hook registration (send/receive validation hooks),
+  * active task tracking,
+  * connection intent (travel/quit).
+
+* Initializes flow support (`Flow`) used for route parsing and state-driven activation.
+
+### Inputs
+
+#### `name`
+
+* **Type:** `Optional[str]`
+* **Meaning:** A human-readable identifier for logs and diagnostics.
+* **Default behavior:** If `name` is not a string, a placeholder is used (`"<client:no-name>"`).
+
+### Outputs
+
+This constructor returns a `SummonerClient` instance.
+
+### Examples
+
+#### Basic initialization
 
 ```python
-SummonerClient.__init__(name: str | None = None)
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
 ```
 
-**Parameters**
-
-| Name   | Type  | Default | Description |                                                            |
-| ------ | ----- | ------- | ----------- | ---------------------------------------------------------- |
-| `name` | \`str | None\`  | `None`      | Name used by the logger; defaults to `"<client:no-name>"`. |
-
-**Side effects**
-
-* Creates a **new event loop** and sets it as current.
-* Initializes locks, indices, worker bookkeeping, and a `Flow()` instance.
-
----
-
-### Configuration
-
-Settings are applied by `run()` via `_apply_config()` (not public) after loading a config file/dict. The effective schema:
-
-| Path                                                | Type    | Default             | Notes                                                                    |                                                   |
-| --------------------------------------------------- | ------- | ------------------- | ------------------------------------------------------------------------ | ------------------------------------------------- |
-| `host`                                              | \`str   | None\`              | `None`                                                                   | Initial override for connection target.           |
-| `port`                                              | \`int   | None\`              | `None`                                                                   | Initial override for connection target.           |
-| `logger`                                            | `dict`  | `{}`                | Passed to `configure_logger`.                                            |                                                   |
-| `hyper_parameters.reconnection.retry_delay_seconds` | `int`   | `3`                 | Sleep between attempts.                                                  |                                                   |
-| `hyper_parameters.reconnection.primary_retry_limit` | \`int   | None\`              | `3`                                                                      | Attempts on primary host/port. `None` = infinite. |
-| `hyper_parameters.reconnection.default_host`        | \`str   | None\`              | `host`                                                                   | Fallback host.                                    |
-| `hyper_parameters.reconnection.default_port`        | \`int   | None\`              | `port`                                                                   | Fallback port.                                    |
-| `hyper_parameters.reconnection.default_retry_limit` | \`int   | None\`              | `2`                                                                      | Attempts on fallback. `None` = infinite.          |
-| `hyper_parameters.receiver.max_bytes_per_line`      | `int`   | `64*1024`           | Line-based protocol hard limit. Oversize lines are dropped with warning. |                                                   |
-| `hyper_parameters.receiver.read_timeout_seconds`    | \`float | None\`              | `None`                                                                   | `None` waits indefinitely.                        |
-| `hyper_parameters.sender.concurrency_limit`         | `int`   | `50`                | Number of async send workers. ≥ 1.                                       |                                                   |
-| `hyper_parameters.sender.batch_drain`               | `bool`  | `True`              | `True` → writer drains after each batch; `False` → drain per message.    |                                                   |
-| `hyper_parameters.sender.queue_maxsize`             | `int`   | `concurrency_limit` | Back-pressure capacity for send jobs. ≥ 1.                               |                                                   |
-| `hyper_parameters.sender.event_bridge_maxsize`      | `int`   | `1000`              | Capacity of internal event bridge.                                       |                                                   |
-| `hyper_parameters.sender.max_worker_errors`         | `int`   | `3`                 | Consecutive crashes before aborting sender loop. ≥ 1.                    |                                                   |
-
-Validation errors raise `ValueError` with an explicit message.
-
----
-
-## Flow control and triggers
+## `SummonerClient.run`
 
 ```python
-client.flow() -> Flow
-client.initialize() -> None
+def run(
+    self,
+    host: str = "127.0.0.1",
+    port: int = 8888,
+    config_path: Optional[str] = None,
+    config_dict: Optional[dict[str, Any]] = None,
+) -> None
 ```
 
-* `flow()` exposes the internal `Flow` instance. To enable **route normalization** and **reactive senders**, call `client.flow().activate()` and add at least one `ArrowStyle` before `run()`.
-* `initialize()` calls `Flow.compile_arrow_patterns()`; if the flow is not `in_use`, parsing still works but normalization/reactivity features are not enabled.
+### Behavior
 
-**Example**
+Starts the client and blocks the calling thread until the client stops.
+
+At a high level, `run(...)` does six things:
+
+1. Loads configuration (from `config_dict` or `config_path`).
+2. Applies configuration to internal runtime settings (logger, reconnection, receiver/sender parameters).
+3. Initializes flow parsing metadata.
+4. Installs termination signal handlers (where supported).
+5. Awaits completion of all decorator registrations scheduled before runtime.
+6. Runs the client session loop with reconnection and fallback behavior.
+
+This method is the normal entry point for SDK usage.
+
+### Inputs
+
+#### `host`
+
+* **Type:** `str`
+* **Meaning:** Initial target host to connect to.
+* **Default:** `"127.0.0.1"`
+
+#### `port`
+
+* **Type:** `int`
+* **Meaning:** Initial target port to connect to.
+* **Default:** `8888`
+
+#### `config_path`
+
+* **Type:** `Optional[str]`
+* **Meaning:** Path to a JSON configuration file.
+* **When used:** Used when `config_dict` is not provided.
+
+#### `config_dict`
+
+* **Type:** `Optional[dict[str, Any]]`
+* **Meaning:** In-memory configuration dictionary.
+* **Precedence:** If provided, it is used instead of `config_path`.
+* **Validation:** Must be a `dict` or `None`. Any other type raises `TypeError`.
+
+#### Configuration keys used by `run(...)`
+
+This method expects configuration keys such as:
+
+* `host`, `port` (optional): default connection target (may be overridden by `run(host, port)` at the SDK call site).
+* `logger` (optional): logging configuration.
+* `hyper_parameters` (optional): client runtime tuning, including:
+
+  * `hyper_parameters.reconnection`
+  * `hyper_parameters.receiver`
+  * `hyper_parameters.sender`
+
+The full set of configuration keys is documented in the [configuration guide for the client](configs.md).
+
+### Outputs
+
+* Returns `None`.
+* This call **blocks** until the client exits.
+* The client attempts a clean shutdown on `KeyboardInterrupt` and cancellation.
+
+### Examples
+
+#### Minimal usage (no config file)
 
 ```python
-client.flow().activate()
-client.flow().add_arrow_style('-', ('[', ']'), ',', '>')
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+client.run(host="127.0.0.1", port=8888)
+```
+
+#### Load from a JSON config file
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+client.run(
+    host="127.0.0.1",
+    port=8888,
+    config_path="client.json",
+)
+```
+
+#### Pass config as a dictionary
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+client.run(
+    host="127.0.0.1",
+    port=8888,
+    config_dict={
+        "logger": {"log_level": "INFO", "enable_console_log": True},
+        "hyper_parameters": {
+            "reconnection": {"primary_retry_limit": 3, "retry_delay_seconds": 2},
+            "receiver": {"max_bytes_per_line": 65536, "read_timeout_seconds": None},
+            "sender": {"concurrency_limit": 20},
+        },
+    },
+)
+```
+
+## `SummonerClient.flow`
+
+```python
+def flow(self) -> Flow
+```
+
+### Behavior
+
+Returns the `Flow` object owned by this client. This is the object used to define and parse routes and to enable flow-driven activation.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns a `Flow` instance.
+
+### Examples
+
+#### Enable and configure flow before running
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+
+flow = client.flow()
+# flow.enable(...) or flow.add(...) depending on your Flow API
+```
+
+## `SummonerClient.initialize`
+
+```python
+def initialize(self) -> None
+```
+
+### Behavior
+
+Initializes flow metadata by compiling route patterns used by the flow parser.
+
+This is called by `run(...)` as part of startup. You usually do not need to call it directly unless you embed the client lifecycle manually.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+#### Manual initialization (advanced)
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
 client.initialize()
 ```
 
----
-
-## Intents: travel & quit
+## `SummonerClient.upload_states`
 
 ```python
-await client.travel_to(host: str, port: int) -> None
-await client.quit() -> None
+def upload_states(self) -> Callable[[Callable[[], Awaitable[Any]]], Callable[[], Awaitable[Any]]]
 ```
 
-* Both are safe to call from handlers. They set internal flags under a lock; the current session exits and either **reconnects** (travel) or **shuts down** (quit).
+### Behavior
 
----
+Decorator used to register an **async** function that returns the current state snapshot for the flow system.
 
-## State synchronization
+If flow is enabled, the receiver loop can call this function to obtain state, build a `StateTape`, compute activations, and schedule receivers accordingly.
 
-### `upload_states()` — decorator
+This decorator must be used before `client.run()`.
 
-Provide an async function that **returns the current state snapshot**. Used only when the flow is active.
+### Inputs
 
-**Signature**
+### Outputs
 
-```python
-client.upload_states()(fn: Callable[[], Awaitable]) -> Callable
-```
+Returns a decorator. The decorated function is stored on the client as the upload-state provider.
 
-**Constraints (validated)**
+### Examples
 
-* Must be `async def` with **no parameters**.
-* Return types allowed: `None`, `str`,
-  `list[str]`,
-  `dict[str, str]`, `dict[str, list[str]]`, or `dict[str, str | list[str]]`.
-
-The snapshot is normalized by `StateTape` and used to collect receiver activations.
-
-**Example**
+#### Register an upload-state function
 
 ```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+
 @client.upload_states()
-async def states():
-    # examples:
-    # return "A"  # SINGLE
-    # return ["A", "B"]  # MANY
-    return {"k0": ["A", "C"], "k1": ["/all"]}  # INDEX_MANY
+async def upload():
+    return {"stage": "idle", "room": "alpha"}
 ```
 
----
-
-### `download_states()` — decorator
-
-Provide an async function that **receives** a normalized state view after each receiver batch when the flow is active.
-
-**Signature**
+## `SummonerClient.download_states`
 
 ```python
-client.download_states()(fn: Callable[[Any], Awaitable]) -> Callable
+def download_states(self) -> Callable[[Callable[[Any], Awaitable[Any]]], Callable[[Any], Awaitable[Any]]]
 ```
 
-**Constraints (validated)**
+### Behavior
 
-* Must be `async def`.
-* Parameter may be any of: `None`, `Node`, `list[Node]`, `dict[str|None, Node|list[Node]]` (the method accepts multiple structurally equivalent typings).
-* Return types allowed: `None`, `bool`, any.
+Decorator used to register an **async** function that receives a `StateTape`-compatible payload after receiver batches execute.
 
-**Example**
+If flow is enabled, the client updates the tape during receiver execution and then calls this function with the updated snapshot.
+
+This decorator must be used before `client.run()`.
+
+### Inputs
+
+### Outputs
+
+Returns a decorator. The decorated function is stored on the client as the download-state consumer.
+
+### Examples
+
+#### Register a download-state function
 
 ```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+
 @client.download_states()
-async def observe(tape):
-    # tape is list[Node] or dict[str, list[Node]] depending on initial shape
-    print("tape:", tape)
+async def download(tape):
+    # Persist tape to memory/DB if desired
+    return None
 ```
 
----
-
-## Decorators for handlers
-
-### `hook(direction, priority=())`
-
-Register a validation/transform **hook** that runs **before receivers** (on payload in) or **before writers** (on payload out).
-
-**Signature**
+## `SummonerClient.hook`
 
 ```python
-client.hook(
+def hook(
+    self,
     direction: Direction,
-    priority: int | tuple[int, ...] = (),
-)(fn: Callable[[str | dict | Any | None], Awaitable[str | dict | None]])
+    priority: Union[int, tuple[int, ...]] = (),
+) -> Callable[[Callable[[Optional[Union[str, dict]]], Awaitable[Optional[Union[str, dict]]]]], Callable[..., Any]]
 ```
 
-**Rules**
+### Behavior
 
-* Must be `async def` taking **one argument** (payload) and returning either a modified payload or `None` to drop it.
-* `direction` is `Direction.RECEIVE` or `Direction.SEND`.
-* `priority` orders hooks lexicographically (lower tuples run first). A plain `int` is coerced to `(int,)`.
+Decorator used to register an **async hook** that runs on payloads:
 
-**Example**
+* **Direction.RECEIVE:** after a message is received and decoded, before receiver handlers run.
+* **Direction.SEND:** before a payload is encoded and sent to the server.
 
-```python
-@client.hook(Direction.RECEIVE, priority=(0,))
-async def reject_empty(payload):
-    return None if payload in (None, "", {}) else payload
-```
+Hooks are ordered by `priority`. A hook may:
 
----
+* return a transformed payload (string/dict/other supported payload types), or
+* return `None` to drop the payload (skip further processing for that payload).
 
-### `receive(route, priority=())`
+This decorator must be used before `client.run()` (recommended) although registration is scheduled safely.
 
-Register an async **receiver** for a route. The function gets the **decoded payload** and returns an **`Event`** (to enable reactive senders) or `None`.
+### Inputs
 
-**Signature**
+#### `direction`
 
-```python
-client.receive(
-    route: str,
-    priority: int | tuple[int, ...] = (),
-)(fn: Callable[[str | dict | Any], Awaitable[Event | None]])
-```
+* **Type:** `Direction`
+* **Meaning:** Whether the hook applies on receive or send.
 
-**Validation**
+#### `priority`
 
-* Must be `async def` and accept **exactly one parameter**.
-* Allowed param types: any (`str`, `dict`, ...). Return type: `Event | None`.
-* `route` must be a `str`.
-* `priority` as in hooks.
+* **Type:** `Union[int, tuple[int, ...]]`
+* **Meaning:** Ordering key for hook execution. Lower priorities run earlier (based on the SDK's ordering rule).
+* **Default:** `()`
 
-**Flow-aware behavior**
+### Outputs
 
-* If `Flow.in_use` is **True**, the route is parsed & canonicalized; activations are collected from the current state-tape and batched by priority.
-* Otherwise, receivers are just grouped by their declared priority.
+Returns a decorator.
 
-**Example**
+### Examples
+
+#### Receive hook that drops messages
 
 ```python
-@client.receive("A --[ f ]--> B", priority=(1,))
-async def handle(payload):
-    # do work and optionally emit an Event
-    Trigger = client.flow().triggers(json_dict={"OK": None})
-    return Event(Trigger.OK)  # or Move/Stay/Test
-```
+from summoner.client import SummonerClient
+from summoner.protocol.process import Direction
 
----
-
-### `send(route, multi=False, on_triggers=None, on_actions=None)`
-
-Register an async **sender** for a route. The function takes **no arguments** and returns a payload to transmit.
-
-**Signature**
-
-```python
-client.send(
-    route: str,
-    multi: bool = False,
-    on_triggers: set[Signal] | None = None,
-    on_actions: set[type] | None = None,
-)(fn: Callable[[], Awaitable])
-```
-
-**Validation**
-
-* Must be `async def` with **no parameters**.
-* When `multi=False`: return `None | Any | str | dict` (single payload).
-* When `multi=True`: return `None | list[str] | list[dict] | list[str|dict]` (batch), each item becomes a send.
-* `on_triggers` must be `None` **or** a `set` of `Signal`.
-* `on_actions` must be `None` **or** a `set` drawn from `{Action.MOVE, Action.STAY, Action.TEST}`.
-
-**Reactive senders (flow active)**
-
-* If both `Flow.in_use` and at least one of `on_actions` / `on_triggers` is non-empty, the sender is **reactive**:
-
-  * It is scheduled **only** when there exists a **pending activation** from a receiver whose `ParsedRoute` **matches** the sender route and whose returned **Event** passes `sender.responds_to(Event)`.
-  * Matching uses route acceptance (`source`, `label`, `target`) and signal/action filters.
-* If both are `None`, the sender is **non-reactive** and is scheduled each cycle.
-
-**Example**
-
-```python
-from summoner.protocol.triggers import Move
-Trigger = client.flow().triggers(json_dict={"OK": {"minor": None}})
-
-@client.send("/all --[ hello ]--> B", on_actions={Move}, on_triggers={Trigger.minor})
-async def greet():
-    return {"event": "minor move seen"}
-```
-
----
-
-## Serialization and DNA
-
-### `dna()`
-
-Serialize all registered decorators into a JSON string that captures type (`receive`|`send`|`hook`), decorator parameters, module/function names, and the **source code** of each async function.
-
-```python
-client.dna() -> str
-```
-
-This is useful for reproducing or migrating client behavior.
-
----
-
-## Running the client
-
-### `run(host='127.0.0.1', port=8888, config_path=None, config_dict=None)`
-
-Entry point that: loads config, applies settings, prepares the flow, installs termination signals, **awaits registration**, and runs the retry loop.
-
-* Supply either `config_path` **or** `config_dict`. When both are omitted, defaults are used.
-* Blocks the current thread until exit, then ensures workers and tasks are awaited, and closes the loop.
-
-**Example**
-
-```python
-client.run(
-    host="127.0.0.1", port=8888,
-    config_dict={
-        "logger": {"level": "INFO"},
-        "hyper_parameters": {
-            "sender": {"concurrency_limit": 10}
-        }
-    })
-```
-
-### `run_client` and `handle_session` (advanced)
-
-* `run_client` implements the two-stage retry (primary → fallback) and examines `ClientIntent` after a successful session to decide whether to quit or travel.
-* `handle_session` establishes a TCP connection, launches the **receiver** and **sender** loops, and coordinates their shutdown via a shared `asyncio.Event`.
-
----
-
-## I/O loops (behavioral reference)
-
-### Receiver loop
-
-* Reads framed lines (`StreamReader.readline`), with optional timeout. Oversized lines are dropped.
-* Decodes with `recover_with_types` to preserve JSON vs. plain string types.
-* Applies **RECEIVE hooks** in priority order; `None` halts processing.
-* Flow inactive → group receivers by priority and run.
-* Flow active → build `StateTape` from `upload_states()`,
-  collect **activations**, run each batch, compute **activated nodes** via `ParsedRoute.activated_nodes(event)`, and pass an optional **download** view to `download_states()`.
-* Emits `(priority, key, parsed_route, event)` tuples onto an **event bridge** for the sender loop.
-
-### Sender loop
-
-* Builds a batch of `(route, sender)`
-
-  * **Non-reactive**: always eligible each cycle.
-  * **Reactive**: eligible only if any pending activation both **route-accepts** and **responds_to(event)**.
-* Warns when the pending puts would exceed 80% of queue capacity (back-pressure).
-* Queues work into `send_queue`. Workers consume, apply **SEND hooks**, wrap with `wrap_with_types(version=core_version)`, and write to the socket.
-* Consecutive worker failures ≥ `max_worker_errors` cause a controlled shutdown of the sender loop.
-
----
-
-## Error reference (common)
-
-* Mis-typed decorator argument (e.g., `priority="high"`) → `ValueError` with details.
-* Non-async handler in any decorator → `TypeError` (explicit message).
-* `@receive` handler not accepting exactly one parameter → `TypeError`.
-* `@send` handler with parameters → `TypeError`.
-* Invalid `on_triggers`/`on_actions` types → `TypeError` with expected forms.
-* Flow inactive while relying on reactive filters → sender is treated as non-reactive.
-
----
-
-## End-to-end example (flow-aware, reactive)
-
-```python
-from summoner.client.client import SummonerClient
-from summoner.protocol.triggers import Move, Stay
-
-client = SummonerClient("agent-1")
-client.flow().activate()
-client.flow().add_arrow_style('-', ('[', ']'), ',', '>')
-Trigger = client.flow().triggers(text="""
-OK
-  acceptable
-  all_good
-error
-  minor
-  major
-""")
-
-@client.upload_states()
-async def states():
-    return {"session": ["A", "C"], "peer": ["/all"]}
-
-@client.download_states()
-async def observe(view):
-    print("view:", view)
+client = SummonerClient(name="summoner:client")
 
 @client.hook(Direction.RECEIVE, priority=0)
-async def keep_json(payload):
-    return payload  # no-op
+async def drop_empty(payload):
+    if payload is None:
+        return None
+    return payload
+```
 
-@client.receive("A --[ hello ]--> B", priority=(1,))
-async def recv(payload):
-    if payload == {"cmd": "go"}:
-        return Move(Trigger.minor)
+#### Send hook that normalizes payloads
+
+```python
+from summoner.client import SummonerClient
+from summoner.protocol.process import Direction
+
+client = SummonerClient(name="summoner:client")
+
+@client.hook(Direction.SEND, priority=0)
+async def normalize(payload):
+    if isinstance(payload, dict) and "type" not in payload:
+        payload["type"] = "message"
+    return payload
+```
+
+## `SummonerClient.receive`
+
+```python
+def receive(
+    self,
+    route: str,
+    priority: Union[int, tuple[int, ...]] = (),
+) -> Callable[[Callable[[Union[str, dict]], Awaitable[Optional[Event]]]], Callable[..., Any]]
+```
+
+### Behavior
+
+Decorator used to register an **async receiver handler** that is called when messages are received.
+
+Receivers are grouped and executed in batches by `priority`. When flow is enabled, the route may be parsed and used for activation logic; otherwise the raw route is used as the index key.
+
+The decorated function must:
+
+* be `async`
+* accept exactly one argument (the payload)
+* return `Optional[Event]` (or `None`)
+
+### Inputs
+
+#### `route`
+
+* **Type:** `str`
+* **Meaning:** Logical route string used for indexing and (optionally) flow parsing.
+
+#### `priority`
+
+* **Type:** `Union[int, tuple[int, ...]]`
+* **Meaning:** Batch ordering key.
+* **Default:** `()`
+
+### Outputs
+
+Returns a decorator.
+
+### Examples
+
+#### Register a simple receiver
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+
+@client.receive(route="chat.message", priority=0)
+async def on_message(payload):
+    # payload is typically a dict or string depending on upstream encoding
+    return None
+```
+
+## `SummonerClient.send`
+
+```python
+def send(
+    self,
+    route: str,
+    multi: bool = False,
+    on_triggers: Optional[set[Signal]] = None,
+    on_actions: Optional[set[Type]] = None,
+) -> Callable[[Callable[[], Awaitable[Any]]], Callable[..., Any]]
+```
+
+### Behavior
+
+Decorator used to register an **async sender handler** that produces outbound payloads.
+
+Senders are executed by the sender loop and enqueue output payloads to be encoded and written to the server connection.
+
+* If `multi=False`, the sender returns a single payload (or `None`).
+* If `multi=True`, the sender returns a list of payloads (or `None` entries).
+
+When flow is enabled, `on_triggers` / `on_actions` can be used to make a sender reactive to activation events. From an SDK perspective, these parameters declare when a sender is eligible to run.
+
+### Inputs
+
+#### `route`
+
+* **Type:** `str`
+* **Meaning:** Logical route string used for indexing and (optionally) flow parsing.
+
+#### `multi`
+
+* **Type:** `bool`
+* **Meaning:** Whether the sender returns multiple payloads per invocation.
+* **Default:** `False`
+
+#### `on_triggers`
+
+* **Type:** `Optional[set[Signal]]`
+* **Meaning:** Optional trigger set that gates sender execution in flow-enabled mode.
+
+#### `on_actions`
+
+* **Type:** `Optional[set[Type]]`
+* **Meaning:** Optional action set that gates sender execution in flow-enabled mode. This is validated against allowed action event classes.
+
+### Outputs
+
+Returns a decorator.
+
+### Examples
+
+#### Single-payload sender
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+
+@client.send(route="chat.send")
+async def send_one():
+    return {"kind": "chat", "data": "hello"}
+```
+
+#### Multi-payload sender
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+
+@client.send(route="chat.send", multi=True)
+async def send_many():
+    return [{"data": "a"}, {"data": "b"}, {"data": "c"}]
+```
+
+## `SummonerClient.travel_to`
+
+```python
+async def travel_to(self, host: str, port: int) -> None
+```
+
+### Behavior
+
+Requests that the client **travel** to a new server address (host/port). This sets an internal intent flag checked by the session loops.
+
+In typical use, you call this from within a receiver or sender handler to migrate the client to another server endpoint.
+
+### Inputs
+
+#### `host`
+
+* **Type:** `str`
+* **Meaning:** Destination host.
+
+#### `port`
+
+* **Type:** `int`
+* **Meaning:** Destination port.
+
+### Outputs
+
+An awaitable coroutine. Returns `None`.
+
+### Examples
+
+#### Travel from inside a receiver
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+
+@client.receive("control.travel")
+async def on_travel(payload):
+    await client.travel_to(host="127.0.0.1", port=9999)
+    return None
+```
+
+## `SummonerClient.quit`
+
+```python
+async def quit(self) -> None
+```
+
+### Behavior
+
+Requests that the client exit cleanly. This sets an internal intent flag that is checked by the session loops. In typical use, you call this from within a receiver or sender handler.
+
+### Inputs
+
+None.
+
+### Outputs
+
+An awaitable coroutine. Returns `None`.
+
+### Examples
+
+#### Quit from inside a receiver
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+
+@client.receive("control.quit")
+async def on_quit(payload):
+    await client.quit()
+    return None
+```
+
+## `SummonerClient.dna`
+
+```python
+def dna(self, include_context: bool = False) -> str
+```
+
+### Behavior
+
+Serializes this client's registered behavior (decorated handlers and related metadata) into a JSON string called "DNA".
+
+At the SDK level, DNA is used to support cloning and merging workflows by capturing:
+
+* handler type (receive/send/hook/upload_states/download_states),
+* route keys and priorities (where applicable),
+* handler source code,
+* optional context metadata when `include_context=True`.
+
+### Inputs
+
+#### `include_context`
+
+* **Type:** `bool`
+* **Meaning:** If `True`, includes a `__context__` header with best-effort imports/globals/recipes/missing bindings used by handlers.
+* **Default:** `False`
+
+### Outputs
+
+Returns a JSON string.
+
+### Examples
+
+#### Export DNA (handlers only)
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+dna_json = client.dna()
+```
+
+#### Export DNA with context
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+dna_json = client.dna(include_context=True)
+```
+
+## `SummonerClient.set_termination_signals`
+
+```python
+def set_termination_signals(self) -> None
+```
+
+### Behavior
+
+Installs process termination signal handlers on non-Windows platforms.
+
+* Registers handlers for:
+
+  * SIGINT (Ctrl+C)
+  * SIGTERM (process termination)
+
+* Each handler triggers `shutdown()`.
+
+On Windows, signal handler installation is skipped.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+You normally do not call this directly because `run(...)` calls it as part of normal startup.
+
+## `SummonerClient.shutdown`
+
+```python
+def shutdown(self) -> None
+```
+
+### Behavior
+
+Triggers client shutdown by cancelling all tasks in the client's event loop.
+
+This is typically invoked through signal handlers or process interruption.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+#### Programmatic shutdown (advanced)
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+client.shutdown()
+```
+
+## `SummonerClient.run_client`
+
+```python
+async def run_client(self, host: str = "127.0.0.1", port: int = 8888) -> None
+```
+
+### Behavior
+
+Runs the client's reconnection state machine.
+
+This coroutine:
+
+* attempts a "primary stage" connection loop using the provided `host`/`port`,
+* on repeated failures, falls back to configured default host/port (if configured),
+* exits cleanly on `/quit`,
+* restarts primary behavior on `/travel`.
+
+In typical SDK usage, you do not call this directly; it is run by `run(...)`.
+
+### Inputs
+
+#### `host`
+
+* **Type:** `str`
+* **Meaning:** Primary connection host.
+* **Default:** `"127.0.0.1"`
+
+#### `port`
+
+* **Type:** `int`
+* **Meaning:** Primary connection port.
+* **Default:** `8888`
+
+### Outputs
+
+An awaitable coroutine. Returns `None` when the client finishes.
+
+### Examples
+
+This method is usually called internally by `run(...)`.
+
+## `SummonerClient.handle_session`
+
+```python
+async def handle_session(self, host: str = "127.0.0.1", port: int = 8888) -> None
+```
+
+### Behavior
+
+Runs a single connected session: one receiver loop and one sender loop concurrently.
+
+* Opens a TCP connection to the current host/port (including dynamic overrides from travel).
+* Starts background send workers to execute sender handlers.
+* Runs `message_receiver_loop(...)` and `message_sender_loop(...)` concurrently.
+* Ends the session when one side completes (disconnect, travel, quit), then cancels the other side.
+* Closes the connection and cleans up workers and tracked tasks.
+
+In typical SDK usage, you do not call this directly; it is used as part of the reconnection logic.
+
+### Inputs
+
+#### `host`
+
+* **Type:** `str`
+* **Meaning:** Session host (used as fallback if the client has no dynamic host override).
+* **Default:** `"127.0.0.1"`
+
+#### `port`
+
+* **Type:** `int`
+* **Meaning:** Session port (used as fallback if the client has no dynamic port override).
+* **Default:** `8888`
+
+### Outputs
+
+An awaitable coroutine. Returns when the session ends.
+
+### Examples
+
+This method is usually called internally by `run_client(...)`.
+
+## `SummonerClient.message_receiver_loop`
+
+```python
+async def message_receiver_loop(
+    self,
+    reader: asyncio.StreamReader,
+    stop_event: asyncio.Event,
+) -> None
+```
+
+### Behavior
+
+Continuously reads messages from the server, applies receive hooks, and dispatches receiver handlers.
+
+At a high level:
+
+* Reads one newline-delimited message (with size and timeout controls).
+* Decodes the message into a relayed payload type.
+* Applies receiving hooks in priority order.
+* Runs receiver handlers in batches (by priority). If flow is enabled, batches may be activation-driven.
+* If flow is enabled, forwards activation events across the event bridge to the sender side.
+* Exits when `stop_event` is set, the server disconnects, or the task is cancelled.
+
+### Inputs
+
+#### `reader`
+
+* **Type:** `asyncio.StreamReader`
+* **Meaning:** Read side of the TCP connection.
+
+#### `stop_event`
+
+* **Type:** `asyncio.Event`
+* **Meaning:** Cooperative termination signal shared with the sender loop.
+
+### Outputs
+
+An awaitable coroutine. Returns when the session ends or raises `ServerDisconnected` on EOF, depending on shutdown path.
+
+### Examples
+
+This method is usually called internally by `handle_session(...)`.
+
+## `SummonerClient.message_sender_loop`
+
+```python
+async def message_sender_loop(
+    self,
+    writer: asyncio.StreamWriter,
+    stop_event: asyncio.Event,
+) -> None
+```
+
+### Behavior
+
+Continuously schedules and enqueues sender handlers for execution, then ensures outbound payloads are written to the server.
+
+At a high level:
+
+* Builds a sender batch from registered senders.
+* If flow is enabled, may gate senders based on pending activation events and route matching.
+* Enqueues work to a bounded queue (backpressure to producers when full).
+* Waits for the queue batch to finish (`send_queue.join()`).
+* Drains the writer according to `batch_drain`.
+* Exits when `stop_event` is set, travel/quit intent is detected, or the task is cancelled.
+
+### Inputs
+
+#### `writer`
+
+* **Type:** `asyncio.StreamWriter`
+* **Meaning:** Write side of the TCP connection.
+
+#### `stop_event`
+
+* **Type:** `asyncio.Event`
+* **Meaning:** Cooperative termination signal shared with the receiver loop.
+
+### Outputs
+
+An awaitable coroutine. Returns when the session ends.
+
+### Examples
+
+This method is usually called internally by `handle_session(...)`.
+
+## End-to-end example
+
+### Example: run a client with one receiver and one sender
+
+#### client.py
+
+```python
+from summoner.client import SummonerClient
+from summoner.protocol.process import Direction
+
+client = SummonerClient(name="summoner:client")
+
+@client.receive("chat.message", priority=0)
+async def on_message(payload):
+    client.logger.info(f"received: {payload!r}")
     return None
 
-@client.send("A --[ hello ]--> B", on_actions={Move}, on_triggers={Trigger.minor})
-async def send_response():
-    return {"ok": True}
+@client.send("chat.send")
+async def send_message():
+    # Return a payload to send; returning None sends nothing this cycle
+    return {"kind": "chat", "data": "hello"}
 
-client.run(host="127.0.0.1", port=8888, config_dict={"logger": {"level": "INFO"}})
+client.run(
+    host="127.0.0.1",
+    port=8888,
+    config_dict={
+        "logger": {"log_level": "INFO", "enable_console_log": True},
+        "hyper_parameters": {
+            "sender": {"concurrency_limit": 10, "queue_maxsize": 10},
+            "receiver": {"read_timeout_seconds": None},
+        },
+    },
+)
 ```
+
+#### behavior
+
+* The client connects to the server at `127.0.0.1:8888`.
+* Incoming messages are passed through receive hooks (if any) and then dispatched to `@receive` handlers.
+* Outbound senders are executed by background workers and their payloads are written to the server connection.
 
 ---
 
-## See also
-
-* `summoner.protocol.triggers` — `Signal`, `Event`, `Action`, trigger loading
-* `summoner.protocol.process` — `Node`, `ParsedRoute`, `StateTape`, `Receiver`, `Sender`
-* `summoner.protocol.flow` — route parsing and arrow styles
-
-
 <p align="center">
-  <a href="../client.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.client</b></code> </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="./merger.md">Next: <code style="background: transparent;">Summoner<b>.client.merger</b></code> &raquo;</a>
+  <a href="../client.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.client</b></code> </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="./configs.md">Next: <code style="background: transparent;">Summoner<b>.client</b></code> configuration guide &raquo;</a>
 </p>

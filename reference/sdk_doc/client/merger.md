@@ -1,275 +1,659 @@
-# Module: `summoner.client.merger`
+# <code style="background: transparent;">Summoner<b>.client.merger</b></code>
 
-Tools for **composing** or **reconstructing** clients from code DNA:
+This page documents the **Python SDK interface** for composing clients from other clients or from DNA artifacts. It focuses on how to use the public classes and their methods, and what behavior to expect when you call them.
 
-* **`ClientMerger`** — combine multiple live `SummonerClient` instances into a single client by **replaying their handlers** and rebinding their module-level client variables to the merged instance.
-* **`ClientTranslation`** — rebuild a client from a **DNA list** (the output of `SummonerClient.dna()`), inlining handlers back into their original modules.
+This module provides two related utilities built on top of `SummonerClient`:
 
-> **Terminology**: *DNA* is the JSON-serializable capture of handlers produced by `SummonerClient.dna()`: it records type (`receive`/`send`/`hook`), decorator parameters, module & function names, and the full handler source.
+* **`ClientMerger`**: build a single composite client by replaying handlers from multiple sources (live imported clients and/or DNA).
+* **`ClientTranslation`**: reconstruct a fresh client from a DNA list by compiling handlers into an isolated sandbox module.
 
----
+## Security note
 
-## Public API surface
+Both classes may execute code found in DNA via `exec()` / `eval()` (context imports, recipes, handler bodies). Use only with **trusted DNA** (typically produced by your own agents). Do not run untrusted DNA.
 
-* Class: **`ClientMerger(SummonerClient)`**
-
-  * `__init__(named_clients, name=None)`
-  * `initiate_hooks()` · `initiate_receivers()` · `initiate_senders()`
-* Class: **`ClientTranslation(SummonerClient)`**
-
-  * `__init__(dna_list, name=None, var_name='agent')`
-  * `initiate_hooks()` · `initiate_receivers()` · `initiate_senders()`
-  * overrides: `shutdown()` · `quit()` · `run()`
-
-Internal helpers (documented for completeness): `_clone_handler`, `_make_from_source`, `_apply_with_source_patch`, `_async_shutdown`.
-
----
-
-## Class: `ClientMerger`
-
-Merge multiple named clients into a single client by **replaying** their decorators on the merged instance. Each handler is **cloned** so that references to the original module-level client variable (e.g., `agent`) now point to the merged client.
-
-### Constructor
+## `ClientMerger.__init__`
 
 ```python
-ClientMerger.__init__(
-    named_clients: list[dict[str, SummonerClient]],
-    name: str | None = None,
+def __init__(
+    self,
+    named_clients: list[Any],
+    name: Optional[str] = None,
+    rebind_globals: Optional[dict[str, Any]] = None,
+    allow_context_imports: bool = True,
+    verbose_context_imports: bool = False,
+    close_subclients: bool = True,
+) -> None
+```
+
+### Behavior
+
+Creates a composite client that can later replay handlers from multiple sources.
+
+A "source" can be any of:
+
+* an imported `SummonerClient` instance (live object),
+* a DNA list (`list[dict]`),
+* a DNA JSON file path,
+* or a dict wrapper with one of: `{"client": ...}`, `{"dna_list": ...}`, `{"dna_path": ...}`.
+
+The merger **does not** automatically register handlers on construction. You must call `initiate_all()` (or individual `initiate_*` methods) before calling `run(...)`.
+
+If `close_subclients=True`, the merger attempts to **clean up imported template clients** after extracting their handlers (to reduce pending-task and event-loop warnings when importing agent scripts as templates).
+
+### Inputs
+
+#### `named_clients`
+
+* **Type:** `list[Any]`
+* **Meaning:** List of sources to merge.
+* **Accepted entry formats:**
+
+  * `SummonerClient` instance
+  * DNA list (`list[dict]`)
+  * dict with one of:
+
+    * `{"client": SummonerClient, "var_name": Optional[str]}`
+    * `{"dna_list": list[dict], "var_name": Optional[str]}`
+    * `{"dna_path": str, "var_name": Optional[str]}`
+
+#### `name`
+
+* **Type:** `Optional[str]`
+* **Meaning:** Logical name used for logging.
+* **Default behavior:** Falls back to `SummonerClient`'s default placeholder if not provided.
+
+#### `rebind_globals`
+
+* **Type:** `Optional[dict[str, Any]]`
+* **Meaning:** Extra globals injected into:
+
+  * sandbox globals for DNA sources, and
+  * handler globals for imported-client sources.
+* **Typical use:** supply "missing" symbols referenced by handlers (shared objects, Trigger/Action-like bindings, utilities).
+
+#### `allow_context_imports`
+
+* **Type:** `bool`
+* **Meaning:** Whether to execute import lines recorded in DNA `__context__` headers.
+* **Default:** `True`
+
+#### `verbose_context_imports`
+
+* **Type:** `bool`
+* **Meaning:** Whether to log successful context imports as well as failures.
+* **Default:** `False`
+
+#### `close_subclients`
+
+* **Type:** `bool`
+* **Meaning:** Whether to attempt best-effort cleanup of imported template clients after extraction.
+* **Default:** `True`
+
+### Outputs
+
+Creates a `ClientMerger` instance (subclass of `SummonerClient`).
+
+### Examples
+
+#### Merge two imported clients
+
+```python
+from summoner.client.client import SummonerClient
+from summoner.client.merger import ClientMerger
+
+a = SummonerClient(name="a")
+b = SummonerClient(name="b")
+
+agent = ClientMerger([a, b], name="merged")
+agent.initiate_all()
+agent.run(host="127.0.0.1", port=8888)
+```
+
+#### Merge imported client + DNA file
+
+```python
+from summoner.client.client import SummonerClient
+from summoner.client.merger import ClientMerger
+
+template = SummonerClient(name="template")
+
+agent = ClientMerger(
+    [
+        template,
+        {"dna_path": "agent_dna.json"},
+    ],
+    name="merged",
+    rebind_globals={"SOME_SHARED": object()},
 )
+agent.initiate_all()
+agent.run(host="127.0.0.1", port=8888)
 ```
 
-**Parameters**
-
-| Name            | Type                              | Required | Description                                                                                                                                                                   |                                              |
-| --------------- | --------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| `named_clients` | `list[dict[str, SummonerClient]]` | ✓        | Each dict **must** contain keys: `{"var_name": str, "client": SummonerClient}` where `var_name` is the module-level variable the donor handlers use to refer to their client. |                                              |
-| `name`          | \`str                             | None\`   |                                                                                                                                                                               | Name for the merged client (used by logger). |
-
-**Behavior & side effects**
-
-* Validates each entry; raises `TypeError` / `KeyError` with explicit messages.
-* Cancels any pending registration tasks on donor clients and **closes their event loops** to avoid leftover tasks.
-* Stores the cleaned list in `self.named_clients`.
-
-> **Caution**: After merging, donor clients should be considered **retired** (their loops are closed).
-
-### Handler replay
-
-Each `initiate_*` scans the donor's captured DNA lists (`_dna_hooks`, `_dna_receivers`, `_dna_senders`), **clones** the original function object, and registers it on the merged client using the same decorator parameters.
-
-#### `initiate_hooks()`
+## `ClientMerger.initiate_all`
 
 ```python
-ClientMerger.initiate_hooks(self) -> None
+def initiate_all(self) -> None
 ```
 
-Replays all `@hook` handlers from donors with their original `direction` and `priority`.
+### Behavior
 
-#### `initiate_receivers()`
+Replays all supported handler types from every source onto the merged client, in a standard order:
 
-```python
-ClientMerger.initiate_receivers(self) -> None
-```
+1. `upload_states`
+2. `download_states`
+3. `hook`
+4. `receive`
+5. `send`
 
-Replays all `@receive` handlers from donors with original `route` and `priority`.
+This should be called before `run(...)`.
 
-#### `initiate_senders()`
+### Inputs
 
-```python
-ClientMerger.initiate_senders(self) -> None
-```
+None.
 
-Replays all `@send` handlers with original `route`, `multi`, `on_triggers`, and `on_actions`.
+### Outputs
 
-> In `ClientMerger` the donors' `on_triggers` / `on_actions` are **live objects** (e.g., `set[Signal]`, `{Action.MOVE}`) because they're taken from the in-memory DNA (not the JSON). No conversion is needed.
+Returns `None`.
 
-### Internal: `_clone_handler`
+### Examples
 
-```python
-ClientMerger._clone_handler(self, fn: types.FunctionType, original_name: str) -> types.FunctionType
-```
-
-Clones `fn` so it shares its **module globals** and **closure**, but updates the function's module namespace to bind `original_name` to the **merged client** (`self`). Metadata (`__doc__`, `__annotations__`) is preserved.
-
-**Raises**: logs a warning if the global rebinding fails but still returns a function.
-
-### Minimal example — merge two clients
+#### Standard merger usage pattern
 
 ```python
 from summoner.client.merger import ClientMerger
 
-# Suppose these were built elsewhere and decorated with @receive/@send/@hook
-agent_a = build_client_A()  # uses module-level name "agent" in its handlers
-agent_b = build_client_B()  # uses module-level name "bot" in its handlers
-
-merger = ClientMerger([
-    {"var_name": "agent", "client": agent_a},
-    {"var_name": "bot",   "client": agent_b},
-], name="mega-client")
-
-# Optional: enable flow and arrow styles on the merged client
-merger.flow().activate()
-merger.flow().add_arrow_style('-', ('[', ']'), ',', '>')
-
-# Replay all handlers onto the merged instance
-merger.initiate_hooks()
-merger.initiate_receivers()
-merger.initiate_senders()
-
-# Run as a normal client
-merger.run(config_dict={"logger": {"level": "INFO"}})
+agent = ClientMerger([{"dna_path": "a.json"}, {"dna_path": "b.json"}], name="merged")
+agent.initiate_all()
+agent.run(host="127.0.0.1", port=8888)
 ```
 
-**Notes**
-
-* If two donors refer to **the same module-level name** in the **same module**, the rebinding targets the **same global** — be mindful of collisions.
-* Donor-specific module state (counters, caches) remains shared per module due to cloning with the same `__globals__` and closures.
-
----
-
-## Class: `ClientTranslation`
-
-Reconstructs a `SummonerClient` from a **DNA list** (parsed from `SummonerClient.dna()`), compiling each handler back into its original module namespace and registering it.
-
-### Constructor
+## `ClientMerger.initiate_upload_states`
 
 ```python
-ClientTranslation.__init__(
-    dna_list: list[dict[str, Any]],
-    name: str | None = None,
-    var_name: str = "agent",
+def initiate_upload_states(self) -> None
+```
+
+### Behavior
+
+Replays `@upload_states()` handlers from every source onto the merged client.
+
+* For imported-client sources: clones the handler, rebinding the original client variable name (commonly `"agent"`) to the merged client and injecting `rebind_globals`.
+* For DNA sources: compiles the function in the DNA sandbox and registers it onto the merged client.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+```python
+from summoner.client.merger import ClientMerger
+
+agent = ClientMerger([{"dna_path": "a.json"}], name="merged")
+agent.initiate_upload_states()
+```
+
+## `ClientMerger.initiate_download_states`
+
+```python
+def initiate_download_states(self) -> None
+```
+
+### Behavior
+
+Replays `@download_states()` handlers from every source onto the merged client.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+```python
+from summoner.client.merger import ClientMerger
+
+agent = ClientMerger([{"dna_path": "a.json"}], name="merged")
+agent.initiate_download_states()
+```
+
+## `ClientMerger.initiate_hooks`
+
+```python
+def initiate_hooks(self) -> None
+```
+
+### Behavior
+
+Replays `@hook(Direction, priority=...)` handlers from every source onto the merged client.
+
+* Imported-client sources keep module-backed execution (their original globals dict).
+* DNA sources compile hooks into the per-source sandbox and then register them normally.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+```python
+from summoner.client.merger import ClientMerger
+
+agent = ClientMerger([{"dna_path": "a.json"}], name="merged")
+agent.initiate_hooks()
+```
+
+## `ClientMerger.initiate_receivers`
+
+```python
+def initiate_receivers(self) -> None
+```
+
+### Behavior
+
+Replays `@receive(route, priority=...)` handlers from every source onto the merged client.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+```python
+from summoner.client.merger import ClientMerger
+
+agent = ClientMerger([{"dna_path": "a.json"}], name="merged")
+agent.initiate_receivers()
+```
+
+## `ClientMerger.initiate_senders`
+
+```python
+def initiate_senders(self) -> None
+```
+
+### Behavior
+
+Replays `@send(route, multi, on_triggers, on_actions)` handlers from every source onto the merged client.
+
+For DNA sources, triggers/actions are stored by **name** and are resolved as follows:
+
+* **Triggers**:
+
+  * prefers a `Trigger` binding present in the sandbox globals (often provided by context or `rebind_globals`),
+  * otherwise falls back to default trigger loading (`load_triggers()`).
+
+* **Actions**:
+
+  * resolved by name against the protocol `Action` container.
+
+If trigger/action names cannot be resolved, replay may fail for that sender.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+#### Merge DNA that references `Trigger` via context
+
+```python
+from summoner.client.merger import ClientMerger
+
+agent = ClientMerger([{"dna_path": "agent_dna.json"}], name="merged")
+agent.initiate_senders()
+```
+
+#### Merge DNA that requires a `Trigger` binding via `rebind_globals`
+
+```python
+from summoner.client.merger import ClientMerger
+from summoner.protocol.triggers import load_triggers
+
+Trigger = load_triggers()
+
+agent = ClientMerger(
+    [{"dna_path": "agent_dna.json"}],
+    name="merged",
+    rebind_globals={"Trigger": Trigger},
 )
+agent.initiate_senders()
 ```
 
-**Parameters**
-
-| Name       | Type                   | Required | Description                                                                                                                                                 |                     |
-| ---------- | ---------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
-| `dna_list` | `list[dict[str, Any]]` | ✓        | The parsed JSON list from `donor.dna()`.                                                                                                                    |                     |
-| `name`     | \`str                  | None\`   |                                                                                                                                                             | Logger/client name. |
-| `var_name` | `str`                  |          | Name bound into each original module so handlers referring to that module-level client variable now point to this translated instance (default: `"agent"`). |                     |
-
-**Behavior**
-
-* Validates types; raises `TypeError` on bad input.
-* Stores DNA and `var_name` for later use in `initiate_*`.
-
-### `initiate_hooks` / `initiate_receivers` / `initiate_senders`
-
-Rebuilds each function from its **source** and registers it with the appropriate decorator.
+## `ClientTranslation.__init__`
 
 ```python
-ClientTranslation.initiate_hooks(self) -> None
-ClientTranslation.initiate_receivers(self) -> None
-ClientTranslation.initiate_senders(self) -> None
+def __init__(
+    self,
+    dna_list: list[dict[str, Any]],
+    name: Optional[str] = None,
+    var_name: Optional[str] = None,
+    rebind_globals: Optional[dict[str, Any]] = None,
+    allow_context_imports: bool = True,
+    verbose_context_imports: bool = False,
+) -> None
 ```
 
-* For each DNA entry of the matching `type`, `_make_from_source` loads the original **module**, binds `module_globals[var_name] = self`, then **executes only the `def` block** (decorators are stripped) so top-level module side effects are not rerun.
-* Registration is wrapped by `_apply_with_source_patch` to temporarily override `inspect.getsource` so the client can record the exact handler text in its internal DNA capture.
-* **Actions** are reconstructed via `getattr(Action, name)`.
-* **Signals** are reconstructed as `{Signal[t] for t in names} or None`.
+### Behavior
 
-> **Important**: The provided `Signal[...]` lookup implies your environment exposes a **name→Signal** mapping via `Signal["NAME"]`. If you build triggers at runtime, you may need to adapt this resolution (e.g., `{getattr(Trigger, n) for n in names}`) to match your project's trigger loading. See the note below.
+Constructs a new `SummonerClient` from a DNA list by compiling handlers into a dedicated sandbox module, then preparing them for replay via `initiate_*`.
 
-### Overrides for graceful shutdown
+Key properties of translation:
 
-#### `shutdown()` → non-blocking
+* Handlers are not executed in their original modules.
+* Handlers run in the translation sandbox with explicit bindings:
 
-Schedules an async `_async_shutdown()` task (cancels handlers, awaits pending decorator registrations and workers, then stops the loop). Safe to call from SIGINT/SIGTERM handlers.
+  * `var_name` (often `"agent"`) is bound to the translated client,
+  * optional context (imports/globals/recipes) may be applied,
+  * optional `rebind_globals` may be injected.
 
-#### `quit()`
+This class also attempts best-effort cleanup of "template clients" that may have been created as a side effect of importing modules referenced by DNA entries.
 
-Calls the base `quit()` (so the session breaks out of the retry loop) then performs the same cleanup as `shutdown()`.
+### Inputs
 
-#### `run()`
+#### `dna_list`
 
-Wraps the base `run()` so `KeyboardInterrupt` cancels any leftover registration tasks and exits cleanly (no "coroutine was never awaited").
+* **Type:** `list[dict[str, Any]]`
+* **Meaning:** Parsed DNA entries (already JSON-decoded).
+* **Note:** If the DNA begins with a `__context__` entry, it may be applied into the sandbox.
 
-### Internal helpers
+#### `name`
 
-#### `_make_from_source`
+* **Type:** `Optional[str]`
+* **Meaning:** Logical name used for logging.
 
-```python
-ClientTranslation._make_from_source(self, entry: dict[str, Any]) -> types.FunctionType
-```
+#### `var_name`
 
-* Imports or reuses the original module.
-* Binds `module_globals[var_name] = self`.
-* Extracts the `def name(...):` block from `entry["source"]` and `exec`s it in the module namespace.
-* Returns the function object.
+* **Type:** `Optional[str]`
+* **Meaning:** The global name used inside handler source code to reference the client (for example `"agent"`).
+* **Default behavior:** uses `__context__.var_name` if present, otherwise `"agent"`.
 
-**Raises**: `ImportError` (module missing), `RuntimeError` (cannot find `def` or not a function after exec).
+#### `rebind_globals`
 
-#### `_apply_with_source_patch`
+* **Type:** `Optional[dict[str, Any]]`
+* **Meaning:** Extra globals injected into the sandbox to satisfy referenced symbols (shared objects, Trigger bindings, etc.).
 
-Temporarily patches `inspect.getsource` so the decorator can record the correct source.
+#### `allow_context_imports`
 
-#### `_async_shutdown`
+* **Type:** `bool`
+* **Meaning:** Whether to execute import lines from a DNA `__context__` entry.
+* **Default:** `True`
 
-Async cleanup helper used by `shutdown()`/`quit()`.
+#### `verbose_context_imports`
 
-### Minimal example — translate from DNA
+* **Type:** `bool`
+* **Meaning:** Whether to log successful context imports.
+* **Default:** `False`
+
+### Outputs
+
+Creates a `ClientTranslation` instance (subclass of `SummonerClient`).
+
+### Examples
+
+#### Translate from an in-memory DNA list
 
 ```python
 import json
 from summoner.client.merger import ClientTranslation
 
-# Donor → DNA (e.g., captured at runtime or stored)
-dna_list = json.loads(donor_client.dna())
+dna_list = json.loads(open("agent_dna.json", "r", encoding="utf-8").read())
 
-clone = ClientTranslation(dna_list, name="clone", var_name="agent")
-clone.flow().activate()
-clone.flow().add_arrow_style('-', ('[', ']'), ',', '>')
-
-clone.initiate_hooks()
-clone.initiate_receivers()
-clone.initiate_senders()
-
-clone.run(config_dict={"logger": {"level": "INFO"}})
+agent = ClientTranslation(dna_list, name="translated")
+agent.initiate_all()
+agent.run(host="127.0.0.1", port=8888)
 ```
 
-### Signal-name resolution note
-
-If your build does **not** provide `Signal["NAME"]` lookup, reconstruct triggers explicitly and adapt `initiate_senders` before calling it, for example:
+## `ClientTranslation.initiate_all`
 
 ```python
-# Build a Trigger class first (same hierarchy as the donor used)
-Trigger = clone.flow().triggers(text="""
-OK
-  acceptable
-  all_good
-error
-  minor
-  major
-""")
-
-# Monkey-patch a helper to convert DNA names → Signal objects
-resolve = lambda names: {getattr(Trigger, n) for n in names}
-
-# If needed, you can loop over clone._dna_list to pre-resolve `on_triggers` fields
-# before calling clone.initiate_senders().
+def initiate_all(self) -> None
 ```
 
-> **Security**: Translating from DNA executes **handler source code**. Only load DNA from trusted origins.
+### Behavior
+
+Replays all handler types from the DNA list onto this translated client, in the standard order:
+
+1. `upload_states`
+2. `download_states`
+3. `hook`
+4. `receive`
+5. `send`
+
+Call this before `run(...)`.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+```python
+from summoner.client.merger import ClientTranslation
+
+agent = ClientTranslation(dna_list, name="translated")
+agent.initiate_all()
+agent.run(host="127.0.0.1", port=8888)
+```
+
+## `ClientTranslation.initiate_upload_states`
+
+```python
+def initiate_upload_states(self) -> None
+```
+
+### Behavior
+
+Replays `@upload_states()` from DNA onto this translated client.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+```python
+from summoner.client.merger import ClientTranslation
+
+agent = ClientTranslation(dna_list, name="translated")
+agent.initiate_upload_states()
+```
+
+## `ClientTranslation.initiate_download_states`
+
+```python
+def initiate_download_states(self) -> None
+```
+
+### Behavior
+
+Replays `@download_states()` from DNA onto this translated client.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+```python
+from summoner.client.merger import ClientTranslation
+
+agent = ClientTranslation(dna_list, name="translated")
+agent.initiate_download_states()
+```
+
+## `ClientTranslation.initiate_hooks`
+
+```python
+def initiate_hooks(self) -> None
+```
+
+### Behavior
+
+Replays `@hook(...)` entries from DNA onto this translated client.
+
+Direction and priorities are interpreted from the DNA entries and applied to the normal `SummonerClient.hook(...)` decorator.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+```python
+from summoner.client.merger import ClientTranslation
+
+agent = ClientTranslation(dna_list, name="translated")
+agent.initiate_hooks()
+```
+
+## `ClientTranslation.initiate_receivers`
+
+```python
+def initiate_receivers(self) -> None
+```
+
+### Behavior
+
+Replays `@receive(...)` entries from DNA onto this translated client.
+
+Routes and priorities are interpreted from the DNA entries and applied to the normal `SummonerClient.receive(...)` decorator.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+```python
+from summoner.client.merger import ClientTranslation
+
+agent = ClientTranslation(dna_list, name="translated")
+agent.initiate_receivers()
+```
+
+## `ClientTranslation.initiate_senders`
+
+```python
+def initiate_senders(self) -> None
+```
+
+### Behavior
+
+Replays `@send(...)` entries from DNA onto this translated client.
+
+Triggers and actions are stored in DNA by name and are resolved as follows:
+
+* **Triggers**:
+
+  * uses a `Trigger` binding found in the sandbox globals (possibly from context or `rebind_globals`),
+  * otherwise uses `load_triggers()`.
+
+* **Actions**:
+
+  * resolved by name against the protocol `Action` container.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+#### Provide Trigger via `rebind_globals`
+
+```python
+from summoner.client.merger import ClientTranslation
+from summoner.protocol.triggers import load_triggers
+
+Trigger = load_triggers()
+
+agent = ClientTranslation(
+    dna_list,
+    name="translated",
+    rebind_globals={"Trigger": Trigger},
+)
+agent.initiate_senders()
+```
+
+## End-to-end examples
+
+### Example: merge two DNA files into one runnable client
+
+#### merge_and_run.py
+
+```python
+import json
+from summoner.client.merger import ClientMerger
+
+a = json.loads(open("a.json", "r", encoding="utf-8").read())
+b = json.loads(open("b.json", "r", encoding="utf-8").read())
+
+agent = ClientMerger([a, b], name="merged")
+agent.initiate_all()
+agent.run(host="127.0.0.1", port=8888)
+```
+
+### Example: translate DNA into a fresh client, then run
+
+#### translate_and_run.py
+
+```python
+import json
+from summoner.client.merger import ClientTranslation
+
+dna_list = json.loads(open("agent_dna.json", "r", encoding="utf-8").read())
+
+agent = ClientTranslation(dna_list, name="translated")
+agent.initiate_all()
+agent.run(host="127.0.0.1", port=8888)
+```
 
 ---
-
-## Error reference
-
-* Wrong `named_clients` shape → `TypeError`/`KeyError` with index and missing key details.
-* Non-async decorators in donors are already rejected by `SummonerClient`; merge/translate only replay valid handlers.
-* Module import failure in translation → `ImportError` with module name.
-* Function extraction failure (cannot find `def`) → `RuntimeError`.
-
----
-
-## See also
-
-* `summoner.client.client.SummonerClient` — base class providing decorators and run loop
-* `SummonerClient.dna()` — producing the DNA list consumed by `ClientTranslation`
-* `summoner.protocol.triggers` — `Signal`, `Action`, trigger building
 
 
 <p align="center">
-  <a href="./client.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.client.client</b></code> </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../client.md">Next: <code style="background: transparent;">Summoner<b>.client</b></code> &raquo;</a>
+  <a href="./configs.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.client</b></code> configuration guide</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../client.md">Next: <code style="background: transparent;">Summoner<b>.client</b></code> &raquo;</a>
 </p>

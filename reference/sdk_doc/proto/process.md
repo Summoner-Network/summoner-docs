@@ -1,566 +1,766 @@
-# Module: `summoner.protocol.process`
+# <code style="background: transparent;">Summoner<b>.protocol.process</b></code>
 
-Processing primitives for routing and event flow:
+This page documents the **protocol-layer data structures** used by Summoner clients and flows.
 
-* **Node**: gate or state token used in routes and tapes
-* **ArrowStyle**: canonicalization and validation of arrow syntax parts
-* **ParsedRoute**: normalized representation of a route (object or arrow)
-* **Sender** and **Receiver**: async call sites for emitting or consuming events
-* **StateTape**: typed container for active states with activation collection
-* **Enums**: `Direction`, `TapeType`, `ClientIntent`
+The module defines:
 
-The examples below mirror the simulations you shared.
+* `Node`: a token model used as a **gate** (matching incoming state).
+* `ArrowStyle` and `ParsedRoute`: a parsed representation of routes (objects or arrows).
+* `Sender`, `Receiver`, `Direction`: protocol wrappers used by the client runtime.
+* `StateTape`: an in-memory tape of active states, plus activation discovery.
+* `ClientIntent`: a small enum used by the client lifecycle (quit vs travel vs abort).
 
----
 
-## Quick map
 
-* Tokens and regex constants: `_PLAIN_TOKEN_RE`, `_ALL_RE`, `_NOT_RE`, `_ONEOF_RE`
-* Sentinel: `_WILDCARD`
-* Classes: `Node`, `ArrowStyle`, `ParsedRoute`, `Sender`, `Receiver`, `TapeActivation`, `StateTape`
-* Enums: `Direction`, `TapeType`, `ClientIntent`
-
----
-
-## Constants
-
-### `_PLAIN_TOKEN_RE`
-
-**Type**
-
-`re.Pattern[str]`
-
-**Pattern**
-
-`^[A-Za-z_]\w*$`
-
-**Description**
-
-Validates plain tokens such as `A`, `foo`, `bar_2`.
-
----
-
-### `_ALL_RE`
-
-**Type**
-
-`re.Pattern[str]`
-
-**Pattern**
-
-`^/all$`
-
-**Description**
-
-Matches the special token `/all`.
-
----
-
-### `_NOT_RE`
-
-**Type**
-
-`re.Pattern[str]`
-
-**Pattern**
-
-`^/not\(\s*([^)]*?)\s*\)$`
-
-**Description**
-
-Matches a negation list like `/not(E,F)` and captures the comma separated payload.
-
----
-
-### `_ONEOF_RE`
-
-**Type**
-
-`re.Pattern[str]`
-
-**Pattern**
-
-`^/oneof\(\s*([^)]*?)\s*\)$`
-
-**Description**
-
-Matches a one-of list like `/oneof(A,B)` and captures the comma separated payload.
-
----
-
-### `_WILDCARD`
-
-**Type**
-
-`object`
-
-**Description**
-
-Internal sentinel used by `Node.accepts` for match table entries. Not exported.
-
----
-
-## Classes and data types
-
-### `Node`
-
-**Summary**
-
-Parses and normalizes a single gate/state token. Supports four kinds: `all`, `plain`, `not`, `oneof`.
-
-**Constructor**
+## `class Node`
 
 ```python
-summoner.protocol.process.Node(expr: str)
+class Node
 ```
 
-**Parameters**
+### Behavior
 
-| Name   | Type  | Required | Default | Description                                                   |
-| ------ | ----- | -------- | ------- | ------------------------------------------------------------- |
-| `expr` | `str` | yes      | —       | Raw token string. Leading and trailing whitespace is ignored. |
+Represents a token used as either:
 
-**Normalization**
+* a **gate** (pattern) in a route source, or
+* a **state** stored on a `StateTape`.
 
-* `/all` → kind `all`
-* `/not(E,F)` → kind `not`, values `("E", "F")`
-* `/oneof(A,B)` → kind `oneof`, values `("A", "B")`
-* `A` or `abc_123` → kind `plain`, values `(token,)`
+A `Node` is created from a single expression string and is normalized into:
 
-**Raises**
+* `kind` in `{ "plain", "all", "not", "oneof" }`
+* `values` as `tuple[str]` or `None`
 
-* `ValueError` if the token syntax is invalid.
+Accepted syntaxes:
 
-**Methods**
+* Plain token: `foo`, `ok_1`, `StateX`
+* All wildcard: `/all`
+* Negation set: `/not(a,b,c)`
+* One-of set: `/oneof(a,b,c)`
+
+Invalid syntax raises `ValueError`.
+
+### Inputs
+
+#### `expr`
+
+* **Type:** `str`
+* **Meaning:** Token expression that defines the node.
+
+### Outputs
+
+A `Node` instance.
+
+### Examples
 
 ```python
-Node.accepts(state: Node) -> bool
+from summoner.protocol.process import Node
+
+Node("OK")
+Node("/all")
+Node("/not(minor,major)")
+Node("/oneof(a,b,c)")
 ```
 
-| Name    | Type   | Required | Default | Description                      |
-| ------- | ------ | -------- | ------- | -------------------------------- |
-| `state` | `Node` | yes      | —       | State to test against this gate. |
 
-**Returns**
 
-* `bool`: whether the gate accepts the state.
-
-**Raises**
-
-* `TypeError` if `state` is not a `Node`.
-* `RuntimeError` for an unhandled match combination (should not occur with supported kinds).
-
-**Acceptance semantics**
-
-The decision is table-driven. Key cases:
-
-* `all` accepts everything.
-* `plain` vs `plain`: equal names match.
-* `plain` vs `not(X,...)`: match if name not in the set.
-* `plain` vs `oneof(...)`: match if name in the set.
-* `not(E,...)` vs `plain`: match if state not in the set.
-* `not(...)` vs any state type: wildcard entries allow matching in broad contexts.
-* `oneof(S)` vs `plain`: match if state in `S`.
-* `oneof(S)` vs `not(T)`: match if `S \ T` is non empty.
-* `oneof(S)` vs `oneof(T)`: match if `S ∩ T` is non empty.
-
-**String forms**
-
-* `str(Node('/all')) == '/all'`
-* `str(Node('A')) == 'A'`
-* `str(Node('/not(E,F)')) == '/not(E,F)'`
-* `str(Node('/oneof(A,B)')) == '/oneof(A,B)'`
-
-**Example**
+## `Node.accepts`
 
 ```python
-Node('/all').accepts(Node('X'))           # True
-Node('A').accepts(Node('A'))              # True
-Node('A').accepts(Node('/not(A)'))        # False
-Node('A').accepts(Node('/oneof(A,B)'))    # True
+def accepts(self, state: Node) -> bool
 ```
 
----
+### Behavior
 
-### `ArrowStyle`
+Checks whether this node (the gate) accepts another node (the state).
 
-**Summary**
+This is used when matching a parsed route's `source` nodes (gates) against states stored on a `StateTape`.
 
-Defines the syntactic parts of an arrow for route parsing and canonicalization.
+Key cases:
 
-**Constructor**
+* `/all` accepts any state.
+* A plain gate matches plain state if names match.
+* A plain gate accepts `/oneof(...)` if the gate token is in the set.
+* A plain gate accepts `/not(...)` if the gate token is not in the forbidden set.
+* A `/oneof(...)` gate accepts a plain state if the state token is in the set.
+* A `/oneof(...)` gate accepts another `/oneof(...)` if the sets intersect.
+* A `/not(...)` gate accepts a plain state if the state token is not in the forbidden set.
+
+If `state` is not a `Node`, raises `TypeError`.
+
+### Inputs
+
+#### `state`
+
+* **Type:** `Node`
+* **Meaning:** Concrete state node to test against this gate.
+
+### Outputs
+
+* **Type:** `bool`
+* **Meaning:** `True` if accepted, else `False`.
+
+### Examples
 
 ```python
-summoner.protocol.process.ArrowStyle(
-    stem: str,
-    brackets: tuple[str, str],
-    separator: str,
-    tip: str,
+from summoner.protocol.process import Node
+
+gate = Node("/oneof(a,b)")
+assert gate.accepts(Node("a")) is True
+assert gate.accepts(Node("c")) is False
+
+gate = Node("x")
+assert gate.accepts(Node("/not(a,b)")) is True
+assert gate.accepts(Node("/not(x,y)")) is False
+```
+
+
+
+## `class ArrowStyle`
+
+```python
+class ArrowStyle
+```
+
+### Behavior
+
+Describes the syntax used to render an "arrow route" string. It defines:
+
+* `stem`: single character used for the arrow shaft (example `-`)
+* `brackets`: label delimiters (example `("[", "]")`)
+* `separator`: token separator inside segments (example `","`)
+* `tip`: arrow terminator (example `">"`)
+
+The constructor validates:
+
+* `stem` is exactly 1 character.
+* all parts are non-empty strings.
+* no part overlaps another (substring conflicts).
+* `separator` does not contain reserved characters used by the parser or style.
+* style parts are safe to use with `re.escape`.
+
+### Inputs
+
+#### `stem`
+
+* **Type:** `str`
+* **Meaning:** One-character arrow shaft marker.
+
+#### `brackets`
+
+* **Type:** `tuple[str, str]`
+* **Meaning:** Left and right bracket strings for the label part.
+
+#### `separator`
+
+* **Type:** `str`
+* **Meaning:** Separator for multiple tokens within a segment.
+
+#### `tip`
+
+* **Type:** `str`
+* **Meaning:** Arrow head or terminator string.
+
+### Outputs
+
+An `ArrowStyle` instance.
+
+### Examples
+
+```python
+from summoner.protocol.process import ArrowStyle
+
+style = ArrowStyle(
+    stem="-",
+    brackets=("[", "]"),
+    separator=",",
+    tip=">",
 )
 ```
 
-**Parameters**
 
-| Name        | Type              | Required | Default | Description                                                                |
-| ----------- | ----------------- | -------- | ------- | -------------------------------------------------------------------------- |
-| `stem`      | `str`             | yes      | —       | Single character used for the arrow shaft, for example `-` or `=`.         |
-| `brackets`  | `tuple[str, str]` | yes      | —       | Left and right label delimiters, for example `("[", "]")` or `("{", ")")`. |
-| `separator` | `str`             | yes      | —       | Separator for multi token lists. Must not include reserved characters.     |
-| `tip`       | `str`             | yes      | —       | Arrow head or terminator, for example `>` or `)`.                          |
 
-**Validation**
-
-* Stem must be a single character.
-* Brackets, separator, and tip must be non empty strings.
-* Parts must not overlap each other.
-* Separator cannot contain the stem, either bracket, the tip, or any of `(`, `)`, `/`.
-* Each part must be regex safe.
-
-**Raises**
-
-* `ValueError` on any validation failure.
-
-**Example**
+## `class ParsedRoute`
 
 ```python
-ArrowStyle(stem='-', brackets=('[', ']'), separator=',', tip='>')
+class ParsedRoute
 ```
 
----
+### Behavior
 
-### `ParsedRoute`
+Represents a parsed route in a structured form:
 
-**Summary**
+* `source`: tuple of gate `Node`s
+* `label`: tuple of label `Node`s
+* `target`: tuple of target `Node`s
+* `style`: optional `ArrowStyle` used for rendering
 
-Normalized representation of a route. An object route has only `source`. An arrow route has optional `source`, optional `label`, and optional `target` depending on syntax.
+The string form of the route is precomputed and used for equality and hashing.
 
-**Constructor**
+Interpretation:
 
-```python
-summoner.protocol.process.ParsedRoute(
-    source: tuple[Node, ...],
-    label: tuple[Node, ...],
-    target: tuple[Node, ...],
-    style: ArrowStyle | None,
-)
-```
+* If the route has `target` or `label`, it is treated as an **arrow route**.
+* If it has no label and no target, it is treated as an **object route** (only source nodes).
 
-**Attributes**
+### Inputs
 
-| Name     | Type               | Access    | Description                                            |                                             |
-| -------- | ------------------ | --------- | ------------------------------------------------------ | ------------------------------------------- |
-| `source` | `tuple[Node, ...]` | read-only | Gate nodes on the left side. Empty for initial arrows. |                                             |
-| `label`  | `tuple[Node, ...]` | read-only | Label nodes enclosed by brackets. May be empty.        |                                             |
-| `target` | `tuple[Node, ...]` | read-only | Target nodes on the right side. May be empty.          |                                             |
-| `style`  | \`ArrowStyle       | None\`    | read-only                                              | Arrow style used. `None` for object routes. |
+#### `source`
 
-**Derived properties**
+* **Type:** `tuple[Node, ...]`
 
-```python
-has_label: bool
-is_arrow: bool
-is_object: bool
-is_initial: bool  # arrow with empty source
-```
+#### `label`
 
-**Methods**
+* **Type:** `tuple[Node, ...]`
 
-```python
-ParsedRoute.activated_nodes(event: Event | None) -> tuple[Node, ...]
-```
+#### `target`
 
-Routing rule:
+* **Type:** `tuple[Node, ...]`
 
-* If `is_object` (no arrow):
-  * If `event` is `Action.TEST`, returns empty tuple.
-  * If `event` is any other `Event`, returns `source`.
-  * If `event` is `None` (or not an `Event`), returns empty tuple.
+#### `style`
 
-* If `is_arrow`:
-  * If `event` is `Action.MOVE`, returns `label + target`.
-  * If `event` is `Action.TEST`, returns `label`.
-  * If `event` is `Action.STAY`, returns `source`.
-  * Otherwise returns empty tuple.
+* **Type:** `Optional[ArrowStyle]`
 
-**Equality and hashing**
+### Outputs
 
-Two routes are equal if their canonical string representations match. `str(route)` yields the canonical form used for keys.
+A `ParsedRoute` instance.
 
-**Example**
+### Examples
 
 ```python
-from summoner.protocol.process import Node, ArrowStyle, ParsedRoute
-from summoner.protocol.triggers import Signal, Action  # or wherever these live
+from summoner.protocol.process import Node, ParsedRoute, ArrowStyle
 
-style = ArrowStyle('-', ('[', ']'), ',', '>')
-route = ParsedRoute(
-    source=(Node('A'), Node('C')),
-    label=(Node('f'), Node('g')),
-    target=(Node('B'),),
+style = ArrowStyle("-", ("[", "]"), ",", ">")
+
+r = ParsedRoute(
+    source=(Node("A"),),
+    label=(Node("L"),),
+    target=(Node("B"),),
     style=style,
 )
 
-event = Action.MOVE(Signal((0,), 'OK'))
-assert route.activated_nodes(event) == (Node('f'), Node('g'), Node('B'))
-
-obj = ParsedRoute(source=(Node('opened'), Node('notify')), label=(), target=(), style=None)
-assert obj.activated_nodes(Action.STAY(Signal((0,), 'OK'))) == (Node('opened'), Node('notify'))
-assert obj.activated_nodes(Action.TEST(Signal((0,), 'OK'))) == ()
+assert r.is_arrow is True
+assert r.has_label is True
 ```
 
----
 
-### `Sender`
 
-**Summary**
-
-Async producer side bound to a route. Can filter on action class and signal set.
-
-**Dataclass**
+## `ParsedRoute.has_label`
 
 ```python
-@dataclass(frozen=True)
-class Sender:
-    fn: Callable[[], Awaitable]
-    multi: bool
-    actions: set[type] | None
-    triggers: set[Signal] | None
-    def responds_to(self, event: Any) -> bool: ...
+@property
+def has_label(self) -> bool
 ```
 
-**Parameters**
+### Behavior
 
-| Name       | Type                      | Required | Default | Description                                                                      |                                                                                                                     |
-| ---------- | ------------------------- | -------- | ------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `fn`       | `Callable[[], Awaitable]` | yes      | —       | Async callable to execute when eligible. No arguments.                           |                                                                                                                     |
-| `multi`    | `bool`                    | yes      | —       | Whether multiple instances may run or be scheduled. Semantics defined by caller. |                                                                                                                     |
-| `actions`  | \`set[type]              | None\`   | yes     | —                                                                                | Allowed event classes, for example `{Action.MOVE, Action.TEST}`. `None` means allow all. Empty set matches nothing. |
-| `triggers` | \`set[Signal]            | None\`   | yes     | —                                                                                | Allowed signals. `None` means allow all. Empty set matches nothing.                                                 |
+Returns `True` when the route has at least one label node.
 
-**Method: `responds_to`**
+### Outputs
 
-Returns `True` when the event class is permitted by `actions` and the event signal is in `triggers` according to:
+`bool`
 
-* If `actions is not None`, must have `isinstance(event, cls)` for some `cls` in `actions`.
-* If `triggers is not None`, must have `extract_signal(event) in triggers`.
 
-**Example**
+
+## `ParsedRoute.is_arrow`
 
 ```python
-sender = Sender(fn=async_lambda, multi=False,
-                actions={Action.MOVE, Action.TEST},
-                triggers={Trigger.OK, Trigger.minor})
-assert sender.responds_to(Action.TEST(Trigger.minor))
+@property
+def is_arrow(self) -> bool
 ```
 
----
+### Behavior
 
-### `Receiver`
+Returns `True` when the route has a target or a label. This indicates an arrow route.
 
-**Summary**
+### Outputs
 
-Async consumer side bound to a route. Yields an `Event` or `None`.
+`bool`
 
-**Dataclass**
+
+
+## `ParsedRoute.is_object`
 
 ```python
-@dataclass(frozen=True)
-class Receiver:
-    fn: Callable[[str | dict], Awaitable[Event | None]]
-    priority: tuple[int, ...]
+@property
+def is_object(self) -> bool
 ```
 
-**Parameters**
+### Behavior
 
-| Name       | Type              | Required                | Default  | Description                                                                         |   |                                                                                    |
-| ---------- | ----------------- | ----------------------- | -------- | ----------------------------------------------------------------------------------- | - | ---------------------------------------------------------------------------------- |
-| `fn`       | \`Callable[[str | dict], Awaitable[Event | None]]\` | yes                                                                                 | — | Async handler. Receives the decoded message payload. Returns an `Event` or `None`. |
-| `priority` | `tuple[int, ...]` | yes                     | —        | Lexicographic priority used for batch ordering. Empty tuple means default priority. |   |                                                                                    |
+Returns `True` when the route is not an arrow route. This indicates an object route.
 
-**Example**
+### Outputs
+
+`bool`
+
+
+
+## `ParsedRoute.is_initial`
 
 ```python
-recv = Receiver(fn=my_async_handler, priority=(1, 2))
+@property
+def is_initial(self) -> bool
 ```
 
----
+### Behavior
 
-### `Direction`
+Returns `True` for arrow routes that have no source gates. These are "initial" routes that can fire without matching tape state.
 
-**Summary**
+### Outputs
 
-Dispatch direction.
+`bool`
 
-**Enum members**
 
-* `SEND`
-* `RECEIVE`
 
----
-
-### `TapeActivation`
-
-**Summary**
-
-Execution record produced when a `Receiver` is eligible for a given route and tape state.
-
-**Dataclass**
+## `ParsedRoute.activated_nodes`
 
 ```python
-@dataclass(frozen=True)
-class TapeActivation:
-    key: str | None
-    state: Node | None
-    route: ParsedRoute
-    fn: Callable[[Any], Awaitable]
+def activated_nodes(self, event: Optional[Event]) -> tuple[Node, ...]
 ```
 
-**Fields**
+### Behavior
 
-| Name    | Type                         | Description                    |                                                             |
-| ------- | ---------------------------- | ------------------------------ | ----------------------------------------------------------- |
-| `key`   | \`str                        | None\`                         | Tape key that matched. `None` for initial arrows.           |
-| `state` | \`Node                       | None\`                         | The concrete state that matched. `None` for initial arrows. |
-| `route` | `ParsedRoute`                | The matched route.             |                                                             |
-| `fn`    | `Callable[[Any], Awaitable]` | The receiver function to call. |                                                             |
+Given an event (typically one of `Action.MOVE`, `Action.STAY`, `Action.TEST`), returns the nodes that should be added to the tape.
 
----
+Rules:
 
-### `TapeType`
+* **Object route** (`is_object`):
 
-**Summary**
+  * `Action.TEST`: activates nothing
+  * any other `Event`: activates `source`
+* **Arrow route** (`is_arrow`):
 
-Shape classification for `StateTape` content.
+  * `Action.MOVE`: activates `label + target`
+  * `Action.TEST`: activates `label`
+  * `Action.STAY`: activates `source`
+* Any other input returns `()`.
 
-**Enum members**
+### Inputs
 
-* `SINGLE`          — a single Node
-* `MANY`            — a list of Nodes
-* `INDEX_SINGLE`    — mapping `key -> Node`
-* `INDEX_MANY`      — mapping `key -> list[Node]`
+#### `event`
 
----
+* **Type:** `Optional[Event]`
+* **Meaning:** The event produced by a receiver or state machine step.
 
-### `StateTape`
+### Outputs
 
-**Summary**
+* **Type:** `tuple[Node, ...]`
+* **Meaning:** Nodes to be appended to a `StateTape`.
 
-Typed container for states used to drive activations. Supports flexible input shapes and stable reversion to either a list or an index mapping.
-
-**Constructor**
+### Examples
 
 ```python
-summoner.protocol.process.StateTape(
-    states: Any = None,
-    with_prefix: bool = True,
+from summoner.protocol.process import Node, ParsedRoute, ArrowStyle
+from summoner.protocol.triggers import Action, Signal
+
+style = ArrowStyle("-", ("[", "]"), ",", ">")
+r = ParsedRoute(
+    source=(Node("A"),),
+    label=(Node("L"),),
+    target=(Node("B"),),
+    style=style,
 )
+
+sig = Signal((0,), "OK")
+assert r.activated_nodes(Action.MOVE(sig)) == (Node("L"), Node("B"))
+assert r.activated_nodes(Action.TEST(sig)) == (Node("L"),)
+assert r.activated_nodes(Action.STAY(sig)) == (Node("A"),)
 ```
 
-**Parameters**
 
-| Name          | Type   | Required | Default | Description                                                            |                      |            |     |      |           |
-| ------------- | ------ | -------- | ------- | ---------------------------------------------------------------------- | -------------------- | ---------- | --- | ---- | --------- |
-| `states`      | `Any`  | no       | `None`  | One of: `None`, `str`, `Node`, \`list[Node                            | str]`, or `dict[str | None, Node | str | list | tuple]\`. |
-| `with_prefix` | `bool` | no       | `True`  | If mapping input is given, add the `prefix` to keys as `"tape:<key>"`. |                      |            |     |      |           |
 
-**Attributes**
-
-| Name     | Type                    | Access     | Description                                      |
-| -------- | ----------------------- | ---------- | ------------------------------------------------ |
-| `states` | `dict[str, list[Node]]` | read-write | Internal normalized storage.                     |
-| `_type`  | `TapeType`              | read-write | Shape classification that controls `revert`.     |
-| `prefix` | `str`                   | read-only  | Prefix used for internal keys. Default `"tape"`. |
-
-**Methods**
+## `@dataclass Sender`
 
 ```python
-StateTape.set_type(value: TapeType) -> StateTape
-StateTape.refresh() -> StateTape
-StateTape.extend(states: Any) -> None
-StateTape.revert() -> list[Node] | dict[str, list[Node]] | None
-StateTape.collect_activations(
+@dataclass(frozen=True)
+class Sender
+```
+
+### Behavior
+
+Represents a sending handler registered by a client:
+
+* `fn`: async callable that produces a payload (or multiple payloads)
+* `multi`: whether `fn` returns a list of payloads
+* `actions`: optional set of event classes that gate execution
+* `triggers`: optional set of `Signal` values that gate execution
+
+Senders are "reactive" when `actions` or `triggers` is set. The runtime calls `responds_to(event)` to decide whether a sender should run for a given event.
+
+### Fields
+
+* `fn`: `Callable[[], Awaitable]`
+* `multi`: `bool`
+* `actions`: `Optional[set[Type]]`
+* `triggers`: `Optional[set[Signal]]`
+
+### Examples
+
+```python
+from summoner.protocol.process import Sender
+# In SDK usage, Sender is usually created internally by SummonerClient decorators.
+```
+
+
+
+## `Sender.responds_to`
+
+```python
+def responds_to(self, event: Any) -> bool
+```
+
+### Behavior
+
+Checks whether `event` satisfies the sender's action and trigger filters:
+
+* If `actions` is set: `event` must be an instance of at least one class in `actions`.
+* If `triggers` is set: `extract_signal(event)` must equal at least one signal in `triggers`.
+
+If a filter is `None`, it is treated as "no constraint".
+
+### Inputs
+
+#### `event`
+
+* **Type:** `Any`
+* **Meaning:** An event-like object produced by receiver logic, typically an `Event` or `Signal`.
+
+### Outputs
+
+`bool`
+
+
+
+## `@dataclass Receiver`
+
+```python
+@dataclass(frozen=True)
+class Receiver
+```
+
+### Behavior
+
+Represents a receiving handler registered by a client:
+
+* `fn`: async callable that consumes a payload and returns an optional `Event`
+* `priority`: a tuple used for batch ordering
+
+### Fields
+
+* `fn`: `Callable[[Union[str, dict]], Awaitable[Optional[Event]]]`
+* `priority`: `tuple[int, ...]`
+
+### Examples
+
+```python
+from summoner.protocol.process import Receiver
+# In SDK usage, Receiver is usually created internally by SummonerClient decorators.
+```
+
+
+
+## `class Direction`
+
+```python
+class Direction(Enum)
+```
+
+### Behavior
+
+Indicates whether a hook or handler belongs to the sending side or receiving side.
+
+Values:
+
+* `Direction.SEND`
+* `Direction.RECEIVE`
+
+### Examples
+
+```python
+from summoner.protocol.process import Direction
+
+assert Direction.SEND.name == "SEND"
+```
+
+
+
+## `@dataclass TapeActivation`
+
+```python
+@dataclass(frozen=True)
+class TapeActivation
+```
+
+### Behavior
+
+Represents one activation of a receiver due to a tape match.
+
+Fields capture:
+
+* `key`: the tape key that matched (or `None` for initial routes)
+* `state`: the concrete tape state that matched (or `None` for initial routes)
+* `route`: the parsed route that matched
+* `fn`: the receiver function to execute
+
+### Fields
+
+* `key`: `Optional[str]`
+* `state`: `Optional[Node]`
+* `route`: `ParsedRoute`
+* `fn`: `Callable[[Any], Awaitable]`
+
+
+
+## `class TapeType`
+
+```python
+class TapeType(Enum)
+```
+
+### Behavior
+
+Internal classification of tape input/output shapes:
+
+* `SINGLE`: a single state
+* `MANY`: a list of states
+* `INDEX_SINGLE`: dict key → single state
+* `INDEX_MANY`: dict key → list of states
+
+This type is inferred by `StateTape` on construction and influences `revert()`.
+
+
+
+## `class StateTape`
+
+```python
+class StateTape
+```
+
+### Behavior
+
+Stores active states as a mapping:
+
+* internal storage: `dict[str, list[Node]]`
+* keys are prefixed by default with `tape:` (configurable by `with_prefix`)
+
+Accepted constructor inputs:
+
+* `None` or unrecognized: creates an empty index-many tape.
+* `str` or `Node`: treated as `SINGLE`.
+* `list[str|Node]` or `tuple[str|Node]`: treated as `MANY`.
+* `dict[key -> str|Node]`: treated as `INDEX_SINGLE`.
+* `dict[key -> (str|Node|list|tuple)]`: treated as `INDEX_MANY`.
+
+The tape is used by flow-enabled clients to decide which receivers should run.
+
+### Inputs
+
+#### `states`
+
+* **Type:** `Any`
+* **Meaning:** Initial tape content, in one of the accepted shapes.
+
+#### `with_prefix`
+
+* **Type:** `bool`
+* **Meaning:** Whether to prefix keys with `tape:` when building internal storage.
+* **Default:** `True`
+
+### Outputs
+
+A `StateTape` instance.
+
+### Examples
+
+```python
+from summoner.protocol.process import StateTape, Node
+
+t1 = StateTape("A")                       # SINGLE
+t2 = StateTape(["A", "B"])                # MANY
+t3 = StateTape({"x": "A"})                # INDEX_SINGLE
+t4 = StateTape({"x": ["A", Node("B")]})   # INDEX_MANY
+```
+
+
+
+## `StateTape.extend`
+
+```python
+def extend(self, states: Any) -> None
+```
+
+### Behavior
+
+Extends the tape with additional states.
+
+The method constructs a local `StateTape` from `states` (without adding prefixes), then merges:
+
+* missing keys are created
+* nodes are appended to existing lists
+
+### Inputs
+
+#### `states`
+
+* **Type:** `Any`
+* **Meaning:** Additional tape content in any accepted constructor shape.
+
+### Outputs
+
+Returns `None`.
+
+### Examples
+
+```python
+from summoner.protocol.process import StateTape
+
+tape = StateTape({"x": ["A"]})
+tape.extend({"x": ["B"], "y": ["C"]})
+```
+
+
+
+## `StateTape.refresh`
+
+```python
+def refresh(self) -> StateTape
+```
+
+### Behavior
+
+Creates a fresh tape with the same set of keys but empty node lists. The returned tape keeps the same inferred tape type.
+
+This is commonly used to compute the "next tape" in a flow step.
+
+### Outputs
+
+A new `StateTape` instance.
+
+### Examples
+
+```python
+from summoner.protocol.process import StateTape
+
+tape = StateTape({"x": ["A"], "y": ["B"]})
+fresh = tape.refresh()
+assert fresh.revert() == {"x": [], "y": []}
+```
+
+
+
+## `StateTape.revert`
+
+```python
+def revert(self) -> Union[list[Node], dict[str, list[Node]], None]
+```
+
+### Behavior
+
+Converts internal tape storage back into an external representation:
+
+* For `SINGLE` and `MANY`: returns a single flattened `list[Node]`.
+* For index types: returns `dict[str, list[Node]]` with prefixes removed.
+
+### Outputs
+
+* `list[Node]` or `dict[str, list[Node]]` depending on tape type.
+
+### Examples
+
+```python
+from summoner.protocol.process import StateTape
+
+assert StateTape("A").revert() == [StateTape("A").revert()[0]]
+assert isinstance(StateTape({"x": "A"}).revert(), dict)
+```
+
+
+
+## `StateTape.collect_activations`
+
+```python
+def collect_activations(
+    self,
     receiver_index: dict[str, Receiver],
     parsed_routes: dict[str, ParsedRoute],
 ) -> dict[tuple[int, ...], list[TapeActivation]]
 ```
 
-**Behavior**
+### Behavior
 
-* Constructor normalizes input to `states: dict[str, list[Node]]` and classifies the shape using a private `_assess_type` helper.
-* `refresh` creates an empty clone with the same keys and `_type` for batch-local accumulation.
-* `extend` merges states from another `StateTape`-compatible input. Keys are used as is and values are `Node`-wrapped if needed.
-* `revert` returns a list when `_type in {SINGLE, MANY}` or a key-stripped dict when `_type in {INDEX_SINGLE, INDEX_MANY}`.
-* `collect_activations` builds a priority index. For each `Receiver` and each tape `(key, state)`:
+Computes which receivers should run, based on current tape states and parsed route gates.
 
-  * If the route is `is_initial`, add one activation with `key=None, state=None`.
-  * Else, for each gate in `route.source`, add an activation when `gate.accepts(state)`.
+For each `route -> receiver` in `receiver_index`:
 
-**Examples**
+* Looks up `ParsedRoute` in `parsed_routes`. If missing, skips it.
+* If the route is initial (`parsed_route.is_initial`), it activates once unconditionally.
+* Otherwise, for every `(key, state)` on the tape, checks whether any gate in `parsed_route.source` accepts the state.
 
-*Minimal normalize and revert*
+  * If a gate matches, produces a `TapeActivation(key, state, parsed_route, receiver.fn)`.
+
+Returned activations are indexed by receiver priority (`receiver.priority`).
+
+### Inputs
+
+#### `receiver_index`
+
+* **Type:** `dict[str, Receiver]`
+* **Meaning:** Receiver registry keyed by route string.
+
+#### `parsed_routes`
+
+* **Type:** `dict[str, ParsedRoute]`
+* **Meaning:** Parsed routes keyed by normalized route string.
+
+### Outputs
+
+* **Type:** `dict[tuple[int, ...], list[TapeActivation]]`
+* **Meaning:** Activations grouped by priority.
+
+### Examples
 
 ```python
-from summoner.protocol.process import StateTape, Node
+from summoner.protocol.process import StateTape, Receiver, ParsedRoute, Node, ArrowStyle
 
-# index-many input
-st = StateTape({"k0": ["A", "B"], "k1": [Node("C")]})
-assert st.revert() == {"k0": [Node("A"), Node("B")], "k1": [Node("C")]}
-
-# many input
-st2 = StateTape(["A", "B"]).set_type(TapeType.MANY)
-assert isinstance(st2.revert(), list)
-```
-
-*Activation collection*
-
-```python
-from summoner.protocol.process import StateTape, Receiver
-from summoner.protocol.flow import Flow
-
-flow = Flow() 
-flow.activate() 
-flow.compile_arrow_patterns()
-route = str(flow.parse_route("A --[ f ]--> B"))
-
-async def rcvr(payload):
+async def recv(payload):
     return None
 
-ri = {route: Receiver(fn=rcvr, priority=(1,))}
-pr = {route: flow.parse_route(route)}
-st = StateTape({"k0": ["A"]})
-index = st.collect_activations(ri, pr)
-# index is a dict keyed by (1,) containing TapeActivation entries
+receiver_index = {"A": Receiver(fn=recv, priority=())}
+parsed_routes  = {"A": ParsedRoute(source=(Node("A"),), label=(), target=(), style=None)}
+
+tape = StateTape(["A", "B"])
+acts = tape.collect_activations(receiver_index=receiver_index, parsed_routes=parsed_routes)
+
+assert () in acts
+assert len(acts[()]) >= 1
+```
+
+
+
+## `class ClientIntent`
+
+```python
+class ClientIntent(Enum)
+```
+
+### Behavior
+
+Represents the client's lifecycle intent:
+
+* `QUIT`: immediate exit
+* `TRAVEL`: reconnect to a new host/port
+* `ABORT`: abort due to error
+
+This enum is typically produced by the client runtime logic, not by protocol parsing.
+
+### Examples
+
+```python
+from summoner.protocol.process import ClientIntent
+
+assert ClientIntent.TRAVEL.name == "TRAVEL"
 ```
 
 ---
-
-## Enums
-
-### `Direction`
-
-```python
-from enum import Enum, auto
-class Direction(Enum):
-    SEND = auto()
-    RECEIVE = auto()
-```
-
-### `ClientIntent`
-
-```python
-from enum import Enum, auto
-class ClientIntent(Enum):
-    QUIT = auto()      # immediate exit
-    TRAVEL = auto()    # switch to a new host and port
-    ABORT = auto()     # abort due to error
-```
-
----
-
-## See also
-
-* `summoner.protocol.triggers` for `Signal`, `Event`, `Action`, and `extract_signal`
-* `summoner.protocol.flow` for parser construction and canonicalization
 
 
 <p align="center">

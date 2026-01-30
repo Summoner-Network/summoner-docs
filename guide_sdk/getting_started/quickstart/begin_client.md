@@ -256,7 +256,7 @@ Returning `None` means *no message this cycle.* You can also flip flags from a `
 
 ## Composition: thinking in "capabilities"
 
-Composition is central to how you scale an agent without rewriting it. The practical unit of reuse is a **capability**: a small set of `@receive`/`@send` handlers tied to a set of **routes**, or sometimes a set of route types classified through node logic (see [API Reference on the `Node` class](../../../reference/sdk_doc/proto/process.md#classes-and-data-types)). You can copy these blocks between agents to add or remove skills.
+Composition is central to how you scale an agent without rewriting it. The practical unit of reuse is a **capability**: a small set of `@receive`/`@send` handlers tied to a set of **routes**, or sometimes a set of route types classified through node logic (see [SDK Reference on the `Node` class](../../../reference/sdk_doc/proto/process.md#classes-and-data-types)). You can copy these blocks between agents to add or remove skills.
 
 **Mental model**
 
@@ -295,7 +295,7 @@ async def hb_tx():
 agent.run(host="127.0.0.1", port=8888)
 ```
 
-This single agent exposes two clear capabilities on distinct routes. In a larger project, you can keep each capability in its own file and register them onto the same `agent` instance. If you later need to assemble capabilities authored in separate agents, see the **[`Merger`](../../../reference/sdk_doc/client/merger.md)** utility in the API reference; it replays handlers from multiple agents into one process.
+This single agent exposes two clear capabilities on distinct routes. In a larger project, you can keep each capability in its own file and register them onto the same `agent` instance. If you later need to assemble capabilities authored in separate agents, see the **[`Merger`](../../../reference/sdk_doc/client/merger.md)** utility in the SDK reference; it replays handlers from multiple agents into one process.
 
 > [!TIP]
 > Choose short, stable route names. Routes are your namespace for composition. Keeping them consistent makes it easy to move capabilities between agents.

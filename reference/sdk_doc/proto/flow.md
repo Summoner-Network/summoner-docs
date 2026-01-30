@@ -1,355 +1,515 @@
-# Module: `summoner.protocol.flow`
+# <code style="background: transparent;">Summoner<b>.protocol.flow</b></code>
 
-Parses human readable routes into canonical `ParsedRoute` objects using configurable arrow styles. Also exposes a loader for the `Trigger` namespace built from TRIGGERS definitions.
+This page documents the **flow parser** used by Summoner to interpret route strings into structured `ParsedRoute` objects.
 
-**Typical workflow**
+The module provides:
+
+* `get_token_list`: tokenizes a segment using a separator while respecting parentheses.
+* `Flow`: a parser configured by one or more `ArrowStyle`s.
+* `Flow.triggers`: loads a dynamic `Trigger` class (signals tree) for use with flows.
+* `Flow.parse_route` / `Flow.parse_routes`: converts route strings into `ParsedRoute`.
+
+It depends on:
+
+* `Node`, `ArrowStyle`, `ParsedRoute` from `summoner.protocol.process`
+* `load_triggers` from `summoner.protocol.triggers`
+
+
+
+## Route strings
+
+A route string is parsed into three segments:
+
+* `source`: gate nodes (match against tape state)
+* `label`: nodes activated on `TEST` or `MOVE`
+* `target`: nodes activated on `MOVE`
+
+There are two categories:
+
+### Object route (standalone)
+
+No arrow syntax. Example:
+
+```text
+A,B,/not(x,y)
+```
+
+This produces a `ParsedRoute` with:
+
+* `source=(Node("A"), Node("B"), Node("/not(x,y)"))`
+* `label=()`, `target=()`, `style=None`
+
+### Arrow route (style-dependent)
+
+Arrow parsing requires at least one `ArrowStyle` registered on the `Flow`. A style defines:
+
+* arrow stem character (doubled in syntax)
+* label brackets
+* token separator inside segments
+* arrow tip
+
+A labeled arrow looks like:
+
+```text
+<source>  <stem><stem><left_bracket> <label> <right_bracket><stem><stem><tip>  <target>
+```
+
+An unlabeled arrow looks like:
+
+```text
+<source>  <stem><stem><tip>  <target>
+```
+
+The parser also supports **dangling** variants where `source` or `target` may be empty.
+
+
+
+## Token syntax
+
+Individual tokens must match a conservative pattern:
+
+* optional leading `/`
+* identifier (`[A-Za-z_]\w*`)
+* optional parentheses group `(...)` with no nesting
+
+Examples of valid tokens:
+
+* `A`
+* `/all`
+* `/not(x,y)`
+* `/oneof(a,b,c)`
+* `foo(bar,baz)` (tokenization respects parentheses)
+
+Invalid tokens raise `ValueError` during parsing.
+
+
+
+## `get_token_list`
+
+```python
+def get_token_list(input_string: str, separator: str) -> list[str]
+```
+
+### Behavior
+
+Splits `input_string` by `separator`, but only at "top level":
+
+* separators inside parentheses are ignored
+* empty tokens are dropped
+* tokens are stripped of surrounding whitespace
+
+This is used for parsing `source`, `label`, and `target` segments.
+
+### Inputs
+
+#### `input_string`
+
+* **Type:** `str`
+* **Meaning:** The raw segment to split.
+
+#### `separator`
+
+* **Type:** `str`
+* **Meaning:** The separator to split on (usually `","` or a style-specific separator).
+
+### Outputs
+
+* **Type:** `list[str]`
+* **Meaning:** Non-empty tokens.
+
+### Examples
+
+```python
+from summoner.protocol.flow import get_token_list
+
+assert get_token_list("foo,bar(baz,qux),zap", ",") == ["foo", "bar(baz,qux)", "zap"]
+assert get_token_list("  A  ,  B , ", ",") == ["A", "B"]
+```
+
+
+
+## `class Flow`
+
+```python
+class Flow
+```
+
+### Behavior
+
+A configurable parser that converts route strings into `ParsedRoute`.
+
+A `Flow` holds:
+
+* `triggers_file`: optional filename for the triggers tree
+* `in_use`: whether the flow is active (affects compilation behavior)
+* `arrows`: a set of registered `ArrowStyle` instances
+* internal regex cache compiled from arrow styles
+
+The parser does not require a `Flow` for object routes, but arrow parsing is driven by the styles registered on the flow.
+
+### Constructor
+
+```python
+def __init__(self, triggers_file: Optional[str] = None) -> None
+```
+
+#### Inputs
+
+* `triggers_file`: optional triggers filename. If `None`, uses the default `"TRIGGERS"` behavior of `load_triggers()`.
+
+#### Outputs
+
+A `Flow` instance.
+
+### Example
 
 ```python
 from summoner.protocol.flow import Flow
 
 flow = Flow().activate()
-flow.add_arrow_style(stem='-', brackets=('[', ']'), separator=',', tip='>')
-flow.add_arrow_style(stem='=', brackets=('{', '}'), separator=';', tip=')')
-flow.compile_arrow_patterns()  # Optional: precompile arrow style(s) listed above
-
-r1 = flow.parse_route('A --[ f, g ]--> B, C')
-assert str(r1) == 'A--[f,g]-->B,C' and r1.is_arrow
-
-r2 = flow.parse_route('/all')
-assert str(r2) == '/all' and r2.is_object
 ```
 
----
 
-## Quick map
 
-* Tokenizer: `get_token_list`
-* `Flow` lifecycle: `activate`, `deactivate`, `add_arrow_style`, `ready`
-* Parsing: `parse_route`, `parse_routes`
-* Triggers: `triggers` (delegates to `load_triggers`)
-* Constants: `_TOKEN_RE` (token validation)
-
----
-
-## Constants
-
-### `_TOKEN_RE`
-
-**Type**
-
-`re.Pattern[str]`
-
-**Pattern**
-
-```
-^/?[A-Za-z_]\w*(?:\([^)]*\))?$
-```
-
-**Description**
-
-Validates a single token possibly prefixed with `/` and with an optional parenthesized suffix without nesting. Examples that match: `A`, `foo_bar`, `/all`, `/not(E,F)`, `/oneof(A,B)`.
-
----
-
-## Functions
-
-### `get_token_list`
-
-**Summary**
-
-Split a string on a top level separator while ignoring separators that appear inside parentheses. Returns trimmed, non empty tokens.
-
-**Signature**
+## `Flow.activate`
 
 ```python
-summoner.protocol.flow.get_token_list(input_string: str, separator: str) -> list[str]
+def activate(self) -> Flow
 ```
 
-**Parameters**
+### Behavior
 
-| Name           | Type  | Required | Default | Description                                         |
-| -------------- | ----- | -------- | ------- | --------------------------------------------------- |
-| `input_string` | `str` | yes      | —       | The raw text to split.                              |
-| `separator`    | `str` | yes      | —       | The character used to separate tokens at top level. |
+Sets `in_use=True` and returns `self`.
 
-**Returns**
+This flag is used to decide whether regex patterns should be prepared/compiled (it is common for a client to activate a flow before registering routes).
 
-* `list[str]`: list of tokens with whitespace removed around each token.
+### Outputs
 
-**Example**
+* **Type:** `Flow`
+* **Meaning:** `self`
 
-```python
-get_token_list('foo,bar(baz,qux), zap', ',')  # ['foo', 'bar(baz,qux)', 'zap']
-```
-
----
-
-## Class: `Flow`
-
-**Summary**
-
-Maintains parser configuration and converts route strings to canonical `ParsedRoute` objects. Also loads the dynamic `Trigger` class for signals.
-
-**Constructor**
-
-```python
-summoner.protocol.flow.Flow(triggers_file: str | None = None)
-```
-
-**Parameters**
-
-| Name            | Type  | Required | Default | Description |                                                                                                                                    |
-| --------------- | ----- | -------- | ------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `triggers_file` | \`str | None\`   | no      | `None`      | Custom TRIGGERS filename used by `triggers()`. If `None`, uses the default adjacent `TRIGGERS` file from `triggers.load_triggers`. |
-
-**Attributes**
-
-| Name     | Type              | Access     | Description                                              |
-| -------- | ----------------- | ---------- | -------------------------------------------------------- |
-| `in_use` | `bool`            | read write | When `True`, `compile_arrow_patterns()` will compile regexes immediately. |
-| `arrows` | `set[ArrowStyle]` | read write | Registered arrow styles used to build the parser.        |
-
-**Methods**
-
-### `activate`
-
-**Signature**
-
-```python
-Flow.activate(self) -> Flow
-```
-
-**Description**
-
-Mark the instance as in use and return `self` for chaining.
-
-**Example**
+### Example
 
 ```python
 flow = Flow().activate()
+assert flow.in_use is True
 ```
 
----
 
-### `deactivate`
 
-**Signature**
+## `Flow.deactivate`
 
 ```python
-Flow.deactivate(self) -> Flow
+def deactivate(self) -> Flow
 ```
 
-**Description**
+### Behavior
 
-Mark the instance as not in use and return `self` for chaining.
+Sets `in_use=False` and returns `self`.
 
----
+### Outputs
 
-### `add_arrow_style`
+* **Type:** `Flow`
+* **Meaning:** `self`
 
-**Signature**
+
+
+## `Flow.add_arrow_style`
 
 ```python
-Flow.add_arrow_style(
+def add_arrow_style(
     self,
     stem: str,
     brackets: tuple[str, str],
     separator: str,
-    tip: str,
+    tip: str
 ) -> None
 ```
 
-**Parameters**
+### Behavior
 
-| Name        | Type              | Required | Default | Description                                                                             |
-| ----------- | ----------------- | -------- | ------- | --------------------------------------------------------------------------------------- |
-| `stem`      | `str`             | yes      | —       | Single character for the shaft, for example `-` or `=`.                                 |
-| `brackets`  | `tuple[str, str]` | yes      | —       | Label delimiters. For example `('[', ']')` or `('{', '}')`.                             |
-| `separator` | `str`             | yes      | —       | Token separator inside source, label, and target. Must satisfy `ArrowStyle` validation. |
-| `tip`       | `str`             | yes      | —       | Arrow head or terminator, for example `>` or `)`.                                       |
+Constructs an `ArrowStyle` and registers it in `self.arrows`.
 
-**Behavior**
+Side effects:
 
-Creates an `ArrowStyle`, adds it to `arrows`, and clears cached regex patterns to force rebuild on next parse.
+* invalidates the internal regex cache (`_regex_ready=False`)
+* clears existing compiled patterns
 
-**Raises**
+All style validation happens in `ArrowStyle`.
 
-* `ValueError` propagated from `ArrowStyle` on invalid parts or conflicts.
+### Inputs
 
-**Example**
+#### `stem`
+
+* **Type:** `str`
+* **Meaning:** One-character arrow shaft marker. The syntax uses it doubled (`stem * 2`).
+
+#### `brackets`
+
+* **Type:** `tuple[str, str]`
+* **Meaning:** Label delimiters.
+
+#### `separator`
+
+* **Type:** `str`
+* **Meaning:** Token separator within each segment.
+
+#### `tip`
+
+* **Type:** `str`
+* **Meaning:** Arrow tip / terminator.
+
+### Outputs
+
+* **Type:** `None`
+* **Meaning:** Mutates the flow (registers an arrow style).
+
+### Example
 
 ```python
-flow.add_arrow_style(stem='-', brackets=('[', ']'), separator=',', tip='>')
+from summoner.protocol.flow import Flow
+
+flow = Flow().activate()
+flow.add_arrow_style(stem="-", brackets=("[", "]"), separator=",", tip=">")
 ```
 
----
+With this style, a labeled route may look like:
 
-### `triggers`
-
-**Signature**
-
-```python
-Flow.triggers(self, json_dict: dict[str, Any] | None = None) -> type
+```text
+A,B--[L]-->C,D
 ```
 
-**Parameters**
+and an unlabeled route may look like:
 
-| Name        | Type              | Required | Default | Description |                                                                                                                                            |
-| ----------- | ----------------- | -------- | ------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `json_dict` | \`dict[str, Any] | None\`   | no      | `None`      | If provided, builds the `Trigger` class directly from this nested mapping. Otherwise reads from `triggers_file` or the default `TRIGGERS`. |
-
-**Returns**
-
-* `type`: the dynamic `Trigger` class with `Signal` attributes.
-
-**Example**
-
-```python
-Trigger = flow.triggers()            # from file
-Trigger2 = flow.triggers(json_dict={"OK": None})
+```text
+A>B
 ```
 
----
+(Exact formatting depends on the style parts. The parser uses `stem * 2` inside patterns.)
 
-### `compile_arrow_patterns`
 
-**Signature**
+
+## `Flow.triggers`
 
 ```python
-Flow.compile_arrow_patterns(self) -> None
+def triggers(self, json_dict: Optional[dict[str, Any]] = None) -> type
 ```
 
-**Description**
+### Behavior
 
-If `in_use` is `True`, compile regex patterns for all registered arrow styles. If `in_use` is `False`, parsing will still work because `parse_route` auto prepares on first use.
+Loads a dynamic `Trigger` class (signals tree) using `load_triggers`.
 
-**Example**
+Priority:
+
+* if `json_dict` is provided: `load_triggers(json_dict=json_dict)`
+* else if `self.triggers_file` is set: `load_triggers(triggers_file=...)`
+* else: `load_triggers()` using the default `TRIGGERS`
+
+### Inputs
+
+#### `json_dict`
+
+* **Type:** `Optional[dict[str, Any]]`
+* **Meaning:** A nested signal tree dict as accepted by `load_triggers`.
+
+### Outputs
+
+* **Type:** `type`
+* **Meaning:** A dynamically built `Trigger` class (attributes are `Signal` instances).
+
+### Example
 
 ```python
-flow.activate() 
-flow.add_arrow_style('-', ('[', ']'), ',', '>')
+from summoner.protocol.flow import Flow
+
+Trigger = Flow().triggers()
+# Trigger.OK, Trigger.error, etc. depending on TRIGGERS content
+```
+
+
+
+## `Flow.compile_arrow_patterns`
+
+```python
+def compile_arrow_patterns(self) -> None
+```
+
+### Behavior
+
+Compiles regex patterns from the currently registered `ArrowStyle`s.
+
+* Safe to call multiple times.
+* Does nothing unless `in_use=True`.
+* Sets up internal pattern list used by `parse_route`.
+
+In typical `SummonerClient` usage, compilation is handled automatically during handler registration, so manual calls are usually only needed in standalone parsing contexts.
+
+### Outputs
+
+* **Type:** `None`
+
+### Example
+
+```python
+flow = Flow().activate()
+flow.add_arrow_style("-", ("[", "]"), ",", ">")
 flow.compile_arrow_patterns()
 ```
 
----
 
-### `parse_route`
 
-**Signature**
+## `Flow.ready` (deprecated)
 
 ```python
-Flow.parse_route(self, route: str) -> ParsedRoute
+def ready(self) -> None
 ```
 
-**Parameters**
+### Behavior
 
-| Name    | Type  | Required | Default | Description                                                               |
-| ------- | ----- | -------- | ------- | ------------------------------------------------------------------------- |
-| `route` | `str` | yes      | —       | Raw route string to parse. Whitespace around tokens and parts is ignored. |
+Deprecated alias for `compile_arrow_patterns`.
 
-**Returns**
+* Emits a `DeprecationWarning`.
+* Calls internal compilation when `in_use=True`.
 
-* `ParsedRoute`: canonical route. `str(result)` is normalized using registered style separators and no extraneous spaces.
+### Outputs
 
-**Behavior**
+* **Type:** `None`
 
-* Ensures regex patterns are prepared.
-* Tries each labeled pattern, then unlabeled patterns for every `ArrowStyle`.
-* On match, splits `source`, `label`, `target` using the style`s `separator`with`get_token_list`, validates tokens with `_TOKEN_RE`, and builds a `ParsedRoute\`.
-* If none match, treats the input as a standalone object list separated by commas and validates with `_TOKEN_RE`.
+### Migration
 
-**Raises**
-
-* `ValueError` if any token fails `_TOKEN_RE` validation. The error message includes the offending token and the full route text.
-
-**Examples**
+Use:
 
 ```python
-# Arrow with label and targets
+flow.compile_arrow_patterns()
+```
+
+
+
+## `Flow.parse_route`
+
+```python
+def parse_route(self, route: str) -> ParsedRoute
+```
+
+### Behavior
+
+Parses a single route string into a `ParsedRoute`.
+
+Steps:
+
+1. Trims whitespace.
+2. Ensures arrow regex patterns are prepared (based on registered arrow styles).
+3. Tries each compiled arrow pattern:
+
+   * If matched:
+
+     * extracts raw `source`, `label`, `target` strings (depending on variant)
+     * tokenizes each segment using the style’s `separator` with `get_token_list`
+     * validates tokens against the token regex
+     * returns a `ParsedRoute(source=..., label=..., target=..., style=style)`
+4. If no arrow pattern matches:
+
+   * parses as a standalone object route using comma separator
+   * returns `ParsedRoute(..., style=None)`
+
+Token validation errors raise `ValueError`.
+
+### Inputs
+
+#### `route`
+
+* **Type:** `str`
+* **Meaning:** Route string in object or arrow form.
+
+### Outputs
+
+* **Type:** `ParsedRoute`
+
+### Examples
+
+#### Object route
+
+```python
+from summoner.protocol.flow import Flow
+
+flow = Flow()
+r = flow.parse_route("A,B,/not(x,y)")
+assert r.is_object is True
+assert str(r) == "A,B,/not(x,y)"
+```
+
+#### Arrow route (requires an arrow style)
+
+```python
+from summoner.protocol.flow import Flow
+
 flow = Flow().activate()
-flow.add_arrow_style('-', ('[', ']'), ',', '>')
+flow.add_arrow_style(stem="-", brackets=("[", "]"), separator=",", tip=">")
+flow.compile_arrow_patterns()
 
-r = flow.parse_route('A, C --[ f, g ]--> B, K')
-assert str(r) == 'A,C--[f,g]-->B,K'
-assert r.is_arrow and r.has_label
-
-# Standalone object
-assert str(flow.parse_route(' /all ')) == '/all'
-
-# Dangling right (no target)
-assert flow.parse_route('E =={ f }==)').is_arrow
-
-# Dangling left (no source)
-assert flow.parse_route(' ==) F ').is_arrow
+r = flow.parse_route("A--[L]-->B")
+assert r.is_arrow is True
+assert r.has_label is True
+assert [str(n) for n in r.source] == ["A"]
+assert [str(n) for n in r.label] == ["L"]
+assert [str(n) for n in r.target] == ["B"]
 ```
 
----
-
-### `parse_routes`
-
-**Signature**
+#### Parentheses in tokens
 
 ```python
-Flow.parse_routes(self, routes: list[str]) -> list[ParsedRoute]
+from summoner.protocol.flow import Flow
+
+flow = Flow().activate()
+flow.add_arrow_style("-", ("[", "]"), ",", ">")
+flow.compile_arrow_patterns()
+
+r = flow.parse_route("foo(x,y)--[lab(a,b)]-->bar")
+assert [str(n) for n in r.source] == ["foo(x,y)"]
+assert [str(n) for n in r.label] == ["lab(a,b)"]
+assert [str(n) for n in r.target] == ["bar"]
 ```
 
-**Parameters**
 
-| Name     | Type        | Required | Default | Description                     |
-| -------- | ----------- | -------- | ------- | ------------------------------- |
-| `routes` | `list[str]` | yes      | —       | List of route strings to parse. |
 
-**Returns**
-
-* `list[ParsedRoute]`: parsed routes in the same order.
-
-**Example**
+## `Flow.parse_routes`
 
 ```python
-result = flow.parse_routes(['A --> B', '/all'])
-[str(r) for r in result]  # ['A--[]-->B', '/all'] after normalization
+def parse_routes(self, routes: list[str]) -> list[ParsedRoute]
 ```
 
----
+### Behavior
 
-## Route grammar
+Parses a list of routes by calling `parse_route` on each element.
 
-**Arrow styles**
+### Inputs
 
-An arrow style is defined by `stem`, `brackets`, `separator`, and `tip`. The shaft is the stem repeated twice. Examples:
+#### `routes`
 
-* `--[ label ]-->` with separator `,`
-* `=={ label }==)` with separator `;`
+* **Type:** `list[str]`
 
-**Recognized forms per style**
+### Outputs
 
-* Labeled complete: `source  stem*2 left label right stem*2 tip  target`
-* Labeled dangling left: `stem*2 left label right stem*2 tip  target`
-* Labeled dangling right: `source  stem*2 left label right stem*2 tip`
-* Unlabeled complete: `source  stem*2 tip  target`
-* Unlabeled dangling left: `stem*2 tip  target`
-* Unlabeled dangling right: `source  stem*2 tip`
+* **Type:** `list[ParsedRoute]`
 
-Whitespace is optional around parts. Source, label, and target each hold zero or more tokens separated by the style separator.
+### Example
 
-**Tokens**
+```python
+from summoner.protocol.flow import Flow
 
-A token must match `_TOKEN_RE`. Examples:
+flow = Flow().activate()
+flow.add_arrow_style("-", ("[", "]"), ",", ">")
 
-* Plain: `A`, `foo_bar`
-* Special with leading slash: `/all`, `/not(E,F)`, `/oneof(A,B)`
+parsed = flow.parse_routes(["A,B", "A--[L]-->B"])
+assert len(parsed) == 2
+```
 
-**Validation**
 
-Invalid tokens raise `ValueError` with a message like: `Invalid token 'inv&alid' in route 'A --> inv&alid'`.
 
----
+## Notes on failure modes
 
-## See also
-
-* `summoner.protocol.triggers` for building the `Trigger` class
-* `summoner.protocol.process` for `ArrowStyle`, `Node`, and `ParsedRoute` semantics
-
+* If an arrow route uses a style that has not been registered, it will not match any arrow pattern and will fall back to object parsing. In that case, token validation may fail (for example, because the arrow symbols appear inside the "tokens").
+* Token validation is strict by design. If you need richer syntax inside tokens, you must extend the parser constraints consistently across `Node` and the flow tokenizer.
 
 
 <p align="center">

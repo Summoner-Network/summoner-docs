@@ -9,7 +9,7 @@ There are two good paths. You can help shape the official `SummonerAgent` classe
 Start by opening an issue in [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass) with a crisp problem statement and the smallest behavior change that solves it. Include:
 
 * **What hurts today.** A concrete scenario that fails or is awkward.
-* **What you propose.** Describe the smallest API surface or decorator shape that addresses it.
+* **What you propose.** Describe the smallest SDK surface or decorator shape that addresses it.
 * **Why it belongs here.** Explain why this should live in the official class rather than as a module. Think security, interop, or broad utility.
 * **Evidence.** Link a tiny fork or test repo and add a short video (2–5 minutes) that shows before and after. A terminal run or local UI is enough.
 
@@ -20,7 +20,7 @@ A simple issue template you can paste:
 What fails or is awkward today. One paragraph and a tiny repro if possible.
 
 ### Proposed change
-Smallest addition to the official class (API shape or decorator), expected behavior, and defaults.
+Smallest addition to the official class (SDK shape or decorator), expected behavior, and defaults.
 
 ### Why official (vs module)
 Security, Flow integration, cross-agent consistency, or other reasons.
@@ -36,7 +36,7 @@ What happens next: we discuss scope in the issue, may ask for a tighter repro, a
 
 ## Why decorators are the center of the design
 
-In Summoner, an agent's behavior is attached to a client through **decorators**. The core already provides `@receive`, `@send`, and `@hook`. Your own framework should look and feel the same so that tools, logs, and the runtime treat your handlers just like native ones. Beyond message handling, similar patterns can be used to compose agent identities, apply cryptographic envelopes, and add validation or policy — see the API catalog for the full surface.
+In Summoner, an agent's behavior is attached to a client through **decorators**. The core already provides `@receive`, `@send`, and `@hook`. Your own framework should look and feel the same so that tools, logs, and the runtime treat your handlers just like native ones. Beyond message handling, similar patterns can be used to compose agent identities, apply cryptographic envelopes, and add validation or policy — see the SDK catalog for the full surface.
 
 A decorator in Python is just syntax sugar for "wrap this function with another function." The minimal idea looks like this:
 
@@ -64,7 +64,7 @@ When you create a new decorator for your framework, think in four steps.
 
 **Fourth, schedule the registration.** Never mutate the routing tables directly from the call site. Wrap the registration in a small `async def register()` coroutine and submit it with `self._schedule_registration(register())`. The client will complete all scheduled registrations before it starts.
 
-These steps are already embodied in the core decorators. Reusing them gives you the same safety and observability without rewriting the runtime. The example below shows a **receive-like** decorator purely as an illustration; you can apply the same pattern to `@send`-style emitters, `@hook` transforms, identity or crypto helpers, and other extension points. For additional attributes, types, and helpers you can compose, see the API reference at [`summoner-docs › reference`](https://github.com/Summoner-Network/summoner-docs/blob/main/reference/index.md).
+These steps are already embodied in the core decorators. Reusing them gives you the same safety and observability without rewriting the runtime. The example below shows a **receive-like** decorator purely as an illustration; you can apply the same pattern to `@send`-style emitters, `@hook` transforms, identity or crypto helpers, and other extension points. For additional attributes, types, and helpers you can compose, see the SDK reference at [`summoner-docs › reference`](https://github.com/Summoner-Network/summoner-docs/blob/main/reference/index.md).
 
 ## A minimal "receive-like" decorator
 

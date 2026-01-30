@@ -18,5 +18,5 @@
 
 
 <p align="center">
-  <a href="launch_agent.md">&laquo; Previous: Launch Your Agent </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../../reference/index.md">Next: Summoner API Reference &raquo;</a>
+  <a href="launch_agent.md">&laquo; Previous: Launch Your Agent </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../../reference/index.md">Next: Summoner SDK Reference &raquo;</a>
 </p>

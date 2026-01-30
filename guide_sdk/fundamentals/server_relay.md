@@ -29,7 +29,7 @@ This configuration layer stays modest on purpose. It gives you control over fair
 
 ## Two Implementations: Python and Rust
 
-There are two interchangeable implementations exposed through the same Python API:
+The server SDK provides two interchangeable implementations behind a common Python interface:
 
 * **Python server** built on `asyncio`. It is the default everywhere and the only option on Windows.
 * **Rust server** built on Tokio via PyO3. It runs on Unix-like systems and is selected through configuration.

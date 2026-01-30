@@ -55,7 +55,7 @@ Summoner clients run on `asyncio` with non-blocking sockets. Handlers must `awai
 **Race-reduction patterns.**
 
 * Keep `@receive` handlers small and mostly pure. Validate, normalize, and compute outcomes. Defer side effects.
-* Commit state in one place per key. If you use the flows API, consolidate commits in `@download_states` and run post-effects via hub senders gated by actions/triggers.
+* Commit state in one place per key. If you use flows, consolidate commits in `@download_states` and run post-effects via hub senders gated by actions/triggers.
 * Use a single driver task per data domain (for example, a periodic retry sender) to serialize expensive or out-of-order work.
 
 **Split send loops to tame races.** A practical pattern is to separate a periodic **tick sender** (maintenance like register, finalize retries, reconnect) from an **event-driven hub** (chatty steps tied to triggers/actions). This ensures receivers finish clearing or updating transient fields (like nonces) before new outbound payloads mint fresh values.

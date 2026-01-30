@@ -130,8 +130,8 @@
         - [Launch your agent](guide_app/features/launch_agent.md) 
         - [Launch a server](guide_app/features/launch_server.md) 
 
-- [**📚 API Reference**](reference/index.md)
-    - [***Core API (client, server, protocol)***](reference/sdk_doc/index.md)
+- [**📚 SDK Reference**](reference/index.md)
+    - [***Core SDK***](reference/sdk_doc/index.md)
         - [<code style="background: transparent;">Summoner<b>.client</b></code>](reference/sdk_doc/client.md)
         - [<code style="background: transparent;">Summoner<b>.server</b></code>](reference/sdk_doc/server.md)
         - [<code style="background: transparent;">Summoner<b>.protocol</b></code>](reference/sdk_doc/proto.md)

@@ -1,538 +1,562 @@
-# Module: `summoner.protocol.triggers`
+# <code style="background: transparent;">Summoner<b>.protocol.triggers</b></code>
 
-Builds a tree of named **signals** from a simple indented text source and exposes them as attributes on a dynamically generated `Trigger` class. Provides event types (`Move`, `Stay`, `Test`), a convenience `Action` namespace, and utilities for parsing a TRIGGERS file.
+This page documents the **Python SDK interface** for working with Summoner signals and trigger trees.
 
-**Typical workflow**
+The module provides:
+
+* A **signal-tree loader** that parses an indented "TRIGGERS" definition into a nested tree.
+* A dynamically generated **`Trigger` class** whose attributes are `Signal` instances.
+* Lightweight **event wrappers** (`Move`, `Stay`, `Test`) and an `Action` container.
+* Utilities for extracting `Signal` from either a `Signal` or an `Event`.
+
+
+## `is_valid_varname`
 
 ```python
-from summoner.protocol.triggers import load_triggers, Move, Action, extract_signal
+def is_valid_varname(name: str) -> bool
+```
 
-Trigger = load_triggers(text="""
+### Behavior
+
+Checks whether `name` is a valid Python identifier suitable for use as a generated `Trigger.<name>` attribute.
+
+### Inputs
+
+#### `name`
+
+* **Type:** `str`
+* **Meaning:** Candidate signal name.
+
+### Outputs
+
+* **Type:** `bool`
+* **Meaning:** `True` if the name matches identifier rules, otherwise `False`.
+
+### Examples
+
+```python
+from summoner.protocol.triggers import is_valid_varname
+
+assert is_valid_varname("OK") is True
+assert is_valid_varname("all_good") is True
+assert is_valid_varname("not valid") is False
+assert is_valid_varname("123bad") is False
+```
+
+## `preprocess_line`
+
+```python
+def preprocess_line(raw: str, lineno: int, tabsize: int) -> Optional[tuple[int, int, str]]
+```
+
+### Behavior
+
+Normalizes a raw line from a triggers file:
+
+* Strips the trailing newline.
+* Expands tabs into spaces (using `tabsize`).
+* Measures indentation from leading spaces.
+* Removes inline comments starting with `#`.
+* Skips blank or comment-only lines.
+
+### Inputs
+
+#### `raw`
+
+* **Type:** `str`
+* **Meaning:** Raw line from the triggers definition.
+
+#### `lineno`
+
+* **Type:** `int`
+* **Meaning:** 1-based line number used for error messages.
+
+#### `tabsize`
+
+* **Type:** `int`
+* **Meaning:** Tab expansion width.
+
+### Outputs
+
+* **Type:** `Optional[tuple[int, int, str]]`
+* **Meaning:**
+
+  * Returns `(lineno, indent, name)` if the line defines a signal.
+  * Returns `None` if the line should be skipped.
+
+### Examples
+
+```python
+from summoner.protocol.triggers import preprocess_line
+
+assert preprocess_line("OK\n", 1, 8) == (1, 0, "OK")
+assert preprocess_line("    acceptable  # comment\n", 2, 8) == (2, 4, "acceptable")
+assert preprocess_line("# comment-only\n", 3, 8) is None
+assert preprocess_line("   \n", 4, 8) is None
+```
+
+## `update_hierarchy`
+
+```python
+def update_hierarchy(indent: int, indent_levels: list[int]) -> int
+```
+
+### Behavior
+
+Maintains indentation state while parsing a triggers file and returns the computed tree depth for the current line.
+
+* If `indent` matches the current level, depth stays the same.
+* If `indent` increases, a new depth level is created.
+* If `indent` decreases, it must match a previously seen indentation level; otherwise parsing fails.
+
+### Inputs
+
+#### `indent`
+
+* **Type:** `int`
+* **Meaning:** The indentation (in spaces) of the current line.
+
+#### `indent_levels`
+
+* **Type:** `list[int]`
+* **Meaning:** The current stack of indentation levels. Mutated in place.
+
+### Outputs
+
+* **Type:** `int`
+* **Meaning:** The computed depth for the current line.
+
+### Examples
+
+```python
+from summoner.protocol.triggers import update_hierarchy
+
+levels = [0]
+assert update_hierarchy(0, levels) == 0
+assert update_hierarchy(4, levels) == 1
+assert levels == [0, 4]
+assert update_hierarchy(4, levels) == 1
+assert update_hierarchy(0, levels) == 0
+```
+
+## `simplify_leaves`
+
+```python
+def simplify_leaves(tree: dict[str, Any]) -> None
+```
+
+### Behavior
+
+Post-processes a nested dict tree in place so that empty dictionaries are replaced with `None` to mark leaves.
+
+### Inputs
+
+#### `tree`
+
+* **Type:** `dict[str, Any]`
+* **Meaning:** The parsed nested tree.
+
+### Outputs
+
+Returns `None` (operates in place).
+
+### Examples
+
+```python
+from summoner.protocol.triggers import simplify_leaves
+
+tree = {"OK": {"acceptable": {}}, "error": {}}
+simplify_leaves(tree)
+assert tree == {"OK": {"acceptable": None}, "error": None}
+```
+
+## `parse_signal_tree_lines`
+
+```python
+def parse_signal_tree_lines(lines: list[str], tabsize: int = 8) -> dict[str, Any]
+```
+
+### Behavior
+
+Parses a list of trigger-definition lines into a nested dict tree.
+
+Rules:
+
+* Each non-empty, non-comment line defines a signal name.
+* Indentation defines parent-child relationships.
+* Names must be valid Python identifiers.
+* Duplicate names at the same indentation scope are rejected.
+* Inconsistent indentation decreases (to an unseen indent level) raises an error.
+
+### Inputs
+
+#### `lines`
+
+* **Type:** `list[str]`
+* **Meaning:** Raw lines that define the trigger hierarchy.
+
+#### `tabsize`
+
+* **Type:** `int`
+* **Meaning:** Tab expansion width for parsing.
+* **Default:** `8`
+
+### Outputs
+
+* **Type:** `dict[str, Any]`
+* **Meaning:** Nested dict describing the hierarchy, with leaves represented as `None`.
+
+### Examples
+
+#### Parse from an in-memory text block
+
+```python
+from summoner.protocol.triggers import parse_signal_tree_lines
+
+text = """
 OK
     acceptable
     all_good
 error
     minor
     major
-""")
+"""
 
-assert Trigger.OK > Trigger.acceptable       # parent > child
-sig = extract_signal(Move(Trigger.error))     # -> <Signal 'error'>
-assert isinstance(Move(Trigger.OK), Action.MOVE)
+tree = parse_signal_tree_lines(text.splitlines())
+assert tree["OK"]["acceptable"] is None
+assert tree["error"]["major"] is None
 ```
 
----
-
-## Quick map
-
-* `Signal` — comparable signal value with a stable path and name.
-* `Event` — base event carrying a `Signal`.
-* `Move`, `Stay`, `Test` — concrete event types.
-* `Action` — namespace of event classes: `MOVE`, `STAY`, `TEST`.
-* Parsing utilities: `parse_signal_tree_lines`, `parse_signal_tree`.
-* Building a trigger namespace: `build_triggers`, `load_triggers`.
-* Helpers and internals: `is_valid_varname`, `preprocess_line`, `update_hierarchy`, `simplify_leaves`, `extract_signal`.
-* Constants: `_VARNAME_RE`, `WORKING_DIR`.
-
----
-
-## Constants
-
-### `_VARNAME_RE`
-
-**Type**
-
-`re.Pattern[str]`
-
-**Description**
-
-Compiled regex used by `is_valid_varname` to validate Python identifiers: `^[A-Za-z_][A-Za-z0-9_]*$`.
-
----
-
-### `WORKING_DIR`
-
-**Type**
-
-`pathlib.Path`
-
-**Default**
-
-`Path(sys.argv[0]).resolve().parent`
-
-**Description**
-
-Base directory used by `load_triggers` when reading the TRIGGERS file by name.
-
----
-
-## Classes and data types
-
-### `Signal`
-
-**Summary**
-
-Comparable signal identified by a **path** tuple and a **name**. Ordering encodes ancestry in the trigger tree.
-
-**Constructor**
+## `parse_signal_tree`
 
 ```python
-summoner.protocol.triggers.Signal(path: tuple[int, ...], name: str)
+def parse_signal_tree(filepath: str, tabsize: int = 8) -> dict[str, Any]
 ```
 
-**Attributes**
+### Behavior
 
-| Name   | Type              | Access    | Description                                                            |
-| ------ | ----------------- | --------- | ---------------------------------------------------------------------- |
-| `path` | `tuple[int, ...]` | read-only | Position in the tree. Parent paths are strict prefixes of child paths. |
-| `name` | `str`             | read-only | Canonical signal name.                                                 |
+Reads a triggers file from disk and parses it into a nested dict tree using `parse_signal_tree_lines`.
 
-**Ordering semantics**
+### Inputs
 
-* `a > b` if and only if `a` is a **strict ancestor** of `b` in the tree.
-* `a >= b` if `a` is the same node as `b` or an ancestor of `b`.
-* Siblings are not comparable using `>` or `<`.
+#### `filepath`
 
-**Example**
+* **Type:** `str`
+* **Meaning:** Path to the triggers file.
+
+#### `tabsize`
+
+* **Type:** `int`
+* **Meaning:** Tab expansion width.
+* **Default:** `8`
+
+### Outputs
+
+* **Type:** `dict[str, Any]`
+* **Meaning:** Nested dict describing the hierarchy.
+
+### Examples
 
 ```python
-ok = Signal((0,), "OK")
-acceptable = Signal((0, 0), "acceptable")
-assert ok > acceptable
-assert not (acceptable > ok)
+from summoner.protocol.triggers import parse_signal_tree
+
+tree = parse_signal_tree("TRIGGERS")
 ```
 
-**Invariants**
-
-`hash(Signal) == hash(path)` and equality is by `path`.
-
----
-
-### `Event`
-
-**Summary**
-
-Base class for events. Holds a single `Signal` and prints as `ClassName(<Signal 'name'>)`.
-
-**Constructor**
+## `class Signal`
 
 ```python
-summoner.protocol.triggers.Event(signal: Signal)
+class Signal
 ```
 
-**Attributes**
+### Behavior
 
-| Name     | Type     | Access    | Description        |
-| -------- | -------- | --------- | ------------------ |
-| `signal` | `Signal` | read-only | Associated signal. |
+Represents a named signal with a stable hierarchical path:
 
-**Example**
+* `path`: a tuple of integer indices describing the position in the trigger tree.
+* `name`: the signal's name as written in the triggers definition.
+
+Signals support ordering comparisons based on ancestry:
+
+* `a > b` is true when `a` is a strict ancestor of `b` (prefix match on paths).
+* `a >= b` includes equality.
+* Hashing and equality are based on `path`.
+
+### Inputs
+
+#### `path`
+
+* **Type:** `tuple[int, ...]`
+* **Meaning:** Hierarchical path.
+
+#### `name`
+
+* **Type:** `str`
+* **Meaning:** Signal name.
+
+### Outputs
+
+A `Signal` instance.
+
+### Examples
 
 ```python
-e = Event(Trigger.OK)
-repr(e)  # 'Event(<Signal \"OK\">)'
+from summoner.protocol.triggers import Signal
+
+root = Signal((0,), "OK")
+child = Signal((0, 0), "acceptable")
+
+assert root > child
+assert child < root
+assert root.name == "OK"
+assert child.path == (0, 0)
 ```
 
----
-
-### `Move` / `Stay` / `Test`
-
-**Summary**
-
-Concrete event subclasses of `Event` used to classify actions. `Test` sets `__test__ = False` for compatibility with pytest.
-
-**Constructor**
+## `build_triggers`
 
 ```python
-Move(signal: Signal)
-Stay(signal: Signal)
-Test(signal: Signal)
+def build_triggers(tree: dict[str, Any]) -> type
 ```
 
-**Example**
+### Behavior
+
+Builds and returns a dynamically-generated `Trigger` class.
+
+The returned class:
+
+* Exposes each signal name as a class attribute: `Trigger.OK`, `Trigger.acceptable`, etc.
+* Assigns each attribute a `Signal` instance with a stable `path`.
+* Provides `Trigger.name_of(*path)` to resolve a name from a path tuple.
+
+Names that conflict with Python reserved keywords or common object attributes are rejected.
+
+### Inputs
+
+#### `tree`
+
+* **Type:** `dict[str, Any]`
+* **Meaning:** Nested trigger tree (as returned by `parse_signal_tree_lines` / `parse_signal_tree`).
+
+### Outputs
+
+* **Type:** `type`
+* **Meaning:** A dynamically generated `Trigger` class.
+
+### Examples
 
 ```python
-from summoner.protocol.triggers import Move, Stay, Test
+from summoner.protocol.triggers import build_triggers
 
-Move(Trigger.error)
-Stay(Trigger.OK)
-Test(Trigger.minor)
-```
+tree = {"OK": {"acceptable": None}, "error": {"major": None}}
+Trigger = build_triggers(tree)
 
----
-
-### `Action`
-
-**Summary**
-
-Namespace that exposes event classes as attributes for ergonomic type checks.
-
-**Attributes**
-
-| Name   | Type         | Access    | Description       |
-| ------ | ------------ | --------- | ----------------- |
-| `MOVE` | `type[Move]` | read-only | The `Move` class. |
-| `STAY` | `type[Stay]` | read-only | The `Stay` class. |
-| `TEST` | `type[Test]` | read-only | The `Test` class. |
-
-**Example**
-
-```python
-isinstance(Move(Trigger.OK), Action.MOVE)  # True
-```
-
----
-
-## Functions
-
-### `is_valid_varname`
-
-**Summary**
-
-Return `True` if a string is a valid Python identifier for use as a trigger name.
-
-**Signature**
-
-```python
-summoner.protocol.triggers.is_valid_varname(name: str) -> bool
-```
-
-**Parameters**
-
-| Name   | Type  | Required | Default | Description           |
-| ------ | ----- | -------- | ------- | --------------------- |
-| `name` | `str` | yes      | —       | Candidate identifier. |
-
-**Returns**
-
-* `bool`: validity result.
-
-**Examples**
-
-```python
-assert is_valid_varname("OK")
-assert not is_valid_varname("bad-name")
-```
-
----
-
-### `preprocess_line`
-
-**Summary**
-
-Normalize a raw TRIGGERS line: strip newline, expand tabs, compute indentation, remove trailing comments, and skip blanks.
-
-**Signature**
-
-```python
-summoner.protocol.triggers.preprocess_line(raw: str, lineno: int, tabsize: int) -> tuple[int, int, str] | None
-```
-
-**Parameters**
-
-| Name      | Type  | Required | Default | Description                                                  |
-| --------- | ----- | -------- | ------- | ------------------------------------------------------------ |
-| `raw`     | `str` | yes      | —       | Raw input line including newline.                            |
-| `lineno`  | `int` | yes      | —       | 1-based source line index. Returned unmodified in the tuple. |
-| `tabsize` | `int` | yes      | —       | Tab expansion size in spaces.                                |
-
-**Returns**
-
-* `tuple[int, int, str]`: `(lineno, indent, name)` where `indent` is the count of leading spaces after tab expansion and `name` is the stripped content before `#`.
-* `None` if the line is empty after comment removal.
-
-**Example**
-
-```python
-preprocess_line("\tOK  # top", 1, 8)  # -> (1, 8, 'OK')
-```
-
----
-
-### `update_hierarchy`
-
-**Summary**
-
-Update the current indentation stack and return the new depth for a line.
-
-**Signature**
-
-```python
-summoner.protocol.triggers.update_hierarchy(indent: int, indent_levels: list[int]) -> int
-```
-
-**Parameters**
-
-| Name            | Type        | Required | Default | Description                                          |
-| --------------- | ----------- | -------- | ------- | ---------------------------------------------------- |
-| `indent`        | `int`       | yes      | —       | Leading space count for the current line.            |
-| `indent_levels` | `list[int]` | yes      | —       | Stack of seen indentation levels. Modified in place. |
-
-**Returns**
-
-* `int`: depth index corresponding to the parent subtree in the tree-building algorithm.
-
-**Raises**
-
-* `ValueError` if the indent does not match any known level when dedenting.
-
-**Example**
-
-```python
-levels = [0]
-depth = update_hierarchy(0, levels)  # 0
-# New child block
-_ = update_hierarchy(4, levels)      # levels -> [0, 4]
-```
-
----
-
-### `simplify_leaves`
-
-**Summary**
-
-Convert empty dict leaves to `None` in a nested tree structure. Operates in place.
-
-**Signature**
-
-```python
-summoner.protocol.triggers.simplify_leaves(tree: dict[str, Any]) -> None
-```
-
-**Parameters**
-
-| Name   | Type             | Required | Default | Description                                             |
-| ------ | ---------------- | -------- | ------- | ------------------------------------------------------- |
-| `tree` | `dict[str, Any]` | yes      | —       | Nested mapping built during parsing. Modified in place. |
-
-**Returns**
-
-* `None`
-
-**Example**
-
-```python
-t = {"OK": {}, "error": {"minor": {}}}
-simplify_leaves(t)
-assert t == {"OK": None, "error": {"minor": None}}
-```
-
----
-
-### `parse_signal_tree_lines`
-
-**Summary**
-
-Parse a list of TRIGGERS lines into a nested dictionary representing the signal tree. Entry point for testing.
-
-**Signature**
-
-```python
-summoner.protocol.triggers.parse_signal_tree_lines(lines: list[str], tabsize: int = 8) -> dict[str, Any]
-```
-
-**Parameters**
-
-| Name      | Type        | Required | Default | Description                    |
-| --------- | ----------- | -------- | ------- | ------------------------------ |
-| `lines`   | `list[str]` | yes      | —       | Lines of the TRIGGERS content. |
-| `tabsize` | `int`       | no       | `8`     | Tab expansion size in spaces.  |
-
-**Returns**
-
-* `dict[str, Any]`: nested mapping where leaves are `None` and branches are dicts.
-
-**Raises**
-
-* `ValueError` for invalid names, duplicate names at the same depth, or inconsistent indentation.
-
-**Example**
-
-```python
-lines = ["OK", "\tacceptable", "error", "\tmajor"]
-tree = parse_signal_tree_lines(lines)
-# {'OK': {'acceptable': None}, 'error': {'major': None}}
-```
-
----
-
-### `parse_signal_tree`
-
-**Summary**
-
-Read a TRIGGERS file from disk and parse it to a nested dictionary.
-
-**Signature**
-
-```python
-summoner.protocol.triggers.parse_signal_tree(filepath: str, tabsize: int = 8) -> dict[str, Any]
-```
-
-**Parameters**
-
-| Name       | Type  | Required | Default | Description                   |
-| ---------- | ----- | -------- | ------- | ----------------------------- |
-| `filepath` | `str` | yes      | —       | Path to the TRIGGERS file.    |
-| `tabsize`  | `int` | no       | `8`     | Tab expansion size in spaces. |
-
-**Returns**
-
-* `dict[str, Any]`: nested mapping as in `parse_signal_tree_lines`.
-
-**Raises**
-
-* `FileNotFoundError` if the file does not exist.
-* `ValueError` for parse errors as in `parse_signal_tree_lines`.
-
-**Example**
-
-```python
-tree = parse_signal_tree("./TRIGGERS")
-```
-
----
-
-### `build_triggers`
-
-**Summary**
-
-Create a dynamic `Trigger` class from a nested dictionary tree. Each signal name becomes a `Signal` attribute on the class.
-
-**Signature**
-
-```python
-summoner.protocol.triggers.build_triggers(tree: dict[str, Any]) -> type
-```
-
-**Parameters**
-
-| Name   | Type             | Required | Default | Description                                              |
-| ------ | ---------------- | -------- | ------- | -------------------------------------------------------- |
-| `tree` | `dict[str, Any]` | yes      | —       | Nested mapping as returned by `parse_signal_tree_lines`. |
-
-**Returns**
-
-* `type`: a new `Trigger` class with a `Signal` attribute for each leaf or branch, and helper members.
-
-**Class attributes on the returned `Trigger`**
-
-| Name            | Type                         | Description                                  |                                                  |
-| --------------- | ---------------------------- | -------------------------------------------- | ------------------------------------------------ |
-| `<signal_name>` | `Signal`                     | One attribute per signal with the same name. |                                                  |
-| `_path_to_name` | `dict[tuple[int, ...], str]` | Map from path to name.                       |                                                  |
-| `name_of`       | \`Callable[..., str         | None]\`                                      | `staticmethod` that maps a path tuple to a name. |
-
-**Raises**
-
-* `ValueError` if any signal name conflicts with reserved names, Python keywords, or starts with `_`.
-
-**Example**
-
-```python
-Trigger = build_triggers({"OK": {"acceptable": None}, "error": {"major": None}})
+assert Trigger.OK.name == "OK"
+assert Trigger.acceptable.path == (0, 0)
 assert Trigger.name_of(1, 0) == "major"
 ```
 
----
-
-### `extract_signal`
-
-**Summary**
-
-Return the underlying `Signal` from an `Event` or pass through a `Signal`. Accepts `None` and returns `None`.
-
-**Signature**
+## `class Event`
 
 ```python
-summoner.protocol.triggers.extract_signal(trigger: Event | Signal | None) -> Signal | None
+class Event
 ```
 
-**Parameters**
+### Behavior
 
-| Name      | Type    | Required | Default | Description |   |                                             |
-| --------- | ------- | -------- | ------- | ----------- | - | ------------------------------------------- |
-| `trigger` | \`Event | Signal   | None\`  | yes         | — | Event instance, signal instance, or `None`. |
+Wraps a `Signal` as a typed protocol event. The module defines three event subclasses:
 
-**Returns**
+* `Move(signal)`
+* `Stay(signal)`
+* `Test(signal)`
 
-* `Signal | None`: the extracted signal or `None`.
+`Test` is marked with `__test__ = False` to avoid certain test discovery behaviors.
 
-**Raises**
+### Inputs
 
-* `TypeError` if `trigger` is neither `Event`, `Signal`, nor `None`.
+#### `signal`
 
-**Example**
+* **Type:** `Signal`
+* **Meaning:** The underlying signal carried by the event.
+
+### Outputs
+
+An `Event` (or subclass) instance.
+
+### Examples
 
 ```python
-extract_signal(Move(Trigger.error))  # <Signal 'error'>
-extract_signal(Trigger.OK)           # <Signal 'OK'>
-extract_signal(None)                 # None
+from summoner.protocol.triggers import Signal, Move, Stay, Test
+
+s = Signal((0,), "OK")
+
+e1 = Move(s)
+e2 = Stay(s)
+e3 = Test(s)
+
+assert e1.signal is s
 ```
 
----
-
-### `load_triggers`
-
-**Summary**
-
-Load and build a `Trigger` class from one of: inline text, a prebuilt nested dict, or a TRIGGERS file on disk. Text takes priority over dict, which takes priority over file.
-
-**Signature**
+## `class Action`
 
 ```python
-summoner.protocol.triggers.load_triggers(
-    triggers_file: str | None = "TRIGGERS",
-    text: str | None = None,
-    json_dict: dict[str, Any] | None = None,
+class Action
+```
+
+### Behavior
+
+A simple container mapping action names to event classes:
+
+* `Action.MOVE` is `Move`
+* `Action.STAY` is `Stay`
+* `Action.TEST` is `Test`
+
+This is commonly used as a stable reference set when validating or resolving actions by name.
+
+### Inputs
+
+None.
+
+### Outputs
+
+Not instanced (used as a namespace container).
+
+### Examples
+
+```python
+from summoner.protocol.triggers import Action, Signal
+
+s = Signal((0,), "OK")
+e = Action.MOVE(s)
+assert type(e).__name__ == "Move"
+```
+
+## `extract_signal`
+
+```python
+def extract_signal(trigger: Any) -> Optional[Signal]
+```
+
+### Behavior
+
+Normalizes an input into a `Signal`:
+
+* If input is an `Event`, returns `event.signal`.
+* If input is a `Signal`, returns it unchanged.
+* If input is `None`, returns `None`.
+* Otherwise raises `TypeError`.
+
+### Inputs
+
+#### `trigger`
+
+* **Type:** `Any`
+* **Meaning:** A `Signal`, an `Event`, or `None`.
+
+### Outputs
+
+* **Type:** `Optional[Signal]`
+* **Meaning:** Extracted signal (or `None`).
+
+### Examples
+
+```python
+from summoner.protocol.triggers import Signal, Move, extract_signal
+
+s = Signal((0,), "OK")
+e = Move(s)
+
+assert extract_signal(s) is s
+assert extract_signal(e) is s
+assert extract_signal(None) is None
+```
+
+## `load_triggers`
+
+```python
+def load_triggers(
+    triggers_file: Optional[str] = "TRIGGERS",
+    text: Optional[str] = None,
+    json_dict: Optional[dict[str, Any]] = None,
 ) -> type
 ```
 
-**Parameters**
+### Behavior
 
-| Name            | Type              | Required | Default | Description  |                                                                  |
-| --------------- | ----------------- | -------- | ------- | ------------ | ---------------------------------------------------------------- |
-| `triggers_file` | \`str             | None\`   | no      | `"TRIGGERS"` | File name resolved relative to `WORKING_DIR` when used.          |
-| `text`          | \`str             | None\`   | no      | `None`       | Inline TRIGGERS content. Highest priority when provided.         |
-| `json_dict`     | \`dict[str, Any] | None\`   | no      | `None`       | Nested mapping already in parsed form. Used if `text` is `None`. |
+Builds and returns a `Trigger` class from one of three inputs:
 
-**Returns**
+Priority:
 
-* `type`: the generated `Trigger` class.
+1. If `text` is provided, parse it as trigger definitions.
+2. Else if `json_dict` is provided, use it as the tree directly (shallow-copied).
+3. Else, read and parse `triggers_file` relative to the process working directory used by the module.
 
-**Raises**
+If the triggers file cannot be found, raises `FileNotFoundError` with a clearer message.
 
-* `FileNotFoundError` with a clear message if the file path cannot be resolved when needed.
-* `ValueError` for parse errors in the provided content or dict.
+### Inputs
 
-**Examples**
+#### `triggers_file`
 
-*Minimal inline text*
+* **Type:** `Optional[str]`
+* **Meaning:** Filename/path to the triggers file used when `text` and `json_dict` are not provided.
+* **Default:** `"TRIGGERS"`
+
+#### `text`
+
+* **Type:** `Optional[str]`
+* **Meaning:** Inline trigger definitions. If provided, it is used instead of reading a file.
+
+#### `json_dict`
+
+* **Type:** `Optional[dict[str, Any]]`
+* **Meaning:** Nested tree structure matching the output schema of `parse_signal_tree_lines`.
+
+### Outputs
+
+* **Type:** `type`
+* **Meaning:** A dynamically generated `Trigger` class whose attributes are `Signal` instances.
+
+### Examples
+
+#### Load from the default `TRIGGERS` file
 
 ```python
-Trigger = load_triggers(text="OK\n    acceptable\nerror\n    major")
-assert Trigger.OK > Trigger.acceptable
+from summoner.protocol.triggers import load_triggers
+
+Trigger = load_triggers()
+print(Trigger.OK)
 ```
 
-*From a dict*
+#### Load from inline text
 
 ```python
-Trigger = load_triggers(json_dict={"OK": {"all_good": None}, "error": {"minor": None}})
+from summoner.protocol.triggers import load_triggers
+
+text = """
+OK
+    acceptable
+error
+    major
+"""
+
+Trigger = load_triggers(text=text)
+assert Trigger.acceptable.path == (0, 0)
+assert Trigger.name_of(1, 0) == "major"
 ```
 
-*From a file*
+#### Load from a prebuilt tree dict
 
 ```python
-Trigger = load_triggers(triggers_file="TRIGGERS")
+from summoner.protocol.triggers import load_triggers
+
+tree = {"OK": {"acceptable": None}, "error": {"major": None}}
+Trigger = load_triggers(json_dict=tree)
+
+assert Trigger.OK.name == "OK"
+assert Trigger.major.name == "major"
 ```
+
 
 ---
-
-## See also
-
-* `sdk_doc/proto.md` for how signals and events link to routing and processing.
-* `summoner.protocol.flow` for route parsing and normalization.
-* `summoner.protocol.process` for `Node`, `Receiver`, `Sender`, and `StateTape`.
-
 
 <p align="center">
   <a href="../proto.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.protocol</b></code> </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="./process.md">Next: <code style="background: transparent;">Summoner<b>.protocol.process</b></code> &raquo;</a>

@@ -754,7 +754,7 @@ It helps to memorize the two core lookups that the engine performs at each tick.
 **Who receives?** The engine takes your uploaded state — a single node, a list, or a per-key mapping — and finds every `@receive` whose **source** gates *accept* any of those nodes for the same key. Receivers with no source but with a label/target (left-dangling) are considered *initial* and are eligible on every inbound message.
 
 
-**What becomes active next?** Each receiver returns an Event. For `Move`, the engine activates the route’s label and target. For `Stay`, it keeps the source. For `Test`, it activates only the label (and for object routes with no arrow, it activates nothing). The engine then aggregates these *possible* nodes and presents them to your `download` function, using the same shape as your upload. You choose what you actually become.
+**What becomes active next?** Each receiver returns an Event. For `Move`, the engine activates the route's label and target. For `Stay`, it keeps the source. For `Test`, it activates only the label (and for object routes with no arrow, it activates nothing). The engine then aggregates these *possible* nodes and presents them to your `download` function, using the same shape as your upload. You choose what you actually become.
 
 Putting it together:
 
