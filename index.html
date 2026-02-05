@@ -16,10 +16,37 @@
       loadNavbar: true,
       subMaxLevel: 2,
       homepage: 'index.md',
-      // relativePath: true,
-      // optional quality-of-life:
-      auto2top: true
-    }
+
+      plugins: [
+        function (hook, vm) {
+          hook.afterEach(function (html, next) {
+            const file = vm.route.file || '';
+            const baseDir = file.includes('/') ? file.slice(0, file.lastIndexOf('/') + 1) : '';
+
+            function toHashRoute(href) {
+              // keep external links and already-hash links untouched
+              if (
+                href.startsWith('http://') ||
+                href.startsWith('https://') ||
+                href.startsWith('mailto:') ||
+                href.startsWith('#') ||
+                href.startsWith('/')
+              ) return href;
+
+              // resolve href relative to the current markdown file directory
+              // using URL to normalize ../ and ./ segments
+              const resolvedPath = new URL(href, 'https://x/' + baseDir).pathname.replace(/^\/+/, '');
+              return '#/' + resolvedPath;
+            }
+
+            // rewrite only HTML anchor href="..."
+            html = html.replace(/href="([^"]+)"/g, (m, href) => `href="${toHashRoute(href)}"`);
+
+            next(html);
+          });
+        }
+      ]
+    };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
   <script>
