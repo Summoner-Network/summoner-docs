@@ -201,7 +201,7 @@
             if (window.__updateThemeToggleLabel) window.__updateThemeToggleLabel();
             
             // after navbar is rendered/re-rendered
-            requestAnimationFrame(ensureThemeToggle);
+            setTimeout(ensureThemeToggle, 0);
           });
 
           // Fix raw HTML href/src inside markdown pages
