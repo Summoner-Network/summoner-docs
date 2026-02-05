@@ -25,11 +25,6 @@
         style: 'callout'
       },
 
-      // Mermaid config used by docsify-mermaid
-      mermaidConfig: {
-        querySelector: ".mermaid"
-      },
-
       plugins: [
         function (hook, vm) {
 
@@ -109,10 +104,11 @@
     };
   </script>
 
-  <!-- Mermaid (pin to v9.4.3 to avoid docsify “[object Promise]” issues) -->
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js"></script>
-  <script>
-    mermaid.initialize({ startOnLoad: false });
+  <!-- Mermaid (ESM) -->
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true });
+    window.mermaid = mermaid;
   </script>
 
   <!-- Docsify plugins -->
