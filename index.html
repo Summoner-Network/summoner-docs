@@ -9,6 +9,15 @@
 </head>
 <body>
   <div id="app"></div>
+  <!-- Mermaid (ESM) -->
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true });
+    window.mermaid = mermaid;
+  </script>
+  <!-- Docsify Mermaid plugin -->
+  <script src="//unpkg.com/docsify-mermaid@2.0.1/dist/docsify-mermaid.js"></script>
+  <script src="https://unpkg.com/docsify-plugin-flexible-alerts"></script>
   <script>
     window.$docsify = {
       name: 'Summoner Docs',
@@ -16,7 +25,12 @@
       loadNavbar: true,
       subMaxLevel: 2,
       homepage: 'index.md',
-
+      'flexible-alerts': {
+        style: 'callout'   // or 'flat'
+      },
+      mermaidConfig: {
+        querySelector: ".mermaid"
+      },
       plugins: [
         function (hook, vm) {
 
