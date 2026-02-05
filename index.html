@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Summoner Docs</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" />
+  <link id="theme-light" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" />
+  <link id="theme-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/dark.css" disabled />
 </head>
 <body>
   <div id="app"></div>
@@ -21,5 +22,29 @@
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script>
+  (function () {
+    const light = document.getElementById('theme-light');
+    const dark  = document.getElementById('theme-dark');
+
+    function apply(mode) {
+      const isDark = mode === 'dark';
+      dark.disabled = !isDark;
+      light.disabled = isDark;
+      localStorage.setItem('docs-theme', mode);
+    }
+
+    // initial: saved preference, else system preference
+    const saved = localStorage.getItem('docs-theme');
+    const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    apply(saved || (systemPrefersDark ? 'dark' : 'light'));
+
+    // expose a simple toggle for a navbar link/button
+    window.toggleDocsTheme = function () {
+      const current = localStorage.getItem('docs-theme') || (systemPrefersDark ? 'dark' : 'light');
+      apply(current === 'dark' ? 'light' : 'dark');
+    };
+  })();
+</script>
 </body>
 </html>
