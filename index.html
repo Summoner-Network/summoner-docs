@@ -16,49 +16,53 @@
       font-weight: 700;
     }
 
-    /* Make the dark theme closer to GitHub's dark */
     body.theme-dark {
-      background: #0d1117;
-      color: #c9d1d9;
+      background: #1f2937;   /* dark gray */
+      color: #e5e7eb;        /* light gray text */
     }
     body.theme-dark .sidebar {
-      background: #0d1117;
-      border-right: 1px solid #30363d;
-    }
-    body.theme-dark .sidebar ul li a {
-      color: #c9d1d9;
-    }
-    body.theme-dark .sidebar ul li.active > a {
-      color: #58a6ff;
-      font-weight: 600;
+      background: #1f2937;
+      border-right: 1px solid #374151;
     }
     body.theme-dark .markdown-section a {
-      color: #58a6ff;
+      color: #93c5fd;        /* softer blue */
     }
     body.theme-dark .markdown-section a:hover {
-      color: #79c0ff;
-      text-decoration: underline;
+      color: #bfdbfe;
     }
 
-    /* Reduce the "jarring red/grey" feel in dark mode (common for code/links) */
-    body.theme-dark code {
-      background: rgba(110,118,129,0.2);
-      color: #c9d1d9;
-    }
     body.theme-dark pre {
-      background: #161b22;
-      border: 1px solid #30363d;
+      background: #111827;   /* slightly darker than page */
+      border: 1px solid #374151;
     }
-    body.theme-dark pre > code {
-      color: #c9d1d9;
-      background: transparent;
+    body.theme-dark code {
+      background: rgba(255,255,255,0.08);
+      color: #e5e7eb;
     }
 
-    /* Optional: make headers a bit more GitHub-like in dark mode */
-    body.theme-dark .markdown-section h1,
-    body.theme-dark .markdown-section h2,
-    body.theme-dark .markdown-section h3 {
-      color: #e6edf3;
+    /* Base table styling (both modes) */
+    .markdown-section table {
+      width: 100%;
+    }
+
+    /* Dark-mode table overrides */
+    body.theme-dark .markdown-section table {
+      color: #e5e7eb;
+    }
+    body.theme-dark .markdown-section th,
+    body.theme-dark .markdown-section td {
+      border-color: #374151;
+    }
+    body.theme-dark .markdown-section thead tr {
+      background: #2b3646; /* header row */
+    }
+
+    /* Zebra rows: subtle, not white/black */
+    body.theme-dark .markdown-section tbody tr {
+      background: #1f2937;           /* base row */
+    }
+    body.theme-dark .markdown-section tbody tr:nth-child(2n) {
+      background: #243244;           /* slightly different */
     }
 
     /* Theme toggle pill (added to navbar) */
@@ -247,6 +251,7 @@
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-toml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-rust.min.js"></script>
 
   <!-- Theme toggle + navbar injection -->
   <script>
@@ -254,17 +259,28 @@
       const light = document.getElementById('theme-light');
       const dark  = document.getElementById('theme-dark');
 
+      // function apply(mode) {
+      //   const isDark = mode === 'dark';
+      //   dark.disabled = !isDark;
+      //   light.disabled = isDark;
+      //   localStorage.setItem('docs-theme', mode);
+
+      //   // stable body classes for CSS overrides
+      //   document.body.classList.toggle('theme-dark', isDark);
+      //   document.body.classList.toggle('theme-light', !isDark);
+
+      //   if (window.__updateThemeToggleLabel) window.__updateThemeToggleLabel();
+      // }
+
       function apply(mode) {
         const isDark = mode === 'dark';
         dark.disabled = !isDark;
         light.disabled = isDark;
-        localStorage.setItem('docs-theme', mode);
 
-        // stable body classes for CSS overrides
         document.body.classList.toggle('theme-dark', isDark);
         document.body.classList.toggle('theme-light', !isDark);
 
-        if (window.__updateThemeToggleLabel) window.__updateThemeToggleLabel();
+        localStorage.setItem('docs-theme', mode);
       }
 
       function currentMode() {
