@@ -1,5 +1,5 @@
-- [Home](/)
-- [SDK Guide](guide_sdk/index.md)
-- [Reference](reference/index.md)
-- [GitHub](https://github.com/Summoner-Network/summoner-docs)
+- [Home](#/)
+- [SDK Guide](#/guide_sdk/index.md)
+- [Reference](#/reference/index.md)
+- [GitHub](#/https://github.com/Summoner-Network/summoner-docs)
 - <a href="javascript:toggleDocsTheme()">Toggle theme</a>

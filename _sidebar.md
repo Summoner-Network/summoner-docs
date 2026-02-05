@@ -1,22 +1,22 @@
-- [Home](/)
+- [Home](#/)
 
 - Introduction
-  - [Overview](introduction/index.md)
-  - [Why Summoner](introduction/why_summoner.md)
+  - [Overview](#/introduction/index)
+  - [Why Summoner](#/introduction/why_summoner)
 
 - SDK Guide
-  - [Overview](guide_sdk/index.md)
-  - [Getting started](guide_sdk/getting_started/index.md)
-  - [Fundamentals](guide_sdk/fundamentals/index.md)
+  - [Overview](#/guide_sdk/index)
+  - [Getting started](#/guide_sdk/getting_started/index)
+  - [Fundamentals](#/guide_sdk/fundamentals/index)
 
 - Desktop App
-  - [Overview](guide_app/index.md)
+  - [Overview](#/guide_app/index)
 
 - Reference
-  - [Overview](reference/index.md)
+  - [Overview](#/reference/index)
 
 - Development
-  - [Overview](development/index.md)
+  - [Overview](#/development/index)
 
 - FAQ
-  - [FAQ](faq/index.md)
+  - [FAQ](#/faq/index)
