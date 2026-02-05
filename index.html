@@ -258,115 +258,87 @@
 
   <!-- Theme toggle + navbar injection -->
   <script>
-    (function () {
-      const light = document.getElementById('theme-light');
-      const dark  = document.getElementById('theme-dark');
+  (function () {
+    const light = document.getElementById('theme-light');
+    const dark  = document.getElementById('theme-dark');
 
-      // function apply(mode) {
-      //   const isDark = mode === 'dark';
-      //   dark.disabled = !isDark;
-      //   light.disabled = isDark;
-      //   localStorage.setItem('docs-theme', mode);
+    function systemPrefersDark() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
 
-      //   // stable body classes for CSS overrides
-      //   document.body.classList.toggle('theme-dark', isDark);
-      //   document.body.classList.toggle('theme-light', !isDark);
+    function currentMode() {
+      const saved = localStorage.getItem('docs-theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      return systemPrefersDark() ? 'dark' : 'light';
+    }
 
-      //   if (window.__updateThemeToggleLabel) window.__updateThemeToggleLabel();
-      // }
+    function apply(mode) {
+      const isDark = (mode === 'dark');
 
-      function apply(mode) {
-        const isDark = mode === 'dark';
-        dark.disabled = !isDark;
-        light.disabled = isDark;
+      // swap docsify theme CSS
+      dark.disabled = !isDark;
+      light.disabled = isDark;
 
-        document.body.classList.toggle('theme-dark', isDark);
-        document.body.classList.toggle('theme-light', !isDark);
+      // stable body classes for your CSS overrides
+      document.body.classList.toggle('theme-dark', isDark);
+      document.body.classList.toggle('theme-light', !isDark);
 
-        localStorage.setItem('docs-theme', mode);
+      localStorage.setItem('docs-theme', mode);
 
-        if (window.__updateThemeToggleLabel) window.__updateThemeToggleLabel();
-      }
+      // update label if button already exists
+      if (window.__updateThemeToggleLabel) window.__updateThemeToggleLabel();
+    }
 
-      function currentMode() {
-        const saved = localStorage.getItem('docs-theme');
-        if (saved === 'dark' || saved === 'light') return saved;
-        const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        return systemPrefersDark ? 'dark' : 'light';
-      }
+    // Expose a stable toggle API (optional but handy)
+    window.toggleDocsTheme = function () {
+      const mode = currentMode();
+      apply(mode === 'dark' ? 'light' : 'dark');
+    };
 
-      function ensureThemeToggle() {
-        const nav = document.querySelector('.app-nav');
-        if (!nav) return;
+    // Create or update the navbar pill button
+    window.ensureThemeToggle = function ensureThemeToggle() {
+      const nav = document.querySelector('nav.app-nav');
+      if (!nav) return false;
 
-        // avoid duplicates
-        let a = nav.querySelector('#theme-toggle');
-        if (!a) {
-          a = document.createElement('a');
-          a.id = 'theme-toggle';
-          a.href = 'javascript:void(0)';
-          a.style.cursor = 'pointer';
-          a.style.fontWeight = '600';
-          a.onclick = function () {
-            if (window.toggleDocsTheme) window.toggleDocsTheme();
-          };
-          nav.appendChild(a);
-        }
-
-        // stable label updater
-        window.__updateThemeToggleLabel = function () {
-          const systemPrefersDark =
-            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-          const mode = localStorage.getItem('docs-theme') || (systemPrefersDark ? 'dark' : 'light');
-
-          // If you're currently in dark mode, the action should say "Light theme"
-          a.textContent = (mode === 'dark') ? 'Light theme' : 'Dark theme';
-          a.setAttribute('data-mode', mode);
-        };
-
-        window.__updateThemeToggleLabel();
-      }
-
-      // Create a small toggle button in navbar (right side)
-      function ensureToggleButton() {
-        const nav = document.querySelector('nav.app-nav');
-        if (!nav) return;
-
-        if (document.getElementById('theme-toggle-btn')) return;
-
-        const btn = document.createElement('span');
+      let btn = document.getElementById('theme-toggle-btn');
+      if (!btn) {
+        btn = document.createElement('span');
         btn.id = 'theme-toggle-btn';
         btn.className = 'theme-toggle';
-        btn.innerHTML = `<span class="dot"></span><span class="label"></span>`;
+        btn.innerHTML = '<span class="dot"></span><span class="label"></span>';
         btn.addEventListener('click', function () {
-          const mode = currentMode();
-          apply(mode === 'dark' ? 'light' : 'dark');
+          window.toggleDocsTheme();
         });
-
         nav.appendChild(btn);
-
-        window.__updateThemeToggleLabel = function () {
-          const mode = currentMode();
-          const label = (mode === 'dark') ? 'Light theme' : 'Dark theme'; // show the next mode
-          const labelEl = btn.querySelector('.label');
-          if (labelEl) labelEl.textContent = label;
-        };
-
-        window.__updateThemeToggleLabel();
       }
 
-      // initial apply
-      apply(currentMode());
+      window.__updateThemeToggleLabel = function () {
+        const mode = currentMode();
+        const label = (mode === 'dark') ? 'Light theme' : 'Dark theme'; // action label
+        const labelEl = btn.querySelector('.label');
+        if (labelEl) labelEl.textContent = label;
+        btn.setAttribute('data-mode', mode);
+      };
 
-      // navbar is injected after load; poll briefly until it exists
-      const t0 = Date.now();
-      const timer = setInterval(function () {
-        ensureToggleButton();
-        if (document.getElementById('theme-toggle-btn')) clearInterval(timer);
-        if (Date.now() - t0 > 5000) clearInterval(timer);
-      }, 100);
-    })();
+      window.__updateThemeToggleLabel();
+      return true;
+    };
+
+    // Initial apply ASAP
+    apply(currentMode());
+
+    // Navbar is injected later; retry a few times
+    (function retryAttach(maxMs) {
+      const start = Date.now();
+      const tick = function () {
+        if (window.ensureThemeToggle()) return;
+        if (Date.now() - start > maxMs) return;
+        setTimeout(tick, 100);
+      };
+      tick();
+    })(5000);
+  })();
   </script>
+
 </body>
 </html>
