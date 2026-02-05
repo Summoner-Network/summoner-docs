@@ -110,7 +110,7 @@ This method expects configuration keys such as:
 * `logger` (optional): logging configuration.
 * `hyper_parameters` (optional): backend tuning parameters.
 
-The full set of configuration keys is documented in the [configugration guide](./configs.md).
+The full set of configuration keys is documented in the [configugration guide](configs.md).
 
 ### Outputs
 

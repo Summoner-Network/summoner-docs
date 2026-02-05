@@ -27,7 +27,7 @@ Clients do **not** require special parameters to connect to **either** the Pytho
 
 ### Run an empty client
 
-First, start a local server. See [Getting Started with Summoner Servers](./basics_server.md), and then run:
+First, start a local server. See [Getting Started with Summoner Servers](basics_server.md), and then run:
 
 ```bash
 python first_server.py

@@ -6,12 +6,12 @@ Most users only need `SummonerClient`. Use `merger` when you want to compose mul
 
 ## Modules
 
-* [<code style="background: transparent;">Summoner<b>.client.client</b></code>](./client/client.md) → Core runtime built around `SummonerClient`: use decorators (`@receive`, `@send`, `@hook`, `@upload_states`, `@download_states`), run the client with automatic retries, enable flow-aware routing, and export DNA for portability.
+* [<code style="background: transparent;">Summoner<b>.client.client</b></code>](client/client.md) → Core runtime built around `SummonerClient`: use decorators (`@receive`, `@send`, `@hook`, `@upload_states`, `@download_states`), run the client with automatic retries, enable flow-aware routing, and export DNA for portability.
 
 
-* [<code style="background: transparent;">Summoner<b>.client</b></code> configuration guide](./client/configs.md) → How to tune `SummonerClient.run(...)`, including connection target precedence (`host`/`port`), reconnection policy, receiver limits, sender concurrency/backpressure, and logging.
+* [<code style="background: transparent;">Summoner<b>.client</b></code> configuration guide](client/configs.md) → How to tune `SummonerClient.run(...)`, including connection target precedence (`host`/`port`), reconnection policy, receiver limits, sender concurrency/backpressure, and logging.
 
-* [<code style="background: transparent;">Summoner<b>.client.merger</b></code>](./client/merger.md) → DNA composition utilities:
+* [<code style="background: transparent;">Summoner<b>.client.merger</b></code>](client/merger.md) → DNA composition utilities:
 
   * `ClientMerger`: merge handlers from multiple sources (clients or DNA) into one composite client.
   * `ClientTranslation`: reconstruct a fresh client from a DNA list.

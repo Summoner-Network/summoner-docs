@@ -4,11 +4,11 @@ The **protocol** layer defines the runtime primitives behind routing and state t
 
 ## Modules
 
-* [<code style="background: transparent;">Summoner<b>.protocol.triggers</b></code>](./proto/triggers.md) → Load a trigger tree into a dynamic `Trigger` class, and work with `Signal`, `Event` (`Move/Stay/Test`), `Action`, and `extract_signal`.
+* [<code style="background: transparent;">Summoner<b>.protocol.triggers</b></code>](proto/triggers.md) → Load a trigger tree into a dynamic `Trigger` class, and work with `Signal`, `Event` (`Move/Stay/Test`), `Action`, and `extract_signal`.
 
-* [<code style="background: transparent;">Summoner<b>.protocol.process</b></code>](./proto/process.md) → Runtime types used during routing: `Node`, `ArrowStyle`, `ParsedRoute`, `Receiver`, `Sender`, `StateTape`, and activation collection.
+* [<code style="background: transparent;">Summoner<b>.protocol.process</b></code>](proto/process.md) → Runtime types used during routing: `Node`, `ArrowStyle`, `ParsedRoute`, `Receiver`, `Sender`, `StateTape`, and activation collection.
 
-* [<code style="background: transparent;">Summoner<b>.protocol.flow</b></code>](./proto/flow.md) → Parse human route strings into `ParsedRoute` objects using configured `ArrowStyle`s.
+* [<code style="background: transparent;">Summoner<b>.protocol.flow</b></code>](proto/flow.md) → Parse human route strings into `ParsedRoute` objects using configured `ArrowStyle`s.
 
 ## Pick the right module
 
