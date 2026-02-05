@@ -199,6 +199,9 @@
 
             // Ensure the toggle button label is correct after navigation
             if (window.__updateThemeToggleLabel) window.__updateThemeToggleLabel();
+            
+            // after navbar is rendered/re-rendered
+            requestAnimationFrame(ensureThemeToggle);
           });
 
           // Fix raw HTML href/src inside markdown pages
@@ -281,6 +284,8 @@
         document.body.classList.toggle('theme-light', !isDark);
 
         localStorage.setItem('docs-theme', mode);
+
+        if (window.__updateThemeToggleLabel) window.__updateThemeToggleLabel();
       }
 
       function currentMode() {
@@ -288,6 +293,39 @@
         if (saved === 'dark' || saved === 'light') return saved;
         const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         return systemPrefersDark ? 'dark' : 'light';
+      }
+
+      function ensureThemeToggle() {
+        const nav = document.querySelector('.app-nav');
+        if (!nav) return;
+
+        // avoid duplicates
+        let a = nav.querySelector('#theme-toggle');
+        if (!a) {
+          a = document.createElement('a');
+          a.id = 'theme-toggle';
+          a.href = 'javascript:void(0)';
+          a.style.cursor = 'pointer';
+          a.style.fontWeight = '600';
+          a.onclick = function () {
+            if (window.toggleDocsTheme) window.toggleDocsTheme();
+          };
+          nav.appendChild(a);
+        }
+
+        // stable label updater
+        window.__updateThemeToggleLabel = function () {
+          const systemPrefersDark =
+            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+          const mode = localStorage.getItem('docs-theme') || (systemPrefersDark ? 'dark' : 'light');
+
+          // If you're currently in dark mode, the action should say "Light theme"
+          a.textContent = (mode === 'dark') ? 'Light theme' : 'Dark theme';
+          a.setAttribute('data-mode', mode);
+        };
+
+        window.__updateThemeToggleLabel();
       }
 
       // Create a small toggle button in navbar (right side)
