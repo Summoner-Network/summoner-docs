@@ -4,6 +4,7 @@
   <img width="300px" src="assets/img/img_intro_2_rounded.png" />
 </p>
 
+**Webpage version**: [https://summoner-network.github.io/summoner-docs](https://summoner-network.github.io/summoner-docs)
 
 ## 🔎 Technical Index (quick search by keywords)
 
