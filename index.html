@@ -19,52 +19,37 @@
 
       plugins: [
         function (hook, vm) {
-          hook.afterEach(function (html, next) {
-            const file = vm.route.file || '';
-            const baseDir = file.includes('/') ? file.slice(0, file.lastIndexOf('/') + 1) : '';
+          function normalizePath(baseFile, rel) {
+            // baseFile: e.g. "introduction/more/why4_mmo.md"
+            // rel: e.g. "../../guide_sdk/getting_started/quickstart/basics_server.md"
+            const baseDir = baseFile.includes('/') ? baseFile.slice(0, baseFile.lastIndexOf('/') + 1) : '';
+            const resolved = new URL(rel, 'https://x/' + baseDir).pathname.replace(/^\/+/, '');
+            return resolved;
+          }
 
-            function isExternal(u) {
-              return (
-                u.startsWith('http://') ||
-                u.startsWith('https://') ||
-                u.startsWith('//') ||
-                u.startsWith('mailto:') ||
-                u.startsWith('data:') ||
-                u.startsWith('javascript:') ||
-                u.startsWith('#') ||
-                u.startsWith('/')
-              );
-            }
+          hook.doneEach(function () {
+            const baseFile = vm.route.file || '';
 
-            function resolveRelative(u) {
-              const resolved = new URL(u, 'https://x/' + baseDir);
-              const path = resolved.pathname.replace(/^\/+/, ''); // no leading "/" so it stays under /summoner-docs/
-              const suffix = (resolved.search || '') + (resolved.hash || '');
-              return path + suffix;
-            }
+            // Rewrite markdown-generated <a href="#/..."> links containing ../
+            document.querySelectorAll('a[href^="#/"]').forEach(a => {
+              const href = a.getAttribute('href');        // e.g. "#/../../guide_sdk/.../basics_server"
+              if (!href) return;
 
-            // Rewrite HTML links to stay inside Docsify routing
-            html = html.replace(/href="([^"]+)"/g, (m, href) => {
-              if (isExternal(href)) return m;
+              const route = href.slice(2);                // remove "#/" -> "../../guide_sdk/..."
+              if (!route.includes('..')) return;
 
-              // Only rewrite markdown-ish links (avoid breaking downloads like .pdf)
-              const hrefNoHash = href.split('#', 1)[0].split('?', 1)[0];
-              const looksLikeDoc =
-                hrefNoHash.endsWith('.md') ||
-                !hrefNoHash.includes('.'); // e.g. "more/why1_world"
+              const routeNoHash = route.split('#', 1)[0].split('?', 1)[0];
 
-              if (!looksLikeDoc) return m;
+              // Re-add ".md" if Docsify stripped it (common)
+              const candidate = routeNoHash.endsWith('.md') ? routeNoHash : (routeNoHash + '.md');
 
-              return `href="#/${resolveRelative(href)}"`;
+              const resolved = normalizePath(baseFile, candidate);
+
+              // Keep Docsify-friendly route: strip trailing ".md"
+              const finalRoute = resolved.endsWith('.md') ? resolved.slice(0, -3) : resolved;
+
+              a.setAttribute('href', '#/' + finalRoute);
             });
-
-            // Rewrite HTML image/src so ../assets/... works from any page
-            html = html.replace(/src="([^"]+)"/g, (m, src) => {
-              if (isExternal(src)) return m;
-              return `src="${resolveRelative(src)}"`;
-            });
-
-            next(html);
           });
         }
       ]
