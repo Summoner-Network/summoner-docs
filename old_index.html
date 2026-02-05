@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Summoner Docs</title>
+
+  <link id="theme-light" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" />
+  <link id="theme-dark"  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/dark.css" disabled />
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    window.$docsify = {
+      name: 'Summoner Docs',
+      loadSidebar: true,
+      loadNavbar: true,
+      subMaxLevel: 2,
+      homepage: 'index.md',
+      relativePath: true,
+
+      // GitHub-style callouts via docsify-plugin-flexible-alerts
+      'flexible-alerts': {
+        style: 'callout'
+      },
+
+      plugins: [
+        function (hook, vm) {
+
+          function baseDirFromFile(file) {
+            return file && file.includes('/') ? file.slice(0, file.lastIndexOf('/') + 1) : '';
+          }
+
+          function isExternal(u) {
+            return (
+              u.startsWith('http://') ||
+              u.startsWith('https://') ||
+              u.startsWith('//') ||
+              u.startsWith('mailto:') ||
+              u.startsWith('data:') ||
+              u.startsWith('javascript:') ||
+              u.startsWith('#') ||   // already docsify-routed
+              u.startsWith('/')       // absolute to site root
+            );
+          }
+
+          function resolveRelative(u, baseDir) {
+            const resolved = new URL(u, 'https://x/' + baseDir);
+            const path = resolved.pathname.replace(/^\/+/, '');
+            const suffix = (resolved.search || '') + (resolved.hash || '');
+            return path + suffix;
+          }
+
+          // 1) Fix raw HTML href/src inside markdown pages
+          hook.afterEach(function (html, next) {
+            const file = vm.route.file || '';
+            const baseDir = baseDirFromFile(file);
+
+            html = html.replace(/href="([^"]+)"/g, (m, href) => {
+              if (isExternal(href)) return m;
+
+              const hrefNoFrag = href.split('#', 1)[0].split('?', 1)[0];
+              const looksLikeDoc =
+                hrefNoFrag.endsWith('.md') ||
+                !hrefNoFrag.includes('.'); // e.g. "more/why1_world"
+
+              if (!looksLikeDoc) return m;
+
+              return `href="#/${resolveRelative(href, baseDir)}"`;
+            });
+
+            html = html.replace(/src="([^"]+)"/g, (m, src) => {
+              if (isExternal(src)) return m;
+              return `src="${resolveRelative(src, baseDir)}"`;
+            });
+
+            next(html);
+          });
+
+          // 2) Fix markdown-generated links that become "#/../../something"
+          hook.doneEach(function () {
+            const file = vm.route.file || '';
+            const baseDir = baseDirFromFile(file);
+
+            document.querySelectorAll('a[href^="#/"]').forEach(a => {
+              const href = a.getAttribute('href');
+              if (!href) return;
+
+              const route = href.slice(2); // remove "#/"
+              if (!route.includes('..')) return;
+
+              const routeNoSuffix = route.split('#', 1)[0].split('?', 1)[0];
+              const candidate = routeNoSuffix.endsWith('.md') ? routeNoSuffix : (routeNoSuffix + '.md');
+
+              const normalized = resolveRelative(candidate, baseDir);
+              const finalRoute = normalized.endsWith('.md') ? normalized.slice(0, -3) : normalized;
+
+              a.setAttribute('href', '#/' + finalRoute);
+            });
+          });
+        }
+      ]
+    };
+  </script>
+
+  <!-- Mermaid (ESM) -->
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true });
+    window.mermaid = mermaid;
+  </script>
+
+  <!-- Docsify plugins -->
+  <script src="https://unpkg.com/docsify-mermaid@2.0.1/dist/docsify-mermaid.js"></script>
+  <script src="https://unpkg.com/docsify-plugin-flexible-alerts@1.1.1/dist/docsify-plugin-flexible-alerts.min.js"></script>
+
+  <!-- Docsify core -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+
+  <!-- Prism syntax highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-toml.min.js"></script>
+
+  <!-- Theme toggle -->
+  <script>
+    (function () {
+      const light = document.getElementById('theme-light');
+      const dark  = document.getElementById('theme-dark');
+
+      function apply(mode) {
+        const isDark = mode === 'dark';
+        dark.disabled = !isDark;
+        light.disabled = isDark;
+        localStorage.setItem('docs-theme', mode);
+      }
+
+      const saved = localStorage.getItem('docs-theme');
+      const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      apply(saved || (systemPrefersDark ? 'dark' : 'light'));
+
+      window.toggleDocsTheme = function () {
+        const current = localStorage.getItem('docs-theme') || (systemPrefersDark ? 'dark' : 'light');
+        apply(current === 'dark' ? 'light' : 'dark');
+      };
+    })();
+  </script>
+</body>
+</html>

@@ -7,6 +7,119 @@
 
   <link id="theme-light" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" />
   <link id="theme-dark"  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/dark.css" disabled />
+
+  <!-- Small CSS overrides (bold name, darker dark-mode, nicer links, home hero alignment) -->
+  <style>
+    /* Bold the site name in the sidebar */
+    .sidebar .app-name-link,
+    .sidebar .app-name {
+      font-weight: 700;
+    }
+
+    /* Make the dark theme closer to GitHub's dark */
+    body.theme-dark {
+      background: #0d1117;
+      color: #c9d1d9;
+    }
+    body.theme-dark .sidebar {
+      background: #0d1117;
+      border-right: 1px solid #30363d;
+    }
+    body.theme-dark .sidebar ul li a {
+      color: #c9d1d9;
+    }
+    body.theme-dark .sidebar ul li.active > a {
+      color: #58a6ff;
+      font-weight: 600;
+    }
+    body.theme-dark .markdown-section a {
+      color: #58a6ff;
+    }
+    body.theme-dark .markdown-section a:hover {
+      color: #79c0ff;
+      text-decoration: underline;
+    }
+
+    /* Reduce the "jarring red/grey" feel in dark mode (common for code/links) */
+    body.theme-dark code {
+      background: rgba(110,118,129,0.2);
+      color: #c9d1d9;
+    }
+    body.theme-dark pre {
+      background: #161b22;
+      border: 1px solid #30363d;
+    }
+    body.theme-dark pre > code {
+      color: #c9d1d9;
+      background: transparent;
+    }
+
+    /* Optional: make headers a bit more GitHub-like in dark mode */
+    body.theme-dark .markdown-section h1,
+    body.theme-dark .markdown-section h2,
+    body.theme-dark .markdown-section h3 {
+      color: #e6edf3;
+    }
+
+    /* Theme toggle pill (added to navbar) */
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(127,127,127,0.25);
+      cursor: pointer;
+      user-select: none;
+      font-size: 14px;
+      line-height: 1;
+    }
+    body.theme-dark .theme-toggle {
+      border-color: #30363d;
+      background: #161b22;
+      color: #c9d1d9;
+    }
+    body.theme-light .theme-toggle {
+      background: #ffffff;
+      color: #2c3e50;
+    }
+    .theme-toggle .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #bbb;
+    }
+    body.theme-dark .theme-toggle .dot {
+      background: #58a6ff;
+    }
+    body.theme-light .theme-toggle .dot {
+      background: #111;
+    }
+
+    /* Home hero layout:
+       - We add a class to body when on homepage, then apply styling only there.
+       Choose ONE of the two options by uncommenting:
+       A) Center the H1
+       B) Left-align the wizard image
+    */
+
+    /* A) Center the main H1 on homepage */
+    body.is-homepage .markdown-section > h1:first-of-type {
+      text-align: center;
+    }
+
+    /* B) Left-align wizard image on homepage (uncomment if you prefer this over centering H1) */
+    /*
+    body.is-homepage .markdown-section p[align="center"] {
+      text-align: left;
+    }
+    body.is-homepage .markdown-section p[align="center"] img {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      display: inline-block;
+    }
+    */
+  </style>
 </head>
 <body>
   <div id="app"></div>
@@ -20,7 +133,6 @@
       homepage: 'index.md',
       relativePath: true,
 
-      // GitHub-style callouts via docsify-plugin-flexible-alerts
       'flexible-alerts': {
         style: 'callout'
       },
@@ -52,7 +164,40 @@
             return path + suffix;
           }
 
-          // 1) Fix raw HTML href/src inside markdown pages
+          // Mark homepage on body (for CSS-only hero tweaks)
+          hook.doneEach(function () {
+            const file = vm.route.file || '';
+            const isHome = (file === '' || file === 'index.md');
+            document.body.classList.toggle('is-homepage', isHome);
+
+            // Also keep a stable light/dark class for CSS overrides
+            const mode = localStorage.getItem('docs-theme') || 'light';
+            document.body.classList.toggle('theme-dark', mode === 'dark');
+            document.body.classList.toggle('theme-light', mode !== 'dark');
+
+            // Fix markdown-generated links that become "#/../../something"
+            const baseDir = baseDirFromFile(file);
+            document.querySelectorAll('a[href^="#/"]').forEach(a => {
+              const href = a.getAttribute('href');
+              if (!href) return;
+
+              const route = href.slice(2); // remove "#/"
+              if (!route.includes('..')) return;
+
+              const routeNoSuffix = route.split('#', 1)[0].split('?', 1)[0];
+              const candidate = routeNoSuffix.endsWith('.md') ? routeNoSuffix : (routeNoSuffix + '.md');
+
+              const normalized = resolveRelative(candidate, baseDir);
+              const finalRoute = normalized.endsWith('.md') ? normalized.slice(0, -3) : normalized;
+
+              a.setAttribute('href', '#/' + finalRoute);
+            });
+
+            // Ensure the toggle button label is correct after navigation
+            if (window.__updateThemeToggleLabel) window.__updateThemeToggleLabel();
+          });
+
+          // Fix raw HTML href/src inside markdown pages
           hook.afterEach(function (html, next) {
             const file = vm.route.file || '';
             const baseDir = baseDirFromFile(file);
@@ -76,28 +221,6 @@
             });
 
             next(html);
-          });
-
-          // 2) Fix markdown-generated links that become "#/../../something"
-          hook.doneEach(function () {
-            const file = vm.route.file || '';
-            const baseDir = baseDirFromFile(file);
-
-            document.querySelectorAll('a[href^="#/"]').forEach(a => {
-              const href = a.getAttribute('href');
-              if (!href) return;
-
-              const route = href.slice(2); // remove "#/"
-              if (!route.includes('..')) return;
-
-              const routeNoSuffix = route.split('#', 1)[0].split('?', 1)[0];
-              const candidate = routeNoSuffix.endsWith('.md') ? routeNoSuffix : (routeNoSuffix + '.md');
-
-              const normalized = resolveRelative(candidate, baseDir);
-              const finalRoute = normalized.endsWith('.md') ? normalized.slice(0, -3) : normalized;
-
-              a.setAttribute('href', '#/' + finalRoute);
-            });
           });
         }
       ]
@@ -125,7 +248,7 @@
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-toml.min.js"></script>
 
-  <!-- Theme toggle -->
+  <!-- Theme toggle + navbar injection -->
   <script>
     (function () {
       const light = document.getElementById('theme-light');
@@ -136,16 +259,59 @@
         dark.disabled = !isDark;
         light.disabled = isDark;
         localStorage.setItem('docs-theme', mode);
+
+        // stable body classes for CSS overrides
+        document.body.classList.toggle('theme-dark', isDark);
+        document.body.classList.toggle('theme-light', !isDark);
+
+        if (window.__updateThemeToggleLabel) window.__updateThemeToggleLabel();
       }
 
-      const saved = localStorage.getItem('docs-theme');
-      const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      apply(saved || (systemPrefersDark ? 'dark' : 'light'));
+      function currentMode() {
+        const saved = localStorage.getItem('docs-theme');
+        if (saved === 'dark' || saved === 'light') return saved;
+        const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        return systemPrefersDark ? 'dark' : 'light';
+      }
 
-      window.toggleDocsTheme = function () {
-        const current = localStorage.getItem('docs-theme') || (systemPrefersDark ? 'dark' : 'light');
-        apply(current === 'dark' ? 'light' : 'dark');
-      };
+      // Create a small toggle button in navbar (right side)
+      function ensureToggleButton() {
+        const nav = document.querySelector('nav.app-nav');
+        if (!nav) return;
+
+        if (document.getElementById('theme-toggle-btn')) return;
+
+        const btn = document.createElement('span');
+        btn.id = 'theme-toggle-btn';
+        btn.className = 'theme-toggle';
+        btn.innerHTML = `<span class="dot"></span><span class="label"></span>`;
+        btn.addEventListener('click', function () {
+          const mode = currentMode();
+          apply(mode === 'dark' ? 'light' : 'dark');
+        });
+
+        nav.appendChild(btn);
+
+        window.__updateThemeToggleLabel = function () {
+          const mode = currentMode();
+          const label = (mode === 'dark') ? 'Light theme' : 'Dark theme'; // show the next mode
+          const labelEl = btn.querySelector('.label');
+          if (labelEl) labelEl.textContent = label;
+        };
+
+        window.__updateThemeToggleLabel();
+      }
+
+      // initial apply
+      apply(currentMode());
+
+      // navbar is injected after load; poll briefly until it exists
+      const t0 = Date.now();
+      const timer = setInterval(function () {
+        ensureToggleButton();
+        if (document.getElementById('theme-toggle-btn')) clearInterval(timer);
+        if (Date.now() - t0 > 5000) clearInterval(timer);
+      }, 100);
     })();
   </script>
 </body>
