@@ -9,7 +9,15 @@
 </head>
 <body>
   <div id="app"></div>
-
+  <!-- Mermaid (ESM) -->
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true });
+    window.mermaid = mermaid;
+  </script>
+  <!-- Docsify Mermaid plugin -->
+  <script src="//unpkg.com/docsify-mermaid@2.0.1/dist/docsify-mermaid.js"></script>
+  <script src="https://unpkg.com/docsify-plugin-flexible-alerts"></script>
   <script>
     window.$docsify = {
       name: 'Summoner Docs',
@@ -17,9 +25,8 @@
       loadNavbar: true,
       subMaxLevel: 2,
       homepage: 'index.md',
-
       'flexible-alerts': {
-        style: 'callout'
+        style: 'callout'   // or 'flat'
       },
 
       plugins: [
@@ -37,35 +44,39 @@
               u.startsWith('mailto:') ||
               u.startsWith('data:') ||
               u.startsWith('javascript:') ||
-              u.startsWith('#') ||
-              u.startsWith('/')
+              u.startsWith('#') ||   // already routed
+              u.startsWith('/')       // absolute to site root
             );
           }
 
           function resolveRelative(u, baseDir) {
             const resolved = new URL(u, 'https://x/' + baseDir);
-            const path = resolved.pathname.replace(/^\/+/, '');
+            const path = resolved.pathname.replace(/^\/+/, ''); // keep relative to repo root
             const suffix = (resolved.search || '') + (resolved.hash || '');
             return path + suffix;
           }
 
+          // 1) Fix raw HTML: href="..." and src="..." inside the markdown content
           hook.afterEach(function (html, next) {
             const file = vm.route.file || '';
             const baseDir = baseDirFromFile(file);
 
+            // Rewrite HTML links to stay inside Docsify routing
             html = html.replace(/href="([^"]+)"/g, (m, href) => {
               if (isExternal(href)) return m;
 
+              // Avoid breaking downloads like .pdf, .zip, etc.
               const hrefNoFrag = href.split('#', 1)[0].split('?', 1)[0];
               const looksLikeDoc =
                 hrefNoFrag.endsWith('.md') ||
-                !hrefNoFrag.includes('.');
+                !hrefNoFrag.includes('.'); // "more/why1_world"
 
               if (!looksLikeDoc) return m;
 
               return `href="#/${resolveRelative(href, baseDir)}"`;
             });
 
+            // Rewrite HTML image/src so ../assets/... works from any page
             html = html.replace(/src="([^"]+)"/g, (m, src) => {
               if (isExternal(src)) return m;
               return `src="${resolveRelative(src, baseDir)}"`;
@@ -74,6 +85,7 @@
             next(html);
           });
 
+          // 2) Fix Markdown-generated links that end up like "#/../../something"
           hook.doneEach(function () {
             const file = vm.route.file || '';
             const baseDir = baseDirFromFile(file);
@@ -82,13 +94,18 @@
               const href = a.getAttribute('href');
               if (!href) return;
 
-              const route = href.slice(2);
+              const route = href.slice(2); // remove "#/"
               if (!route.includes('..')) return;
 
+              // strip query/hash for resolution, then normalize
               const routeNoSuffix = route.split('#', 1)[0].split('?', 1)[0];
+
+              // Docsify often strips ".md" in href; add it for correct resolution
               const candidate = routeNoSuffix.endsWith('.md') ? routeNoSuffix : (routeNoSuffix + '.md');
 
               const normalized = resolveRelative(candidate, baseDir);
+
+              // turn back into Docsify route (strip ".md")
               const finalRoute = normalized.endsWith('.md') ? normalized.slice(0, -3) : normalized;
 
               a.setAttribute('href', '#/' + finalRoute);
@@ -98,7 +115,6 @@
       ]
     };
   </script>
-
   <!-- Mermaid (ESM) -->
   <script type="module">
     import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
@@ -115,29 +131,28 @@
 
   <!-- Theme toggle -->
   <script>
-    (function () {
-      const light = document.getElementById('theme-light');
-      const dark  = document.getElementById('theme-dark');
+  (function () {
+    const light = document.getElementById('theme-light');
+    const dark  = document.getElementById('theme-dark');
 
-      function apply(mode) {
-        const isDark = mode === 'dark';
-        dark.disabled = !isDark;
-        light.disabled = isDark;
-        localStorage.setItem('docs-theme', mode);
-      }
+    function apply(mode) {
+      const isDark = mode === 'dark';
+      dark.disabled = !isDark;
+      light.disabled = isDark;
+      localStorage.setItem('docs-theme', mode);
+    }
 
-      function currentSystemPref() {
-        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      }
+    // initial: saved preference, else system preference
+    const saved = localStorage.getItem('docs-theme');
+    const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    apply(saved || (systemPrefersDark ? 'dark' : 'light'));
 
-      const saved = localStorage.getItem('docs-theme');
-      apply(saved || currentSystemPref());
-
-      window.toggleDocsTheme = function () {
-        const mode = localStorage.getItem('docs-theme') || currentSystemPref();
-        apply(mode === 'dark' ? 'light' : 'dark');
-      };
-    })();
-  </script>
+    // expose a simple toggle for a navbar link/button
+    window.toggleDocsTheme = function () {
+      const current = localStorage.getItem('docs-theme') || (systemPrefersDark ? 'dark' : 'light');
+      apply(current === 'dark' ? 'light' : 'dark');
+    };
+  })();
+</script>
 </body>
 </html>
