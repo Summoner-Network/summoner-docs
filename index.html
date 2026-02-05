@@ -23,24 +23,46 @@
             const file = vm.route.file || '';
             const baseDir = file.includes('/') ? file.slice(0, file.lastIndexOf('/') + 1) : '';
 
-            function toHashRoute(href) {
-              // keep external links and already-hash links untouched
-              if (
-                href.startsWith('http://') ||
-                href.startsWith('https://') ||
-                href.startsWith('mailto:') ||
-                href.startsWith('#') ||
-                href.startsWith('/')
-              ) return href;
-
-              // resolve href relative to the current markdown file directory
-              // using URL to normalize ../ and ./ segments
-              const resolvedPath = new URL(href, 'https://x/' + baseDir).pathname.replace(/^\/+/, '');
-              return '#/' + resolvedPath;
+            function isExternal(u) {
+              return (
+                u.startsWith('http://') ||
+                u.startsWith('https://') ||
+                u.startsWith('//') ||
+                u.startsWith('mailto:') ||
+                u.startsWith('data:') ||
+                u.startsWith('javascript:') ||
+                u.startsWith('#') ||
+                u.startsWith('/')
+              );
             }
 
-            // rewrite only HTML anchor href="..."
-            html = html.replace(/href="([^"]+)"/g, (m, href) => `href="${toHashRoute(href)}"`);
+            function resolveRelative(u) {
+              const resolved = new URL(u, 'https://x/' + baseDir);
+              const path = resolved.pathname.replace(/^\/+/, ''); // no leading "/" so it stays under /summoner-docs/
+              const suffix = (resolved.search || '') + (resolved.hash || '');
+              return path + suffix;
+            }
+
+            // Rewrite HTML links to stay inside Docsify routing
+            html = html.replace(/href="([^"]+)"/g, (m, href) => {
+              if (isExternal(href)) return m;
+
+              // Only rewrite markdown-ish links (avoid breaking downloads like .pdf)
+              const hrefNoHash = href.split('#', 1)[0].split('?', 1)[0];
+              const looksLikeDoc =
+                hrefNoHash.endsWith('.md') ||
+                !hrefNoHash.includes('.'); // e.g. "more/why1_world"
+
+              if (!looksLikeDoc) return m;
+
+              return `href="#/${resolveRelative(href)}"`;
+            });
+
+            // Rewrite HTML image/src so ../assets/... works from any page
+            html = html.replace(/src="([^"]+)"/g, (m, src) => {
+              if (isExternal(src)) return m;
+              return `src="${resolveRelative(src)}"`;
+            });
 
             next(html);
           });
