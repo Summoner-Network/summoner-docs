@@ -6,7 +6,7 @@
 
 **HTML version of this page**: [here](https://summoner-network.github.io/summoner-docs)
 
-**Summoner Standard Profile Spec**: [here](https://summoner-network.github.io/summoner-standard)
+**Summoner Standard Profile**: [here](https://summoner-network.github.io/summoner-standard)
 
 ## 🔎 Technical Index (quick search by keywords)
 
