@@ -19,34 +19,82 @@
 
       plugins: [
         function (hook, vm) {
-          function normalizePath(baseFile, rel) {
-            // baseFile: e.g. "introduction/more/why4_mmo.md"
-            // rel: e.g. "../../guide_sdk/getting_started/quickstart/basics_server.md"
-            const baseDir = baseFile.includes('/') ? baseFile.slice(0, baseFile.lastIndexOf('/') + 1) : '';
-            const resolved = new URL(rel, 'https://x/' + baseDir).pathname.replace(/^\/+/, '');
-            return resolved;
+
+          function baseDirFromFile(file) {
+            return file && file.includes('/') ? file.slice(0, file.lastIndexOf('/') + 1) : '';
           }
 
-          hook.doneEach(function () {
-            const baseFile = vm.route.file || '';
+          function isExternal(u) {
+            return (
+              u.startsWith('http://') ||
+              u.startsWith('https://') ||
+              u.startsWith('//') ||
+              u.startsWith('mailto:') ||
+              u.startsWith('data:') ||
+              u.startsWith('javascript:') ||
+              u.startsWith('#') ||   // already routed
+              u.startsWith('/')       // absolute to site root
+            );
+          }
 
-            // Rewrite markdown-generated <a href="#/..."> links containing ../
+          function resolveRelative(u, baseDir) {
+            const resolved = new URL(u, 'https://x/' + baseDir);
+            const path = resolved.pathname.replace(/^\/+/, ''); // keep relative to repo root
+            const suffix = (resolved.search || '') + (resolved.hash || '');
+            return path + suffix;
+          }
+
+          // 1) Fix raw HTML: href="..." and src="..." inside the markdown content
+          hook.afterEach(function (html, next) {
+            const file = vm.route.file || '';
+            const baseDir = baseDirFromFile(file);
+
+            // Rewrite HTML links to stay inside Docsify routing
+            html = html.replace(/href="([^"]+)"/g, (m, href) => {
+              if (isExternal(href)) return m;
+
+              // Avoid breaking downloads like .pdf, .zip, etc.
+              const hrefNoFrag = href.split('#', 1)[0].split('?', 1)[0];
+              const looksLikeDoc =
+                hrefNoFrag.endsWith('.md') ||
+                !hrefNoFrag.includes('.'); // "more/why1_world"
+
+              if (!looksLikeDoc) return m;
+
+              return `href="#/${resolveRelative(href, baseDir)}"`;
+            });
+
+            // Rewrite HTML image/src so ../assets/... works from any page
+            html = html.replace(/src="([^"]+)"/g, (m, src) => {
+              if (isExternal(src)) return m;
+              return `src="${resolveRelative(src, baseDir)}"`;
+            });
+
+            next(html);
+          });
+
+          // 2) Fix Markdown-generated links that end up like "#/../../something"
+          hook.doneEach(function () {
+            const file = vm.route.file || '';
+            const baseDir = baseDirFromFile(file);
+
             document.querySelectorAll('a[href^="#/"]').forEach(a => {
-              const href = a.getAttribute('href');        // e.g. "#/../../guide_sdk/.../basics_server"
+              const href = a.getAttribute('href');
               if (!href) return;
 
-              const route = href.slice(2);                // remove "#/" -> "../../guide_sdk/..."
+              const route = href.slice(2); // remove "#/"
               if (!route.includes('..')) return;
 
-              const routeNoHash = route.split('#', 1)[0].split('?', 1)[0];
+              // strip query/hash for resolution, then normalize
+              const routeNoSuffix = route.split('#', 1)[0].split('?', 1)[0];
 
-              // Re-add ".md" if Docsify stripped it (common)
-              const candidate = routeNoHash.endsWith('.md') ? routeNoHash : (routeNoHash + '.md');
+              // Docsify often strips ".md" in href; add it for correct resolution
+              const candidate = routeNoSuffix.endsWith('.md') ? routeNoSuffix : (routeNoSuffix + '.md');
 
-              const resolved = normalizePath(baseFile, candidate);
+              const normalized = resolveRelative(candidate, baseDir);
 
-              // Keep Docsify-friendly route: strip trailing ".md"
-              const finalRoute = resolved.endsWith('.md') ? resolved.slice(0, -3) : resolved;
+              // turn back into Docsify route (strip ".md")
+              const finalRoute = normalized.endsWith('.md') ? normalized.slice(0, -3) : normalized;
 
               a.setAttribute('href', '#/' + finalRoute);
             });
