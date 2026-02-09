@@ -20,7 +20,7 @@ Thank you for helping improve Summoner. Contributions from the community focus o
   For changes that affect behavior or SDK components, open an issue with a short design note. State the goal, the minimal surface area of change, and the impact on agents or servers. Link any prototype code.
 
 * **Publish a module**
-  Use the **starter-template** to build a module that plugs into the SDK. This is the preferred way to extend capabilities without modifying core. Your module can be included via `summoner-sdk` recipes. Choose **Apache-2.0** or another permissive, Apache-compatible license, and include your own `LICENSE` and any `NOTICE` content. See the template repo for details.
+  Use the **extension-template** to build a module that plugs into the SDK. This is the preferred way to extend capabilities without modifying core. Your module can be included via `summoner-sdk` recipes. Choose **Apache-2.0** or another permissive, Apache-compatible license, and include your own `LICENSE` and any `NOTICE` content. See the template repo for details.
 
 * **Contribute runnable examples**
   Add agents that demonstrate patterns such as `@receive` and `@send(multi=True)`. Keep dependencies minimal and document setup in a short README.

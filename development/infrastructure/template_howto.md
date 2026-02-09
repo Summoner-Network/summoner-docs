@@ -11,7 +11,7 @@ Templates give you the right layout and the scripts you need. You should **not**
 
 ## Template catalog
 
-* **starter-template**  
+* **extension-template**  
   For building a native module that plugs into the SDK.
   Comes with `install.sh` to clone `summoner-core`, create a venv, reinstall the SDK and Rust server, and spin up a test server.
 
@@ -21,17 +21,17 @@ Templates give you the right layout and the scripts you need. You should **not**
 
 ## No custom scripts needed
 
-* When you start from **starter-template**, run **its** `install.sh`.
+* When you start from **extension-template**, run **its** `install.sh`.
 * When you assemble an SDK, run **summoner-sdk's** `build_sdk.sh`.
 * Do not add a `build_sdk` function to your own `install.sh`. It duplicates what `build_sdk.sh` already does.
 
 ## Two standard workflows
 
-### A) Build a module (starter-template)
+### A) Build a module (extension-template)
 
 ```bash
 # On GitHub: click "Use this template" on:
-# https://github.com/Summoner-Network/starter-template
+# https://github.com/Summoner-Network/extension-template
 git clone https://github.com/<you>/<your-module>.git
 cd <your-module>
 source install.sh setup
@@ -102,7 +102,7 @@ If you need the core dev branch later:
 
 | Goal                                            | Repo                                  | Script         | Typical command                                              |
 | ----------------------------------------------- | ------------------------------------- | -------------- | ------------------------------------------------------------ |
-| Create and test a single module                 | `starter-template` clone of your repo | `install.sh`   | `source install.sh setup` then `bash install.sh test_server` |
+| Create and test a single module                 | `extension-template` clone of your repo | `install.sh`   | `source install.sh setup` then `bash install.sh test_server` |
 | Build a full SDK that includes multiple modules | `summoner-sdk`                        | `build_sdk.sh` | `source build_sdk.sh setup`                                  |
 | Rebuild from scratch                            | `summoner-sdk`                        | `build_sdk.sh` | `source build_sdk.sh reset`                                  |
 

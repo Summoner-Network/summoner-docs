@@ -1,6 +1,6 @@
 # Creating an Agent Class
 
-There are two good paths. You can help shape the official `SummonerAgent` classes in the [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass) repository, or you can publish your own module built on `SummonerClient` using the [`starter-template`](https://github.com/Summoner-Network/starter-template) and include it in an SDK with [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk). If you are new to Summoner, start with a small module. It lets you move quickly while staying aligned with the core.
+There are two good paths. You can help shape the official `SummonerAgent` classes in the [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass) repository, or you can publish your own module built on `SummonerClient` using the [`extension-template`](https://github.com/Summoner-Network/extension-template) and include it in an SDK with [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk). If you are new to Summoner, start with a small module. It lets you move quickly while staying aligned with the core.
 
 **Shaping the official class.** Proposals land as issues in [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass). Make a clear case for the change, then show it working. A small fork or throwaway repo is perfect. A short screen recording that walks through the problem, the proposed behavior, and the outcome goes a long way. The core team curates the official class, so proposals that are narrowly scoped, compatible with Flow and our decorators, and focused on safety tend to be accepted.
 
@@ -195,7 +195,7 @@ Notice how the factory receives configuration once, while the inner wrapper runs
 
 ## Putting it all together
 
-Create a repository from the [`starter-template`](https://github.com/Summoner-Network/starter-template). Add your package under `tooling/`. Write one or two decorators that wrap the core behavior, following the four steps above. Assemble an SDK with [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) so you can import your package alongside the official agent classes. Write one minimal example that shows your decorator working in isolation. Keep configuration in `.env` or flags, avoid secrets in code, and tag releases so `build.txt` can pin versions.
+Create a repository from the [`extension-template`](https://github.com/Summoner-Network/extension-template). Add your package under `tooling/`. Write one or two decorators that wrap the core behavior, following the four steps above. Assemble an SDK with [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) so you can import your package alongside the official agent classes. Write one minimal example that shows your decorator working in isolation. Keep configuration in `.env` or flags, avoid secrets in code, and tag releases so `build.txt` can pin versions.
 
 If you want a change to land in the official `SummonerAgent`, open a design issue in [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass) describing the problem, the smallest surface that solves it, and a link to your minimal example. We will help you decide whether it belongs in the core set or is better as a module.
 

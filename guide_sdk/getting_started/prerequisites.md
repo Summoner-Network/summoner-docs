@@ -32,7 +32,7 @@ To install the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk
 > If you are using our **automated installation scripts** (typically described in each repository's `README.md`), all required Python and Rust packages will be installed for you — including:
 >
 > * All dependencies listed in the `setup.py` file of [`summoner-core`](https://github.com/Summoner-Network/summoner-core)
-> * Any packages specified in `requirements.txt` files of other `summoner-*` modules derived from our [starter template](https://github.com/Summoner-Network/starter-template)
+> * Any packages specified in `requirements.txt` files of other `summoner-*` modules derived from our [extension template](https://github.com/Summoner-Network/extension-template)
 > 
 > However, if you are setting things up manually — for instance, on Windows — you may need to install these dependencies yourself.
 

@@ -29,7 +29,7 @@ This page explains what to use depending on your goal, how the repositories fit 
   ```
 
 * Create a **new module**
-  Repo: `starter-template`. Start a native package under `tooling/`, then integrate it via `summoner-sdk`.
+  Repo: `extension-template`. Start a native package under `tooling/`, then integrate it via `summoner-sdk`.
 
 * Optional desktop UI
   Repo: `summoner-desktop`. A visual interface for running agents and servers.
@@ -37,7 +37,7 @@ This page explains what to use depending on your goal, how the repositories fit 
 **If you want to contribute**
 
 * Open issues in the relevant public repo. See "How to contribute" for scope and expectations.
-* Publish modules from the **starter-template** and reference them in `summoner-sdk` recipes.
+* Publish modules from the **extension-template** and reference them in `summoner-sdk` recipes.
 * For proposed changes to core behavior, open a design issue first. Direct code changes to core are internal.
 
 > [!NOTE]

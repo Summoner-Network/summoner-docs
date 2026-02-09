@@ -50,7 +50,7 @@ Updates will be announced on the website, on social media, and in the planned we
 
 ## Extend Summoner with modules
 
-Use the **starter-template** to author a module that plugs into the SDK. See the repo for full instructions: [https://github.com/Summoner-Network/starter-template](https://github.com/Summoner-Network/starter-template).
+Use the **extension-template** to author a module that plugs into the SDK. See the repo for full instructions: [https://github.com/Summoner-Network/extension-template](https://github.com/Summoner-Network/extension-template).
 
 Typical flow:
 

@@ -18,7 +18,7 @@ Issues are the main way to report bugs, propose features, and ask questions. Cle
 | SDK assembly, build recipes                    | `summoner-sdk`        |
 | Desktop application                            | `summoner-desktop`    |
 | Official agent classes and releases            | `summoner-agentclass` |
-| New module starting point or template feedback | `starter-template`    |
+| New module starting point or template feedback | `extension-template`    |
 
 > [!NOTE]
 > If you are unsure, pick the repo that best matches the code you ran. We can move the issue if needed.
@@ -90,7 +90,7 @@ Other options you considered and why they fall short.
 Which repos are affected and any compatibility notes.
 ```
 
-If your idea is best delivered as an extension, create it with **starter-template** and link the repo in the issue. This helps us evaluate real usage and compatibility.
+If your idea is best delivered as an extension, create it with **extension-template** and link the repo in the issue. This helps us evaluate real usage and compatibility.
 
 ## Security and sensitive reports
 

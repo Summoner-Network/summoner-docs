@@ -18,7 +18,7 @@ This page gives a quick map of the pinned repositories in the Summoner organizat
 | **summoner-docs**       | Documentation you are reading. Concepts, design notes, and developer guides.           | Markdown, static assets | n/a                                       | Read and contribute documentation improvements.              | Apache-2.0 |
 | **summoner-sdk**        | Assembles an SDK from listed modules in `build.txt`.                                   | Bash, Python            | `build_sdk.sh`                            | Build your own SDK from modules. Use `setup` or `dev_setup`. | Apache-2.0 |
 | **summoner-desktop**    | Optional desktop UI for running agents and servers.                                    | Node, Electron          | repo-specific commands                    | Inspect and manage agents visually.                          | Apache-2.0 |
-| **starter-template**    | Template to author a native module that plugs into the SDK.                            | Python, Rust            | `install.sh`                              | Create and test a new module under `tooling/`.               | Apache-2.0 |
+| **extension-template**    | Template to author a native module that plugs into the SDK.                            | Python, Rust            | `install.sh`                              | Create and test a new module under `tooling/`.               | Apache-2.0 |
 | **summoner-agentclass** | Native module that adds security and orchestration features to `SummonerClient`.       | Python                  | repo-specific                             | Use DID and cryptographic envelopes in your agents.          | Apache-2.0 |
 
 > [!IMPORTANT]
@@ -74,11 +74,11 @@ source build_sdk.sh dev_setup
 **summoner-desktop**
 Desktop UI. Follow the repo README for Node prerequisites and run commands.
 
-**starter-template**
+**extension-template**
 Start a new module in `tooling/`, validate with the test server, then publish. Include your own `LICENSE` (Apache-2.0 recommended) and any `NOTICE` content.
 
 ```bash
-git clone https://github.com/Summoner-Network/starter-template my-module
+git clone https://github.com/Summoner-Network/extension-template my-module
 cd my-module
 source install.sh setup
 bash install.sh test_server

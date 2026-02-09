@@ -8,7 +8,7 @@ This page is an overview. Detailed setup and policies live in the linked reposit
 
 * Anyone can open issues for bugs, proposals, or questions.
 * Core code ([`summoner-core`](https://github.com/Summoner-Network/summoner-core) and official servers) is maintained by the internal team.
-* Extensions are community modules. Start from [`starter-template`](https://github.com/Summoner-Network/starter-template), then include your module via [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk).
+* Extensions are community modules. Start from [`extension-template`](https://github.com/Summoner-Network/extension-template), then include your module via [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk).
 
 > [!NOTE]
 > **Licensing**
