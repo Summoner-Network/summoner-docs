@@ -53,7 +53,7 @@ Create a **build.txt** that lists the sources to pull:
 **Include entire repo `tooling/` packages**
 
 ```
-https://github.com/Summoner-Network/summoner-agentclass.git
+https://github.com/Summoner-Network/extension-agentclass.git
 https://github.com/<you>/<your-module>.git
 ```
 

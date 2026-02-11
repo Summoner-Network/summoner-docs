@@ -19,7 +19,7 @@ This page gives a quick map of the pinned repositories in the Summoner organizat
 | **summoner-sdk**        | Assembles an SDK from listed modules in `build.txt`.                                   | Bash, Python            | `build_sdk.sh`                            | Build your own SDK from modules. Use `setup` or `dev_setup`. | Apache-2.0 |
 | **summoner-desktop**    | Optional desktop UI for running agents and servers.                                    | Node, Electron          | repo-specific commands                    | Inspect and manage agents visually.                          | Apache-2.0 |
 | **extension-template**    | Template to author a native module that plugs into the SDK.                            | Python, Rust            | `install.sh`                              | Create and test a new module under `tooling/`.               | Apache-2.0 |
-| **summoner-agentclass** | Native module that adds security and orchestration features to `SummonerClient`.       | Python                  | repo-specific                             | Use DID and cryptographic envelopes in your agents.          | Apache-2.0 |
+| **extension-agentclass** | Native module that adds security and orchestration features to `SummonerClient`.       | Python                  | repo-specific                             | Use DID and cryptographic envelopes in your agents.          | Apache-2.0 |
 
 > [!IMPORTANT]
 > **Licensing and scope**
@@ -84,7 +84,7 @@ source install.sh setup
 bash install.sh test_server
 ```
 
-**summoner-agentclass**
+**extension-agentclass**
 Provides DID support and cryptographic envelopes that integrate with `SummonerClient`. Use when you need secure messaging and orchestration features in your agents.
 
 > [!NOTE]

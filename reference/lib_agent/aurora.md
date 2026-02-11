@@ -10,5 +10,5 @@
 
 
 <p align="center">
-  <a href="index.md">&laquo; Previous: Agent Libraries (Intro)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../lib_proto/index.md">Next: Protocol libraries &raquo;</a>
+  <a href="index.md">&laquo; Previous: Agent Extensions</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="index.md">Next: Agent Extensions &raquo;</a>
 </p>

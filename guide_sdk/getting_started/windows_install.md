@@ -23,8 +23,8 @@ You decide which features to include by editing **`build.txt`** in your new repo
 
 > [!NOTE]
 > The template's default `build.txt` references:
-> * `summoner-agentclass` (public)
-> * ~~`summoner-smart-tools`~~ (removed and kept private for now)
+>   * [`extension-agentclass`](../../reference/lib_agent/index.md) (extends the SDK runtime)
+>   * [`extension-utilities`](../../reference/lib_utils/index.md) (provides agent tools and related utilities)
 
 <p align="center">
   <img width="320px" src="../../assets/img/summoner_arch_windows.png" />
@@ -80,7 +80,7 @@ cd <your-sdk-repo>
 Edit **`build.txt`** to list modules you want pulled into your SDK. Example:
 
 ```txt
-https://github.com/Summoner-Network/summoner-agentclass.git:
+https://github.com/Summoner-Network/extension-agentclass.git:
 aurora
 ```
 

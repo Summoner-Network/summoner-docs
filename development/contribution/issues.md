@@ -17,7 +17,7 @@ Issues are the main way to report bugs, propose features, and ask questions. Cle
 | Documentation corrections or gaps              | `summoner-docs`       |
 | SDK assembly, build recipes                    | `summoner-sdk`        |
 | Desktop application                            | `summoner-desktop`    |
-| Official agent classes and releases            | `summoner-agentclass` |
+| Official agent classes and releases            | `extension-agentclass` |
 | New module starting point or template feedback | `extension-template`    |
 
 > [!NOTE]

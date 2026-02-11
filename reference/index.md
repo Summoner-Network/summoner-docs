@@ -14,23 +14,56 @@ The Core SDK provides the runtime building blocks for agents: the client runtime
 * [<code style="background: transparent;">Summoner<b>.protocol</b></code>](sdk_doc/proto.md) → Use the protocol primitives behind flow-aware routing: define trigger trees, parse routes into typed structures, and use state tapes so agent interactions can be structured, debuggable, and replayable.
 
 
-## Agent Libraries
+## Agent Extensions
 
-Additional agent-level libraries will layer orchestration, memory, and tool integrations on top of the Core SDK.
+Client-level extensions that augment the Core SDK runtime with additional orchestration, memory, and security capabilities. These are official enhancements to the core protocol, designed for advanced agent communication and execution patterns.
 
-* **Aurora** (planned)
-  - High-level patterns for orchestration, memory, and tools.
-  - *Status:* Not yet available. This page will go live when Aurora ships.
-  - Link: [Aurora update](lib_agent/aurora.md)
+* **Aurora**
 
-## Protocol Libraries
+  * Extends the `SummonerClient` with advanced decorator-based handlers and orchestration controls.
+  * *Status:* Available for testing (pre-release).
+  * Link: [Aurora](lib_agent/aurora.md)
 
-Protocol-level extensions are defined but not actively developed at this time.
 
-* **Smart tools** (paused)
-  - Protocol-level tool calling and schema contracts.
-  - *Status:* Paused. The page remains as a placeholder.
-  - Link: [Smart tools](lib_proto/smart_tools.md)
+## Utility Extensions
+
+Protocol-level utilities that provide optional tools, helpers, and operational safeguards for agents. These extensions add capabilities without modifying the core runtime.
+
+* **Visionary**
+
+  * Visualization and state introspection tools for agent graphs and execution flow.
+  * *Status:* Stable.
+  * Link: [<code style="background: transparent;">visionary</code>](lib_utils/visionary.md)
+
+* **PDF Tools**
+
+  * Utilities for reading, parsing, and extracting structured data from PDF files.
+  * *Status:* Experimental.
+  * Link: [<code style="background: transparent;">pdf_tools</code>](lib_utils/pdf_tools.md)
+
+* **Code Tools**
+
+  * Utilities for reading, analyzing, and interpreting source code files.
+  * *Status:* In progress.
+  * Link: [<code style="background: transparent;">code_tools</code>](lib_utils/code_tools.md)
+
+* **cURL Tools**
+
+  * Utilities for parsing and interpreting `curl` commands into structured protocol calls.
+  * *Status:* In progress.
+  * Link: [<code style="background: transparent;">curl_tools</code>](lib_utils/curl_tools.md)
+
+* **LLM Guardrails**
+
+  * Cost control and safety utilities for managing LLM usage and execution constraints.
+  * *Status:* Experimental.
+  * Link: [<code style="background: transparent;">llm_guardrails</code>](lib_utils/llm_guardrails.md)
+
+* **Crypto Utils**
+
+  * Cryptographic helpers for signing, verification, and secure protocol interactions.
+  * *Status:* Experimental.
+  * Link: [<code style="background: transparent;">crypto_utils</code>](lib_utils/crypto_utils.md)
 
 
 <p align="center">

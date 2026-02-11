@@ -63,12 +63,12 @@ This page is an overview. Detailed setup and policies live in the linked reposit
 
 ## Releases in brief
 
-Official updates focus on [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass) and sometimes the [desktop app](https://github.com/Summoner-Network/summoner-desktop). The core server and core SDK evolve on their own cadence. Each agentclass release is kept in its own folder, so you can move forward or pin to an earlier behavior. See [**Summoner updates and extensions**](infrastructure/summoner_ext.md) for version selection and feature proposals.
+Official updates focus on [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass) and sometimes the [desktop app](https://github.com/Summoner-Network/summoner-desktop). The core server and core SDK evolve on their own cadence. Each agentclass release is kept in its own folder, so you can move forward or pin to an earlier behavior. See [**Summoner updates and extensions**](infrastructure/summoner_ext.md) for version selection and feature proposals.
 
 ## Working expectations
 
 Provide a minimal, self-contained reproduction (small steps or a short script) that reliably triggers a bug. For changes that affect behavior, open a design issue first and link any prototype or module. Avoid secrets in code or logs and respect virtual environments.
 
 <p align="center">
-  <a href="../reference/lib_proto/smart_tools.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.smart_tools</b></code></a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="infrastructure/index.md">Next: Development and Infrastructure &raquo;</a>
+  <a href="../reference/lib_utils/index.md">&laquo; Previous: Utility Extensions</b></code></a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="infrastructure/index.md">Next: Development and Infrastructure &raquo;</a>
 </p>

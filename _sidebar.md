@@ -25,8 +25,8 @@
 - Reference
   - [Overview](/reference/index)
   - [Core SDK](/reference/sdk_doc/index)
-  - [Agent libraries](/reference/lib_agent/index)
-  - [Protocol libraries](/reference/lib_proto/index)
+  - [Agent Extensions](/reference/lib_agent/index)
+  - [Utility Extensions](/reference/lib_utils/index)
 
 - Development
   - [Overview](/development/index)

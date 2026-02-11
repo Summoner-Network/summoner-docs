@@ -11,7 +11,7 @@
 
 
 
-<!-- We need agent libraries but explain how the ID can just be modeled by using hooks
+<!-- We need agent extensions but explain how the ID can just be modeled by using hooks
 
 Implement without ID and then use aurora. -->
 

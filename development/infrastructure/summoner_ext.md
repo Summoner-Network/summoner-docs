@@ -5,20 +5,20 @@ Summoner grows along two tracks. Official releases that advance our **SummonerAg
 > [!IMPORTANT]
 > **Where releases land**
 >
-> * Primary focus is the `summoner-agentclass` repository: [https://github.com/Summoner-Network/summoner-agentclass](https://github.com/Summoner-Network/summoner-agentclass).
+> * Primary focus is the `extension-agentclass` repository: [https://github.com/Summoner-Network/extension-agentclass](https://github.com/Summoner-Network/extension-agentclass).
 > * Some releases target the Desktop app.
 > * The core server and the core SDK evolve steadily in parallel. Their cadence is independent from agentclass releases.
 
 ## Official releases and version selection
 
-Each **SummonerAgent** release is preserved as its own folder inside `summoner-agentclass`. This lets you move forward to the latest agent behavior or pin to an earlier one.
+Each **SummonerAgent** release is preserved as its own folder inside `extension-agentclass`. This lets you move forward to the latest agent behavior or pin to an earlier one.
 
 * You always have access to the latest **core server** and **core client** code.
-* To return to a previous agentclass implementation, choose the matching release folder in `summoner-agentclass`.
+* To return to a previous agentclass implementation, choose the matching release folder in `extension-agentclass`.
 
 ```bash
-git clone https://github.com/Summoner-Network/summoner-agentclass
-cd summoner-agentclass
+git clone https://github.com/Summoner-Network/extension-agentclass
+cd extension-agentclass
 # Explore historical agentclass releases
 ls releases/
 # Use a specific release folder (example placeholder)
@@ -70,7 +70,7 @@ cd summoner-sdk
 
 # declare modules to include
 cat > build.txt <<'EOF'
-summoner-agentclass
+extension-agentclass
 <your-org>/<your-module>@main
 EOF
 

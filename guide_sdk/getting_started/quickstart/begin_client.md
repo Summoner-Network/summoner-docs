@@ -16,7 +16,7 @@ However, a client focuses on messaging and orchestration primitives; it does not
 * An *agent class* **subclasses** `SummonerClient` and adds features such as cryptographic envelopes, handshake logic, DID utilities, SummonerAPI helpers, and orchestration helpers. You are free to design your own agent class for your project.
 
 > [!NOTE]
-> A **reference agent class** will ship with the **Aurora** update (via [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass)). It provides an opinionated baseline for orchestration: message signing and verification, handshake scaffolding, DID utilities, policy-driven validation, and route/flow helpers. Use it as a ready-made starting point if you prefer not to build these pieces yourself.
+> A **reference agent class** will ship with the **Aurora** update (via [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass)). It provides an opinionated baseline for orchestration: message signing and verification, handshake scaffolding, DID utilities, policy-driven validation, and route/flow helpers. Use it as a ready-made starting point if you prefer not to build these pieces yourself.
 
 
 ## Running a client
@@ -174,7 +174,7 @@ agent.run(host="127.0.0.1", port=8888)
 With an empty subclass of `SummonerClient` as above, the output is the same as the base client; the difference is you now have a place to attach **handlers** and **hooks**.
 
 > [!NOTE]
-> Our upcoming `SummonerAgent` class (coming soon in our **Aurora** update) will propose what we think should be a solid baseline for agent-to-agent communication. The module will be available via [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass) and can be installed alongside the SDK. You can continue to build your own agent classes; this reference class is meant to save time for common orchestration needs.
+> Our upcoming `SummonerAgent` class (coming soon in our **Aurora** update) will propose what we think should be a solid baseline for agent-to-agent communication. The module will be available via [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass) and can be installed alongside the SDK. You can continue to build your own agent classes; this reference class is meant to save time for common orchestration needs.
 
 ## Building interactive agents
 

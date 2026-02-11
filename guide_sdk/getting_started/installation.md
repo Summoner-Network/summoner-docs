@@ -6,7 +6,7 @@ This script-based approach is consistent across key components of the platform, 
 
 * [`summoner-desktop`](https://github.com/Summoner-Network/summoner-desktop): the Electron-based desktop app
 * [`summoner-core`](https://github.com/Summoner-Network/summoner-core): the core logic of the SDK
-* [`summoner-agentclass`](https://github.com/Summoner-Network/summoner-agentclass): agent extensions and features
+* [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass): agent extensions and features
 
 Each of these repositories contains its own `setup.sh`, `install.sh` or build script, and these scripts **chain together** during installation. For example, installing the SDK via `summoner-desktop` will trigger the `summoner-sdk` script, which in turn calls the setup scripts from `summoner-core` and any modules specified in `build.txt`.
 
@@ -25,8 +25,10 @@ You then customize your new SDK by editing the `build.txt` file to specify which
 
 > [!NOTE]
 > The default `build.txt` in the template includes:
->   * `summoner-agentclass` (public)
->   * ~~`summoner-smart-tools`~~ (removed and kept private for now)
+>   * [`extension-agentclass`](../../reference/lib_agent/index.md) (extends the SDK runtime)
+>   * [`extension-utilities`](../../reference/lib_utils/index.md) (provides agent tools, visualization, protocol helpers, and related utilities)
+
+
 
 A best practice is to only publish new code or features specific to your SDK, and keep the actual installation logic clean and declarative through `build.txt`. For example, [`summoner-agents`](https://github.com/Summoner-Network/summoner-agents) is built from this template and contains only agent code — the SDK is installed via `build_sdk.sh` based on its own `build.txt`.
 
@@ -125,10 +127,10 @@ cd <your_repo>
 
 ### Step 2: Define the SDK in `build.txt`
 
-Edit the `build.txt` file to include the modules you want. For example, to include the `aurora` agent module from `summoner-agentclass`:
+Edit the `build.txt` file to include the modules you want. For example, to include the `aurora` agent module from `extension-agentclass`:
 
 ```txt
-https://github.com/Summoner-Network/summoner-agentclass.git:
+https://github.com/Summoner-Network/extension-agentclass.git:
 aurora
 ```
 
