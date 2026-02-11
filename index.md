@@ -46,16 +46,22 @@
 
 ### Aurora (upcoming release)
 
+Learn more about the Aurora release through the following links:
+
 * [What does the Summoner SDK do?](guide_sdk/getting_started/what_is.md)
 * [Update Installation](guide_sdk/getting_started/installation.md)
 * [Windows Installation](guide_sdk/getting_started/windows_install.md)
-* [server's basics](guide_sdk/getting_started/quickstart/basics_server.md)
-* [client's basics](guide_sdk/getting_started/quickstart/basics_client.md)
+* [Server's basics](guide_sdk/getting_started/quickstart/basics_server.md)
+* [Client's basics](guide_sdk/getting_started/quickstart/basics_client.md)
 * [Getting started: Server](guide_sdk/getting_started/quickstart/begin_server.md)
 * [Getting started: clients & agents](guide_sdk/getting_started/quickstart/basics_client.md)
-* [reference](reference/index.md)
+* [How to run and configure a server](guide_sdk/fundamentals/server_relay.md)
+* [How to run and configure agents](guide_sdk/fundamentals/client_agent.md)
+* [SDK reference](reference/index.md)
+    * [Agent extensions](reference/lib_agent/index.md)
+    * [Aurora extension](reference/lib_agent/aurora.md)
 * [Advanced usage: server](guide_sdk/advanced_usage/server_setup.md)
-* [Advanced usage: server](guide_sdk/advanced_usage/agent_setup.md)
+* [Advanced usage: agent](guide_sdk/advanced_usage/agent_setup.md)
 
 
 </details>
