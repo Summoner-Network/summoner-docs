@@ -18,7 +18,7 @@ During local development, import from `tooling.*`:
 
 ```python
 from tooling.visionary import ClientFlowVisualizer
-````
+```
 
 During SDK composition, the builder copies `tooling/<module>/` into `summoner/<module>/` and rewrites imports of the form `from tooling.<module> ...` into the public namespace:
 
@@ -31,9 +31,9 @@ from summoner.visionary import ClientFlowVisualizer
 > Composition happens in an SDK project via `build.txt`.
 
 
-## Installing utilities in an extension-template workflow
+## Installing modules in an extension-template workflow
 
-In an extension-template project, you include utilities by adding them to `build.txt`. Each entry points at the `extension-utilities` repo plus the module name to merge during SDK composition.
+In an `extension-template` project, you include a module by adding it to `build.txt`. Each entry specifies the extension repository and the module name to merge during SDK composition.
 
 Minimal pattern:
 

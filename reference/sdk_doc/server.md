@@ -30,7 +30,7 @@ server.run(
     port=8888,
     config_path="server.json",   # or pass config_dict={...}
 )
-````
+```
 
 > [!TIP]
 > Start with `config_dict` while iterating locally, then move the exact same structure into a JSON file and use `config_path` for reproducible deployments.

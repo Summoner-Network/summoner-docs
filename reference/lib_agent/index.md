@@ -18,7 +18,7 @@ During local development, import from `tooling.*`:
 
 ```python
 from tooling.aurora import AuroraClient
-````
+```
 
 During SDK composition, the builder copies `tooling/<module>/` into `summoner/<module>/` and rewrites imports of the form `from tooling.<module> ...` into the public namespace:
 
@@ -29,6 +29,33 @@ from summoner.aurora import AuroraClient
 > [!NOTE]
 > In the repository, the script `install.sh setup` boots a dev environment and installs `summoner-core`. It does not compose a new SDK.
 > Composition happens in an SDK project via `build.txt`.
+
+## Installing utilities in an extension-template workflow
+
+In an `extension-template` project, you include a module by adding it to `build.txt`. Each entry specifies the extension repository and the module name to merge during SDK composition.
+
+Minimal pattern:
+
+```text
+https://github.com/Summoner-Network/extension-agentclass.git:
+<module_name>
+```
+
+Example:
+
+```text
+https://github.com/Summoner-Network/extension-agentclass.git:
+aurora
+```
+
+After composition, you import from the `summoner.*` namespace:
+
+```python
+from summoner.aurora import SummonerAgent
+```
+
+> [!NOTE]
+> Inside the `extension-agentclass` repository itself, local tests may import modules directly from the repo layout (for example `from tooling.aurora import ...`). For normal SDK usage, always import from `summoner.<module>`.
 
 ## Aurora
 
