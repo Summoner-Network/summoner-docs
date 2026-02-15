@@ -3,7 +3,7 @@
 > [!CAUTION]
 > This reference is still being refined as naming and semantics settle. The Core SDK is usable for day-to-day development, but some sections may change as we finalize stability guarantees. For walkthroughs and end-to-end examples, see the **[Summoner SDK Guides](../guide_sdk/index.md)**.
 
-## Core SDK
+## [Core SDK](sdk_doc/index.md)
 
 The Core SDK provides the runtime building blocks for agents: the client runtime, the relay server, and the protocol primitives.
 
@@ -14,7 +14,7 @@ The Core SDK provides the runtime building blocks for agents: the client runtime
 * [<code style="background: transparent;">Summoner<b>.protocol</b></code>](sdk_doc/proto.md) → Use the protocol primitives behind flow-aware routing: define trigger trees, parse routes into typed structures, and use state tapes so agent interactions can be structured, debuggable, and replayable.
 
 
-## Agent Extensions
+## [Agent Extensions](lib_agent/index.md)
 
 Client-level extensions that augment the Core SDK runtime with additional orchestration, memory, and security capabilities. These are official enhancements to the core protocol, designed for advanced agent communication and execution patterns.
 
@@ -25,7 +25,7 @@ Client-level extensions that augment the Core SDK runtime with additional orches
   * Link: [Aurora](lib_agent/aurora.md)
 
 
-## Utility Extensions
+## [Utility Extensions](lib_utils/index.md)
 
 Protocol-level utilities that provide optional tools, helpers, and operational safeguards for agents. These extensions add capabilities without modifying the core runtime.
 
