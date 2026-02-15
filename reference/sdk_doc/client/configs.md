@@ -100,7 +100,7 @@ If `port` is not provided (or set to `null`), the client uses the `port` argumen
 
 ## Logger
 
-Logging is how the client answers basic operational questions such as: “Did I connect?”, “Why am I reconnecting?”, “Which hook failed?”, “Are my senders crashing?”, and “Is backpressure building inside the client runtime?”
+Logging is how the client answers basic operational questions such as: "Did I connect?", "Why am I reconnecting?", "Which hook failed?", "Are my senders crashing?", and "Is backpressure building inside the client runtime?"
 
 ### What the client logger emits
 
@@ -109,7 +109,7 @@ The client commonly logs:
 * connection success and clean disconnects
 * retry attempts and fallback transitions (primary target to default target)
 * failures in hooks (receive/send hook exceptions are logged and the payload is preserved)
-* sender worker crashes (with a configurable “consecutive crash” threshold)
+* sender worker crashes (with a configurable "consecutive crash" threshold)
 * queue pressure warnings (for example, when the send queue is close to full)
 * parsing warnings when flow is enabled and a route fails to parse at registration time
 
@@ -196,7 +196,7 @@ If omitted, it defaults to `3`.
 
 Config path: `hyper_parameters.reconnection.primary_retry_limit`.
 
-The client starts in a “Primary” stage. If it cannot maintain a session, it retries up to this limit.
+The client starts in a "Primary" stage. If it cannot maintain a session, it retries up to this limit.
 
 #### Default if omitted
 
@@ -257,7 +257,7 @@ If omitted, it defaults to the value of top-level `port` (which may itself be `n
 
 Config path: `hyper_parameters.reconnection.default_retry_limit`.
 
-After the primary stage fails, the client enters a “Default” stage and retries up to this limit.
+After the primary stage fails, the client enters a "Default" stage and retries up to this limit.
 
 #### Default if omitted
 
@@ -428,7 +428,7 @@ If omitted, it defaults to `true`.
 
 Config path: `hyper_parameters.sender.event_bridge_maxsize`.
 
-When flow-aware routing is enabled, receiver batches can produce events that trigger reactive senders. Those events are passed through an internal queue (the “event bridge”). If the bridge is full, the receiver side blocks, which slows input processing and applies backpressure.
+When flow-aware routing is enabled, receiver batches can produce events that trigger reactive senders. Those events are passed through an internal queue (the "event bridge"). If the bridge is full, the receiver side blocks, which slows input processing and applies backpressure.
 
 #### Default if omitted
 

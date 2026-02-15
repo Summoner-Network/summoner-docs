@@ -10,5 +10,5 @@
 
 
 <p align="center">
-  <a href="llm_guardrails.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.llm_guardrails</b></code></a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="index.md">Next: Utility Extensions &raquo;</a>
+  <a href="gpt_guardrails.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.gpt_guardrails</b></code></a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="index.md">Next: Utility Extensions &raquo;</a>
 </p>

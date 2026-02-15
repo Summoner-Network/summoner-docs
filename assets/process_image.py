@@ -45,5 +45,5 @@ def round_corners_with_border(input_path, output_path, radius=50, border_size=10
 #                                       ]]:
 #     round_corners_with_border(f"{s}.png", f"{s}_rounded.png", radius=50, border_size=4)
 
-for s in [f"assets/img/{s}" for s in ["summoner_user"]]:
-    round_corners_with_border(f"{s}.png", f"{s}_rounded.png", radius=180, border_size=4)
+for s in [f"assets/img/{s}" for s in ["visionary_example"]]:
+    round_corners_with_border(f"{s}.png", f"{s}_rounded.png", radius=18, border_size=4)

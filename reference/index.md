@@ -57,7 +57,7 @@ Protocol-level utilities that provide optional tools, helpers, and operational s
 
   * Cost control and safety utilities for managing LLM usage and execution constraints.
   * *Status:* Experimental.
-  * Link: [<code style="background: transparent;">llm_guardrails</code>](lib_utils/llm_guardrails.md)
+  * Link: [<code style="background: transparent;">gpt_guardrails</code>](lib_utils/gpt_guardrails.md)
 
 * **Crypto Utils**
 

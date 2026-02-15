@@ -127,7 +127,7 @@ Learn more about the Aurora release through the following links:
         - [<code style="background: transparent;">Summoner<b>.pdf_tools</b></code>](reference/lib_utils/pdf_tools.md)
         - [<code style="background: transparent;">Summoner<b>.code_tools</b></code>](reference/lib_utils/code_tools.md)
         - [<code style="background: transparent;">Summoner<b>.curl_tools</b></code>](reference/lib_utils/curl_tools.md)
-        - [<code style="background: transparent;">Summoner<b>.llm_guardrails</b></code>](reference/lib_utils/llm_guardrails.md)
+        - [<code style="background: transparent;">Summoner<b>.gpt_guardrails</b></code>](reference/lib_utils/gpt_guardrails.md)
         - [<code style="background: transparent;">Summoner<b>.crypto_utils</b></code>](reference/lib_utils/crypto_utils.md)
 
 - [**🔧 Developer & Contribution**](development/index.md)
