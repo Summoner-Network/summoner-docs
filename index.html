@@ -123,6 +123,15 @@
       display: inline-block;
     }
     */
+
+    /* Normalize the right-side "current page" section list marker across themes */
+    .app-sub-sidebar li::before {
+      content: "-" !important;
+      padding-right: 4px;
+      float: left;
+      opacity: 0.65; /* optional: matches the subtle look in light mode */
+    }
+
   </style>
 </head>
 <body>
@@ -136,6 +145,8 @@
       subMaxLevel: 2,
       homepage: 'index.md',
       relativePath: true,
+
+      auto2top: true,
 
       'flexible-alerts': {
         style: 'callout'
