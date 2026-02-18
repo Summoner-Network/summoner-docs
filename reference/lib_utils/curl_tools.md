@@ -128,81 +128,166 @@ Fail-fast behavior:
 
 This prevents partially-formed requests from silently executing.
 
-## `SecretResolver`
+## `SecretResolver.__init__`
 
 ```python
-class SecretResolver:
-    def __init__(
-        self,
-        mapping: Optional[Mapping[str, str]] = None,
-        fallback: Optional[Callable[[str], Optional[str]]] = None,
-        auto_dotenv: bool = False,
-        dotenv_path: Optional[str] = None,
-        dotenv_override: bool = False,
-    ):
-        ...
+def __init__(
+    self,
+    mapping: Optional[Mapping[str, str]] = None,
+    fallback: Optional[Callable[[str], Optional[str]]] = None,
+    auto_dotenv: bool = False,
+    dotenv_path: Optional[str] = None,
+    dotenv_override: bool = False,
+) -> None
 ```
 
 ### Behavior
 
-Resolves secrets using the following order:
+Creates a secret resolver with a fixed resolution order:
 
 1. explicit `mapping` passed at construction time
 2. `os.environ`
 3. optional `fallback(name)` callable
 
-If `auto_dotenv=True`, it loads environment variables via `dotenv.load_dotenv(...)` during initialization.
+If `auto_dotenv=True`, the constructor loads environment variables via `dotenv.load_dotenv(...)`.
 
-### `SecretResolver.get`
+### Inputs
 
-```python
-def get(self, name: str) -> Optional[str]
-```
+#### `mapping`
 
-Returns the secret value or `None` if unavailable.
+* **Type:** `Optional[Mapping[str, str]]`
+* **Meaning:** Explicit secret mapping used as the highest-precedence source.
+* **Default:** `None` (treated as empty)
 
-### `SecretResolver.require`
+#### `fallback`
 
-```python
-def require(self, name: str) -> str
-```
+* **Type:** `Optional[Callable[[str], Optional[str]]]`
+* **Meaning:** Optional callable used when a name is missing from both `mapping` and `os.environ`.
+* **Default:** `None`
 
-Returns the secret value or raises a `KeyError` if unavailable.
+#### `auto_dotenv`
 
-### Example
+* **Type:** `bool`
+* **Meaning:** If `True`, loads `.env` variables during initialization.
+* **Default:** `False`
+
+#### `dotenv_path`
+
+* **Type:** `Optional[str]`
+* **Meaning:** Optional path passed to `load_dotenv(...)`.
+* **Default:** `None`
+
+#### `dotenv_override`
+
+* **Type:** `bool`
+* **Meaning:** Whether `.env` values override existing `os.environ`.
+* **Default:** `False`
+
+### Outputs
+
+This constructor returns a `SecretResolver` instance.
+
+### Examples
+
+#### Load `.env` and require a token
 
 ```python
 secrets = SecretResolver(auto_dotenv=True)
 token = secrets.require("HUBSPOT_TOKEN")
 ```
 
-## `HttpRequestSpec`
+## `SecretResolver.get`
 
 ```python
-@dataclass
-class HttpRequestSpec:
-    method: HttpMethod
-    url: str
-    headers: dict[str, str] = field(default_factory=dict)
-    params: dict[str, str] = field(default_factory=dict)
-    body: Optional[Any] = None
-
-    body_mode: BodyMode = "json"
-    auth: Optional[BasicAuthSpec] = None
-
-    timeout_s: Optional[float] = 30.0
-    follow_redirects: bool = False
-    verify_tls: bool = True
-
-    description: Optional[str] = None
-
-    input_model: Optional[Type[BaseModel]] = None
-    output_model: Optional[Type[BaseModel]] = None
+def get(self, name: str) -> Optional[str]
 ```
 
 ### Behavior
 
-`HttpRequestSpec` is the full, deterministic request description consumed by `HttpTool`. It is intentionally close to the inputs of `httpx.AsyncClient.request(...)`, but keeps a stable structure that can be persisted and reloaded.
+Returns the resolved secret value, or `None` if no source provides it.
+
+Resolution order:
+
+1. `mapping`
+2. `os.environ`
+3. `fallback(name)` if provided
+
+### Inputs
+
+#### `name`
+
+* **Type:** `str`
+* **Meaning:** Secret name to resolve.
+
+### Outputs
+
+Returns `Optional[str]`.
+
+### Examples
+
+```python
+token = secrets.get("HUBSPOT_TOKEN")
+if token is None:
+    raise RuntimeError("Missing token")
+```
+
+## `SecretResolver.require`
+
+```python
+def require(self, name: str) -> str
+```
+
+### Behavior
+
+Returns the resolved secret value.
+
+If the secret is unavailable, raises:
+
+* `KeyError(f"Missing required secret: {name}")`
+
+### Inputs
+
+#### `name`
+
+* **Type:** `str`
+* **Meaning:** Secret name to resolve.
+
+### Outputs
+
+Returns `str`.
+
+### Examples
+
+```python
+token = secrets.require("HUBSPOT_TOKEN")
+```
+
+## `HttpRequestSpec.__init__`
+
+```python
+def __init__(
+    self,
+    method: HttpMethod,
+    url: str,
+    headers: dict[str, str] = ...,
+    params: dict[str, str] = ...,
+    body: Optional[Any] = None,
+    body_mode: BodyMode = "json",
+    auth: Optional[BasicAuthSpec] = None,
+    timeout_s: Optional[float] = 30.0,
+    follow_redirects: bool = False,
+    verify_tls: bool = True,
+    description: Optional[str] = None,
+    input_model: Optional[Type[BaseModel]] = None,
+    output_model: Optional[Type[BaseModel]] = None,
+) -> None
+```
+
+### Behavior
+
+Creates a deterministic HTTP request specification consumed by `HttpTool`.
+
+The spec is intentionally close to the arguments accepted by `httpx.AsyncClient.request(...)`, but keeps a stable structure that can be persisted and reloaded.
 
 It describes:
 
@@ -212,84 +297,162 @@ It describes:
 * how to control transport behavior (`timeout_s`, `follow_redirects`, `verify_tls`)
 * optional metadata and validation (`description`, `input_model`, `output_model`)
 
-**Body conventions:**
-
-The meaning of `body` depends on `body_mode`:
+Body conventions:
 
 * `body_mode="json"`
 
-  * If `body` is a `dict` or `list`, it is sent via `httpx` as JSON (`json=...`).
-  * If `body` is a `str`, it is sent as raw `content` (useful when you already have a JSON string).
+  * if `body` is a `dict` or `list`, it is sent as JSON
+  * if `body` is a `str`, it is sent as raw `content`
 
 * `body_mode="form"`
 
-  * `body` may be a `dict`, a `list[tuple[str, str]]`, or a raw string like `"a=1&b=2"`.
-  * The runtime encodes the body as `application/x-www-form-urlencoded`.
+  * `body` may be a `dict`, a `list[tuple[str, str]]`, or a raw string like `"a=1&b=2"`
+  * the runtime encodes the body as `application/x-www-form-urlencoded`
 
 * `body_mode="raw"`
 
-  * `body` is sent as raw `content`.
-  * If `body` is a `dict` or `list`, it is stringified using `json.dumps(...)` first.
+  * `body` is sent as raw `content`
+  * if `body` is a `dict` or `list`, it is stringified using `json.dumps(...)` first
 
-### `HttpRequestSpec.to_dict`
+### Inputs
+
+#### `method`
+
+* **Type:** `HttpMethod`
+* **Meaning:** HTTP method used for the request.
+
+#### `url`
+
+* **Type:** `str`
+* **Meaning:** Endpoint URL. May include `{{env:...}}` and `{{var}}` placeholders.
+
+#### `headers`
+
+* **Type:** `dict[str, str]`
+* **Meaning:** Request headers after templating.
+* **Default:** `{}`
+
+#### `params`
+
+* **Type:** `dict[str, str]`
+* **Meaning:** Query parameters after templating.
+* **Default:** `{}`
+
+#### `body`
+
+* **Type:** `Optional[Any]`
+* **Meaning:** Request body payload. Interpreted according to `body_mode`.
+* **Default:** `None`
+
+#### `body_mode`
+
+* **Type:** `BodyMode`
+* **Meaning:** Body encoding mode (`"json"`, `"form"`, `"raw"`).
+* **Default:** `"json"`
+
+#### `auth`
+
+* **Type:** `Optional[BasicAuthSpec]`
+* **Meaning:** Optional basic auth credentials.
+* **Default:** `None`
+
+#### `timeout_s`
+
+* **Type:** `Optional[float]`
+* **Meaning:** Timeout in seconds passed to `httpx`.
+* **Default:** `30.0`
+
+#### `follow_redirects`
+
+* **Type:** `bool`
+* **Meaning:** Whether redirects are followed by `httpx`.
+* **Default:** `False`
+
+#### `verify_tls`
+
+* **Type:** `bool`
+* **Meaning:** Whether TLS certificates are verified by `httpx`.
+* **Default:** `True`
+
+#### `description`
+
+* **Type:** `Optional[str]`
+* **Meaning:** Optional human-readable description stored on the spec.
+* **Default:** `None`
+
+#### `input_model`
+
+* **Type:** `Optional[Type[BaseModel]]`
+* **Meaning:** Optional Pydantic model used to validate inputs before templating.
+* **Default:** `None`
+
+#### `output_model`
+
+* **Type:** `Optional[Type[BaseModel]]`
+* **Meaning:** Optional Pydantic model used to validate JSON responses when possible.
+* **Default:** `None`
+
+### Outputs
+
+This constructor returns an `HttpRequestSpec` instance.
+
+## `HttpRequestSpec.to_dict`
 
 ```python
 def to_dict(self, *, include_models: bool = False) -> dict[str, Any]
 ```
 
-#### Behavior
+### Behavior
 
-Returns a JSON-safe snapshot of the spec. This is the representation intended for persistence (for example, writing to disk), and it is the format that `CurlToolCompiler.request_schema_from_dict(...)` expects.
+Returns a JSON-safe snapshot of the spec intended for persistence and later rehydration via `CurlToolCompiler.request_schema_from_dict(...)`.
 
-Serialization rules are best-effort:
+Serialization is best-effort:
 
-* tuples become lists (JSON cannot represent tuples)
+* tuples become lists
 * dataclasses become dict-like structures
 * objects that are not JSON-friendly are stringified
 * `input_model` and `output_model` are omitted by default
 
-If `include_models=True`, the function stores best-effort import paths for `input_model` and `output_model`. Rehydration of models is intentionally not automatic.
+If `include_models=True`, the snapshot includes best-effort import paths for `input_model` and `output_model`. Model rehydration is intentionally not automatic.
 
-#### Outputs
+### Inputs
+
+#### `include_models`
+
+* **Type:** `bool`
+* **Meaning:** Whether to include best-effort model import paths in the snapshot.
+* **Default:** `False`
+
+### Outputs
 
 Returns a JSON-safe `dict[str, Any]`.
 
-### `HttpRequestSpec.to_request_schema_kwargs` (not exposed)
+## `HttpRequestSpec.to_request_schema_kwargs`
 
 ```python
 def to_request_schema_kwargs(self) -> dict[str, Any]
 ```
 
-#### Behavior
+### Behavior
 
-Returns a Python-native kwargs dict suitable for rebuilding the tool through:
+Returns Python-native kwargs suitable for rebuilding a tool through:
 
 ```python
-compiler.request_schema(**kwargs)
+tool2 = compiler.request_schema(**kwargs)
 ```
 
-This is a convenience when you want to "round-trip" a spec without going through JSON serialization (so tuples, dataclasses, and model types can remain intact).
+This is a round-trip convenience when you do not want JSON serialization to coerce types. For example, tuple pairs in form bodies and Pydantic model types remain intact.
 
 Important distinction:
 
-* `to_request_schema_kwargs()` returns Python-native values (may include `BasicAuthSpec`, tuple pairs in form bodies, and Pydantic model types).
-* `to_dict()` returns JSON-safe values (tuples become lists, models are omitted by default).
+* `to_request_schema_kwargs()` returns Python-native values
+* `to_dict()` returns JSON-safe values
 
-The returned dict includes all fields accepted by `CurlToolCompiler.request_schema(...)`:
-
-* `method`, `url`
-* `headers`, `params`
-* `body`, `body_mode`
-* `auth`
-* `timeout_s`, `follow_redirects`, `verify_tls`
-* `description`
-* `input_model`, `output_model`
-
-#### Outputs
+### Outputs
 
 Returns a `dict[str, Any]` intended to be passed directly into `CurlToolCompiler.request_schema(...)`.
 
-#### Example
+### Examples
 
 ```python
 compiler = CurlToolCompiler()
@@ -303,28 +466,57 @@ tool = compiler.request_schema(
 )
 
 kwargs = tool.spec.to_request_schema_kwargs()
-
 tool2 = compiler.request_schema(**kwargs)
+
 report = await tool2.call({})
 ```
 
-
-## `HttpTool`
+## `HttpTool.__init__`
 
 ```python
-class HttpTool:
-    def __init__(self, spec: HttpRequestSpec, secrets: Optional[SecretResolver] = None): ...
-    def to_dict(self, *, include_models: bool = False) -> dict[str, Any]: ...
-    async def call(self, inputs: Optional[dict[str, Any]] = None) -> ToolCallReport: ...
+def __init__(self, spec: HttpRequestSpec, secrets: Optional[SecretResolver] = None) -> None
 ```
 
-### `HttpTool.call`
+### Behavior
+
+Creates an async callable tool around a fixed `HttpRequestSpec`.
+
+* Stores the request spec on `self.spec`.
+* Stores a `SecretResolver` on `self.secrets`. If none is provided, a default resolver is created.
+
+This constructor does not execute any request. Execution happens only when you call `await tool.call(...)`.
+
+### Inputs
+
+#### `spec`
+
+* **Type:** `HttpRequestSpec`
+* **Meaning:** Deterministic request description executed by this tool.
+
+#### `secrets`
+
+* **Type:** `Optional[SecretResolver]`
+* **Meaning:** Resolver used to satisfy `{{env:NAME}}` placeholders at runtime.
+* **Default behavior:** If not provided, a default `SecretResolver()` is created.
+
+### Outputs
+
+This constructor returns an `HttpTool` instance.
+
+### Examples
+
+```python
+compiler = CurlToolCompiler()
+tool = compiler.parse(curl_text)
+```
+
+## `HttpTool.call`
 
 ```python
 async def call(self, inputs: Optional[dict[str, Any]] = None) -> ToolCallReport
 ```
 
-#### Behavior
+### Behavior
 
 Executes the request and returns a `ToolCallReport`.
 
@@ -332,12 +524,12 @@ Steps:
 
 1. If `spec.input_model` exists, validates `inputs` via Pydantic and replaces `inputs` with the validated dump.
 2. Renders templates in URL, headers, params, and body.
-3. Applies Basic Auth if `spec.auth` is set (after template rendering).
+3. Applies Basic Auth if `spec.auth` is set, after template rendering.
 4. Applies default `Content-Type` based on `body_mode` if missing.
 5. Sends the HTTP request via `httpx.AsyncClient`.
-6. Attempts JSON parsing if `content-type` includes `application/json`.
-7. If `spec.output_model` exists, validates `response_json` and sets validation fields.
-8. Returns a report with `ok`, `status_code`, `elapsed_ms`, and parsed response fields.
+6. Attempts JSON parsing when the response `content-type` includes `application/json`.
+7. If `spec.output_model` exists, validates `response_json` and fills validation fields.
+8. Returns a report with request summary, status, timing, and parsed response fields.
 
 Request error behavior:
 
@@ -347,28 +539,19 @@ Request error behavior:
   * `status_code=0`
   * `response_text="Request error: ..."`
 
-#### Inputs
+### Inputs
 
-`inputs` is used only for templating and optional input model validation.
+#### `inputs`
 
-#### Outputs
+* **Type:** `Optional[dict[str, Any]]`
+* **Meaning:** Runtime values used to render `{{var}}` placeholders, and optionally validated by `spec.input_model`.
+* **Default:** `None` (treated as empty dict)
 
-Returns a `ToolCallReport`:
+### Outputs
 
-```python
-@dataclass
-class ToolCallReport:
-    ok: bool
-    status_code: int
-    elapsed_ms: int
-    request: dict[str, Any]
-    response_text: Optional[str] = None
-    response_json: Optional[Any] = None
-    output_validation_ok: Optional[bool] = None
-    output_validation_error: Optional[str] = None
-```
+Returns a `ToolCallReport` instance.
 
-### Example
+### Examples
 
 #### Call a JSON tool
 
@@ -401,21 +584,23 @@ report = await tool.call({})
 assert report.status_code in (200, 400)
 ```
 
-### `HttpTool.to_dict`
+## `HttpTool.to_dict`
 
 ```python
 def to_dict(self, *, include_models: bool = False) -> dict[str, Any]
 ```
 
-#### Behavior
+### Behavior
 
-Returns a JSON-safe snapshot of the underlying `HttpRequestSpec`. This is a convenience wrapper around:
+Returns a JSON-safe snapshot of the underlying `HttpRequestSpec`.
+
+This is a convenience wrapper around:
 
 ```python
 tool.spec.to_dict(include_models=include_models)
 ```
 
-This snapshot is intended for deterministic persistence and later rehydration using:
+The snapshot is intended for deterministic persistence and later rehydration using:
 
 ```python
 tool2 = compiler.request_schema_from_dict(spec_dict)
@@ -423,31 +608,128 @@ tool2 = compiler.request_schema_from_dict(spec_dict)
 
 Model handling:
 
-* `input_model` and `output_model` are omitted by default because model types are not robust to serialize.
-* If `include_models=True`, the snapshot includes best-effort import paths for `input_model` and `output_model`. Rehydration of model types is intentionally not automatic.
+* `input_model` and `output_model` are omitted by default
+* if `include_models=True`, the snapshot includes best-effort import paths for `input_model` and `output_model`
+* model rehydration is intentionally not automatic
 
-#### Example
+### Inputs
+
+#### `include_models`
+
+* **Type:** `bool`
+* **Meaning:** Whether to include best-effort model import paths.
+* **Default:** `False`
+
+### Outputs
+
+Returns a JSON-safe `dict[str, Any]`.
+
+### Examples
 
 ```python
-compiler = CurlToolCompiler()
-tool = compiler.parse(curl_text)
-
 spec_dict = tool.to_dict()
-# Persist spec_dict as JSON, then later:
 tool2 = compiler.request_schema_from_dict(spec_dict)
-
 report = await tool2.call({"response_id": "resp_..."})
 ```
 
-## `CurlToolCompiler`
+## `CurlToolCompiler.__init__`
 
-`CurlToolCompiler` is the main entry point for building `HttpTool` instances. It supports three construction paths:
+```python
+def __init__(
+    self,
+    *,
+    secrets: Optional[SecretResolver] = None,
+    openai_api_key: Optional[str] = None,
+    auto_dotenv: bool = True,
+    dotenv_path: Optional[str] = None,
+    dotenv_override: bool = False,
+    max_chat_input_tokens: int = 600,
+    max_chat_output_tokens: int = 1200,
+    default_cost_limit: Optional[float] = None,
+    validate_model_name: bool = True,
+) -> None
+```
 
-* deterministic compilation from cURL (`parse(...)`)
-* fully explicit compilation (`request_schema(...)`)
-* GPT-assisted extraction from docs (`gpt_parse(...)`)
+### Behavior
 
-### `CurlToolCompiler.set_budget`
+Creates a compiler used to build `HttpTool` instances from either deterministic inputs or GPT-assisted extraction.
+
+Constructor responsibilities:
+
+* Optionally loads `.env` via `load_dotenv(...)` when `auto_dotenv=True`.
+* Stores a `SecretResolver` on `self.secrets`. If none is provided, a default resolver is created.
+* Configures budgeting parameters used by `gpt_parse(...)`.
+* If an OpenAI API key is available, initializes an `AsyncOpenAI` client for `gpt_parse(...)`.
+* If `validate_model_name=True`, it may attempt to list available model IDs. If model listing fails, it fails open and continues without blocking `gpt_parse(...)`.
+
+### Inputs
+
+#### `secrets`
+
+* **Type:** `Optional[SecretResolver]`
+* **Meaning:** Secret resolver used for `{{env:...}}` placeholders at runtime.
+* **Default behavior:** If not provided, a default resolver is created.
+
+#### `openai_api_key`
+
+* **Type:** `Optional[str]`
+* **Meaning:** Optional API key used for `gpt_parse(...)`.
+* **Default behavior:** If omitted, the constructor reads `OPENAI_API_KEY` from the environment.
+
+#### `auto_dotenv`
+
+* **Type:** `bool`
+* **Meaning:** Whether to load `.env` variables during initialization.
+* **Default:** `True`
+
+#### `dotenv_path`
+
+* **Type:** `Optional[str]`
+* **Meaning:** Optional path passed to `load_dotenv(...)`.
+* **Default:** `None`
+
+#### `dotenv_override`
+
+* **Type:** `bool`
+* **Meaning:** Whether `.env` values override existing `os.environ`.
+* **Default:** `False`
+
+#### `max_chat_input_tokens`
+
+* **Type:** `int`
+* **Meaning:** Prompt token ceiling enforced by `gpt_parse(...)`.
+* **Default:** `600`
+
+#### `max_chat_output_tokens`
+
+* **Type:** `int`
+* **Meaning:** Output token budget used for API calls and worst-case cost estimation.
+* **Default:** `1200`
+
+#### `default_cost_limit`
+
+* **Type:** `Optional[float]`
+* **Meaning:** Default USD cost ceiling used when `gpt_parse(..., cost_limit=None)`.
+* **Default:** `None`
+
+#### `validate_model_name`
+
+* **Type:** `bool`
+* **Meaning:** Whether `gpt_parse(...)` validates `model_name` against a best-effort model list.
+* **Default:** `True`
+
+### Outputs
+
+This constructor returns a `CurlToolCompiler` instance.
+
+### Examples
+
+```python
+compiler = CurlToolCompiler(secrets=SecretResolver(auto_dotenv=True))
+tool = compiler.parse(curl_text)
+```
+
+## `CurlToolCompiler.set_budget`
 
 ```python
 def set_budget(
@@ -459,7 +741,7 @@ def set_budget(
 ) -> None
 ```
 
-#### Behavior
+### Behavior
 
 Updates the budgeting parameters used by `CurlToolCompiler.gpt_parse(...)`.
 
@@ -473,7 +755,7 @@ Fields updated:
 
 Any argument left as `None` leaves the existing value unchanged.
 
-#### Inputs
+### Inputs
 
 * `max_chat_input_tokens`
 
@@ -493,11 +775,11 @@ Any argument left as `None` leaves the existing value unchanged.
     * **Meaning:** Default USD cost ceiling used by `gpt_parse` when `cost_limit` is not explicitly provided.
     * **Default:** `None` (do not change)
 
-#### Outputs
+### Outputs
 
 Returns `None`.
 
-#### Example
+### Example
 
 ```python
 compiler = CurlToolCompiler()
@@ -512,7 +794,7 @@ compiler.set_budget(
 tool = await compiler.gpt_parse(docs_text, model_name="gpt-4o-mini")
 ```
 
-### `CurlToolCompiler.parse`
+## `CurlToolCompiler.parse`
 
 ```python
 def parse(
@@ -525,7 +807,7 @@ def parse(
 ) -> HttpTool
 ```
 
-#### Behavior
+### Behavior
 
 Parses a practical subset of `curl` into an `HttpRequestSpec` and returns an `HttpTool`.
 
@@ -535,7 +817,7 @@ This method is deterministic. It delegates curl parsing to `parse_curl_command(.
 * `input_model` (validated against `inputs` before sending the request)
 * `output_model` (validated against JSON responses when possible)
 
-#### Example
+### Example
 
 ```python
 compiler = CurlToolCompiler(secrets=SecretResolver(auto_dotenv=True))
@@ -550,7 +832,7 @@ report = await tool.call({"limit": 10})
 assert report.ok
 ```
 
-### `CurlToolCompiler.request_schema`
+## `CurlToolCompiler.request_schema`
 
 ```python
 def request_schema(
@@ -572,7 +854,7 @@ def request_schema(
 ) -> HttpTool
 ```
 
-#### Behavior
+### Behavior
 
 Constructs an `HttpRequestSpec` with no inference and returns an `HttpTool`.
 
@@ -584,7 +866,7 @@ Use this when you want full control over:
 * timeouts
 * optional Pydantic input/output validation
 
-#### Example
+### Example
 
 ```python
 tool = compiler.request_schema(
@@ -601,13 +883,13 @@ report = await tool.call({"limit": 10})
 assert report.status_code == 200
 ```
 
-### `CurlToolCompiler.request_schema_from_dict`
+## `CurlToolCompiler.request_schema_from_dict`
 
 ```python
 def request_schema_from_dict(self, d: Mapping[str, Any]) -> HttpTool
 ```
 
-#### Behavior
+### Behavior
 
 Deterministically rehydrates a tool spec produced by `HttpTool.to_dict()`.
 
@@ -615,7 +897,7 @@ Special fixup:
 
 * if `body_mode == "form"`, it converts stored list pairs back into tuple pairs so form encoding works after JSON reload.
 
-#### Example
+### Example
 
 ```python
 tool = compiler.parse(curl_text)
@@ -625,7 +907,7 @@ tool2 = compiler.request_schema_from_dict(spec_dict)
 report2 = await tool2.call({"limit": 10})
 ```
 
-### `CurlToolCompiler.gpt_parse`
+## `CurlToolCompiler.gpt_parse`
 
 ```python
 async def gpt_parse(
@@ -638,7 +920,7 @@ async def gpt_parse(
 ) -> HttpTool
 ```
 
-#### Behavior
+### Behavior
 
 Extracts a request description from documentation text using OpenAI structured outputs, then compiles it into an `HttpTool`.
 
@@ -651,7 +933,7 @@ Extracts a request description from documentation text using OpenAI structured o
 
 The returned tool is no different from tools built via `parse(...)` or `request_schema(...)`.
 
-#### Example
+### Example
 
 ```python
 compiler = CurlToolCompiler(
@@ -674,7 +956,7 @@ spec_dict = tool.to_dict()
 def parse_curl_command(curl_text: str) -> HttpRequestSpec
 ```
 
-### Behavior
+## Behavior
 
 Parses a practical subset of `curl` into an `HttpRequestSpec`. It is deterministic.
 

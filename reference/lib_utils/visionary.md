@@ -207,6 +207,51 @@ Running this agent opens a browser page on startup with a graph and an activity 
 > * Publishing from `upload_states` / `download_states` keeps the UI aligned with the state resolution boundary. If you publish elsewhere, it is easy for the UI to drift from the post-merge state your client actually uses.
 > * In a composed SDK, the only change is the import path (`from summoner.visionary import ClientFlowVisualizer`).
 
+## `ClientFlowVisualizer.__init__`
+
+```python
+def __init__(self, *, title: str = "Summoner Graph", port: int = 8765) -> None
+```
+
+### Behavior
+
+Creates a visualizer instance and prepares internal state for serving a graph view.
+
+* Stores `title` and `port`.
+* Initializes internal shared state for:
+
+  * the graph payload served at `GET /graph`,
+  * the active token snapshot served at `GET /state`,
+  * the terminal log ring buffer served at `GET /logs?after=<seq>`.
+
+This constructor does not start any threads or bind any ports. Call `start(...)` to launch the HTTP server.
+
+### Inputs
+
+#### `title`
+
+* **Type:** `str`
+* **Meaning:** Title shown in the browser UI header.
+* **Default:** `"Summoner Graph"`
+
+#### `port`
+
+* **Type:** `int`
+* **Meaning:** Local port used when the HTTP server is started.
+* **Default:** `8765`
+
+### Outputs
+
+This constructor returns a `ClientFlowVisualizer` instance.
+
+### Examples
+
+#### Basic initialization
+
+```python
+viz = ClientFlowVisualizer(title="agent:graph", port=8765)
+```
+
 
 ## `ClientFlowVisualizer.start`
 
