@@ -401,6 +401,44 @@ report = await tool.call({})
 assert report.status_code in (200, 400)
 ```
 
+### `HttpTool.to_dict`
+
+```python
+def to_dict(self, *, include_models: bool = False) -> dict[str, Any]
+```
+
+#### Behavior
+
+Returns a JSON-safe snapshot of the underlying `HttpRequestSpec`. This is a convenience wrapper around:
+
+```python
+tool.spec.to_dict(include_models=include_models)
+```
+
+This snapshot is intended for deterministic persistence and later rehydration using:
+
+```python
+tool2 = compiler.request_schema_from_dict(spec_dict)
+```
+
+Model handling:
+
+* `input_model` and `output_model` are omitted by default because model types are not robust to serialize.
+* If `include_models=True`, the snapshot includes best-effort import paths for `input_model` and `output_model`. Rehydration of model types is intentionally not automatic.
+
+#### Example
+
+```python
+compiler = CurlToolCompiler()
+tool = compiler.parse(curl_text)
+
+spec_dict = tool.to_dict()
+# Persist spec_dict as JSON, then later:
+tool2 = compiler.request_schema_from_dict(spec_dict)
+
+report = await tool2.call({"response_id": "resp_..."})
+```
+
 ## `CurlToolCompiler`
 
 `CurlToolCompiler` is the main entry point for building `HttpTool` instances. It supports three construction paths:
