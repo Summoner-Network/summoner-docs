@@ -63,7 +63,7 @@ The public symbols exported by this extension are:
 
 ## Installation in a summoner-sdk workflow
 
-`curl_tools` is shipped as an extension module hosted in the `extension-utilities` repository. In a project based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you can add it to your SDK build list so it is included during composition.
+`curl_tools` is shipped as an extension module hosted in the `extension-utilities` repository. In a project based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you add it to your SDK build list so it is included during composition.
 
 ### Add `curl_tools` to `build.txt`
 
