@@ -32,7 +32,7 @@ from summoner.aurora import AuroraClient
 
 ## Installation in a summoner-sdk workflow
 
-In a project based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you include a module by adding it to `build.txt`. Each entry specifies the extension repository and the module name to merge during SDK composition.
+For every project based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you can include a module by adding it to `build.txt`. Each entry specifies the extension repository and the module name to merge during SDK composition.
 
 Minimal pattern:
 
