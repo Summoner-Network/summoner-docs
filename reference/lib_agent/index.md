@@ -12,7 +12,7 @@ These extensions are "client-level" in the sense that they sit on top of `Summon
 
 ## Repository and import model
 
-The `extension-agentclass` repository follows the extension-template layout, which implies that each extension lives under `tooling/<module>/`.
+The `extension-agentclass` repository follows the [`extension-template`](https://github.com/Summoner-Network/extension-template) layout, which implies that each extension lives under `tooling/<module>/`.
 
 During local development, import from `tooling.*`:
 
@@ -30,9 +30,9 @@ from summoner.aurora import AuroraClient
 > In the repository, the script `install.sh setup` boots a dev environment and installs `summoner-core`. It does not compose a new SDK.
 > Composition happens in an SDK project via `build.txt`.
 
-## Installing utilities in an extension-template workflow
+## Installation in a summoner-sdk workflow
 
-In an `extension-template` project, you include a module by adding it to `build.txt`. Each entry specifies the extension repository and the module name to merge during SDK composition.
+In a project based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you include a module by adding it to `build.txt`. Each entry specifies the extension repository and the module name to merge during SDK composition.
 
 Minimal pattern:
 

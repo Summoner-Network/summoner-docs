@@ -1,6 +1,6 @@
 # <code style="background: transparent;">Summoner<b>.visionary</b></code>
 
-This page documents the **Python SDK interface** for running the **Visionary** browser visualizer via `ClientFlowVisualizer`. It focuses on how to install it in an extension-template workflow, how to start it, and how to use it at runtime to publish a graph, highlight active tokens, and stream logs.
+This page documents the **Python SDK interface** for running the **Visionary** browser visualizer via `ClientFlowVisualizer`. It focuses on how to install it in an `summoner-sdk` workflow, how to start it, and how to use it at runtime to publish a graph, highlight active tokens, and stream logs.
 
 <p align="center">
   <img width="550px" src="../../assets/mov2gif/gifs/demo_visionary.gif" />
@@ -24,13 +24,13 @@ The module is intentionally small and depends only on the standard library. The 
 
 The only public symbol exported by this extension is `ClientFlowVisualizer`. Everything else is internal.
 
-## Installation in an extension-template workflow
+## Installation in a summoner-sdk workflow
 
-**Visionary** is shipped as an extension module hosted in the `extension-utilities` repository. In an extension-template project, you add it to your SDK build list so it is included during composition.
+**Visionary** is shipped as an extension module hosted in the `extension-utilities` repository. In a project based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you add it to your SDK build list so it is included during composition.
 
 ### Add Visionary to `build.txt`
 
-Add the following entry to your SDK builder list:
+Add the following entry to your SDK builder list (in the `build.txt` file):
 
 ```text
 https://github.com/Summoner-Network/extension-utilities.git:

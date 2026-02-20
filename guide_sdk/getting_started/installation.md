@@ -135,7 +135,7 @@ aurora
 ```
 
 > [!WARNING]
->  As of this writing, the `aurora` module is still under development. Full support for agent behavior will be available soon.
+> The `aurora` module is experimental. It is available for early access, but the interface and behavior may change. Documentation and status updates can be found on the reference page: [aurora](../../reference/lib_agent/aurora.md)
 
 You can modify this file at any time to add or remove modules.
 

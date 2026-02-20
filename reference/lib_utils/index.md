@@ -12,7 +12,7 @@ These utilities are protocol-level in the sense that they help you operate agent
 
 ## Repository and import model
 
-The `extension-utilities` repository follows the extension-template layout, which implies that each utility lives under `tooling/<module>/`.
+The `extension-utilities` repository follows the [`extension-template`](https://github.com/Summoner-Network/extension-template) layout, which implies that each utility lives under `tooling/<module>/`.
 
 During local development, import from `tooling.*`:
 
@@ -31,9 +31,9 @@ from summoner.visionary import ClientFlowVisualizer
 > Composition happens in an SDK project via `build.txt`.
 
 
-## Installing modules in an extension-template workflow
+## Installation in a summoner-sdk workflow
 
-In an `extension-template` project, you include a module by adding it to `build.txt`. Each entry specifies the extension repository and the module name to merge during SDK composition.
+In a project based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you include a module by adding it to `build.txt`. Each entry specifies the extension repository and the module name to merge during SDK composition.
 
 Minimal pattern:
 

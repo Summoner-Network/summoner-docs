@@ -1,6 +1,6 @@
 # <code style="background: transparent;">Summoner<b>.gpt_guardrails</b></code>
 
-This page documents the **Python utility interface** for budgeting OpenAI calls using `gpt_guardrails`. It focuses on how to install it in an extension-template workflow, how to use it to estimate tokens and cost before a call, and how to compute actual cost after a call when usage is available.
+This page documents the **Python utility interface** for budgeting OpenAI calls using `gpt_guardrails`. It focuses on how to install it in a `summoner-sdk` workflow, how to use it to estimate tokens and cost before a call, and how to compute actual cost after a call when usage is available.
 
 `gpt_guardrails` is intentionally small. It does not wrap the OpenAI SDK. It does not retry, split batches, truncate inputs, or filter content. It gives you a consistent way to do two things:
 
@@ -29,13 +29,13 @@ The public symbols exported by this extension are:
 
 All of them are implemented in `gpt_guardrails/cost.py`.
 
-## Installation in an extension-template workflow
+## Installation in a summoner-sdk workflow
 
-`gpt_guardrails` is shipped as an extension module hosted in the `extension-utilities` repository. In an extension-template project, you add it to your SDK build list so it is included during composition.
+`gpt_guardrails` is shipped as an extension module hosted in the `extension-utilities` repository. In a project based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you add it to your SDK build list so it is included during composition.
 
 ### Add `gpt_guardrails` to `build.txt`
 
-Add the following entry to your SDK builder list:
+Add the following entry to your SDK builder list (in the `build.txt` file):
 
 ```text
 https://github.com/Summoner-Network/extension-utilities.git:
