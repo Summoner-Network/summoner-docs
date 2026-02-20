@@ -31,7 +31,7 @@ All of them are implemented in `gpt_guardrails/cost.py`.
 
 ## Installation in a summoner-sdk workflow
 
-`gpt_guardrails` is shipped as an extension module hosted in the `extension-utilities` repository. In a project based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you add it to your SDK build list so it is included during composition.
+`gpt_guardrails` is shipped as an extension module hosted in the `extension-utilities` repository. In projects based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you add it to your SDK build list so it is included during composition.
 
 ### Add `gpt_guardrails` to `build.txt`
 

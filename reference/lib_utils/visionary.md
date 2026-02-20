@@ -26,7 +26,7 @@ The only public symbol exported by this extension is `ClientFlowVisualizer`. Eve
 
 ## Installation in a summoner-sdk workflow
 
-**Visionary** is shipped as an extension module hosted in the `extension-utilities` repository. In a project based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you add it to your SDK build list so it is included during composition.
+**Visionary** is shipped as an extension module hosted in the `extension-utilities` repository. In projects based on the [`summoner-sdk`](https://github.com/Summoner-Network/summoner-sdk) template, you add it to your SDK build list so it is included during composition.
 
 ### Add Visionary to `build.txt`
 
