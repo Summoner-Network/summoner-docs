@@ -730,5 +730,5 @@ References:
 
 
 <p align="center">
-  <a href="curl_tools.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.curl_tools</b></code></a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="crypto_utils.md">Next: <code style="background: transparent;">Summoner<b>.crypto_utils</b></code> &raquo;</a>
+  <a href="curl_tools.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.curl_tools</b></code></a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="index.md">Next: Utility Extensions &raquo;</a>
 </p>

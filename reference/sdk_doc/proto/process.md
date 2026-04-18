@@ -371,7 +371,7 @@ assert r.activated_nodes(Action.STAY(sig)) == (Node("A"),)
 ## `@dataclass Sender`
 
 ```python
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class Sender
 ```
 
@@ -383,21 +383,35 @@ Represents a sending handler registered by a client:
 * `multi`: whether `fn` returns a list of payloads
 * `actions`: optional set of event classes that gate execution
 * `triggers`: optional set of `Signal` values that gate execution
+* `use_data`: whether matched event payloads are passed into the sender
+* `data_mode`: how event payloads are transferred (`"live"` or `"snapshot"`)
+* `every`: optional cadence for timed senders
+* `run_while`: optional timed-sender guard
+* `registration_id`: stable runtime identifier used by the sender scheduler
 
 Senders are "reactive" when `actions` or `triggers` is set. The runtime calls `responds_to(event)` to decide whether a sender should run for a given event.
 
+The `Sender` record also carries the metadata needed for data-aware and timed senders. In normal SDK usage, you rarely instantiate this class yourself; it is created by `SummonerClient.send(...)` or replayed by merger/translation tools.
+
 ### Fields
 
-* `fn`: `Callable[[], Awaitable]`
+* `fn`: `Callable[..., Awaitable]`
 * `multi`: `bool`
 * `actions`: `Optional[set[Type]]`
 * `triggers`: `Optional[set[Signal]]`
+* `use_data`: `bool`
+* `data_mode`: `Optional[str]`
+* `every`: `Optional[float]`
+* `run_while`: `Any`
+* `registration_id`: `Optional[str]`
 
 ### Examples
 
 ```python
 from summoner.protocol.process import Sender
+
 # In SDK usage, Sender is usually created internally by SummonerClient decorators.
+# The protocol type is shown here mainly so you know what metadata exists at runtime.
 ```
 
 

@@ -1007,5 +1007,5 @@ Special case:
   Reduce the docs text, increase `max_chat_input_tokens`, reduce `max_chat_output_tokens`, or raise the cost limit.
 
 <p align="center">
-  <a href="code_tools.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.code_tools</b></code></a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="gpt_guardrails.md">Next: <code style="background: transparent;">Summoner<b>.gpt_guardrails</b></code> &raquo;</a>
+  <a href="visionary.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.visionary</b></code></a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="gpt_guardrails.md">Next: <code style="background: transparent;">Summoner<b>.gpt_guardrails</b></code> &raquo;</a>
 </p>

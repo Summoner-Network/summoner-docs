@@ -4,9 +4,9 @@ The **protocol** layer defines the runtime primitives behind routing and state t
 
 ## Modules
 
-* [<code style="background: transparent;">Summoner<b>.protocol.triggers</b></code>](proto/triggers.md) → Load a trigger tree into a dynamic `Trigger` class, and work with `Signal`, `Event` (`Move/Stay/Test`), `Action`, and `extract_signal`.
+* [<code style="background: transparent;">Summoner<b>.protocol.triggers</b></code>](proto/triggers.md) → Load a trigger tree into a dynamic `Trigger` class, and work with `Signal`, `Event` (`Move/Stay/Test`, optionally with `data`), `Action`, and `extract_signal`.
 
-* [<code style="background: transparent;">Summoner<b>.protocol.process</b></code>](proto/process.md) → Runtime types used during routing: `Node`, `ArrowStyle`, `ParsedRoute`, `Receiver`, `Sender`, `StateTape`, and activation collection.
+* [<code style="background: transparent;">Summoner<b>.protocol.process</b></code>](proto/process.md) → Runtime types used during routing: `Node`, `ArrowStyle`, `ParsedRoute`, `Receiver`, `Sender` (including reactive/timed sender metadata), `StateTape`, and activation collection.
 
 * [<code style="background: transparent;">Summoner<b>.protocol.flow</b></code>](proto/flow.md) → Parse human route strings into `ParsedRoute` objects using configured `ArrowStyle`s.
 
@@ -25,11 +25,11 @@ The **protocol** layer defines the runtime primitives behind routing and state t
 | Type                               | Purpose                                                                             |
 | ---------------------------------- | ----------------------------------------------------------------------------------- |
 | `Signal`                           | Comparable signals ordered by ancestry (ancestor compares greater than descendant). |
-| `Event` / `Move` / `Stay` / `Test` | Events wrapping a signal used to drive transitions.                                 |
+| `Event` / `Move` / `Stay` / `Test` | Events wrapping a signal, optionally with `data`, used to drive transitions.        |
 | `Node`                             | Gate/state token. Supports `accepts(state: Node) -> bool`.                          |
 | `ArrowStyle`                       | Defines the arrow syntax used by the flow parser.                                   |
 | `ParsedRoute`                      | Parsed route with `is_arrow`, `has_label`, `activated_nodes(event)`.                |
-| `Receiver` / `Sender`              | Async handlers; sender can filter on action types and/or signals.                   |
+| `Receiver` / `Sender`              | Async handlers; sender can filter on action types/signals and carry timed/data-aware scheduling metadata. |
 | `StateTape`                        | Normalizes state shapes and collects activations grouped by priority.               |
 
 ## Mental model

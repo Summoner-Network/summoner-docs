@@ -51,7 +51,7 @@ The **How-tos** provide step-by-step guides to apply the fundamentals in practic
   * [Encrypt and decrypt messages](howtos/proto/encrypt_decrypt.md)
   * [Create handshakes with collaborators](howtos/proto/handshakes.md)
 
-The **Advanced Usage** section is intended primarily for internal development, but users are welcome to explore it. It includes experimental or upcoming capabilities that will shape future add-ons and extensions of the SDK:
+The **Advanced Usage** section is intended primarily for internal development, but users are welcome to explore it. It includes experimental or work-in-progress material related to deeper customization and extension of the SDK:
 
 [**Advanced Usage**](advanced_usage/index.md)
 

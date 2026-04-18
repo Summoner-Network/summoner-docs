@@ -18,9 +18,6 @@ Each outbound frame is a single JSON line with a trailing `\n`, carrying the sen
 ```
 
 
-> [!NOTE]
-> **Aurora preview.** In the Aurora update, **Rust** servers will be programmable to support dedicated discussions without broadcast. You will be able to route conversations per session or per pair, replacing the default broadcast relay when needed.
-
 A few implementation details help with interactive workloads. The Rust server sets TCP_NODELAY to avoid Nagle aggregation, which reduces latency for small frames. The **Rust server** also rejects a second connection from the same socket address to prevent duplicate sessions during testing.
 
 This configuration layer stays modest on purpose. It gives you control over fairness, resource use, and observability without hiding how the network behaves.
@@ -90,7 +87,7 @@ Summoner accepts configuration from three places. Think of them as layers that r
   
    #### Host and port resolution depend on the implementation
 
-  * The **Python server** takes `host` and `port` only from `.run(host=..., port=...)`. If you also provide a config file or dict, the Python path still uses the arguments for binding. The `logger` section is applied from config.
+  * The **Python server** takes `host` and `port` only from `.run(host=..., port=...)`. If you also provide a config file or dict, the Python path uses the arguments for binding. The `logger` section is applied from config.
   * The **Rust server** reads `host` and `port` from config when present. If they are missing, it falls back to the `.run(...)` arguments. The `logger` section and all `hyper_parameters` apply to Rust.
 
   There is no hot reload. Restart the process to apply changes. If you want to make changes safely during development, prefer small, isolated edits and restart quickly to confirm behavior.
@@ -126,7 +123,7 @@ from summoner.server import SummonerServer
 SummonerServer(name="local").run(host="127.0.0.1", port=8888)
 ```
 
-This path ignores `host` and `port` in any config file or dict. It still honors the `logger` section if you also pass a config for logging.
+This path ignores `host` and `port` in any config file or dict. It honors the `logger` section if you also pass a config for logging.
 
 #### File-based, Rust server
 
@@ -166,7 +163,7 @@ cfg = {
 SummonerServer(name="local").run(config_dict=cfg)
 ```
 
-A dict overrides a file if both are provided. For `host` and `port`, Rust reads them from the dict when present. Python still binds using the `.run(...)` arguments.
+A dict overrides a file if both are provided. For `host` and `port`, Rust reads them from the dict when present. Python binds using the `.run(...)` arguments.
 
 <details>
 <summary><b>Deployment tips</b> </summary>

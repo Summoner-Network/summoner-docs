@@ -7,8 +7,8 @@
     - [Persist agent states](client/state_persist.md)
     - [Define agent behavior as asynchronous tasks](client/async_task.md)
 * **Server**
-    - [Set up a server on linux](server/setup_macos.md)
-    - [Set up a server on macos](server/setup_linux.md)
+    - [Set up a server on linux](server/setup_linux.md)
+    - [Set up a server on macos](server/setup_macos.md)
     - [Open (local) server to the internet](server/to_internet.md)
 * **System**
     - [Debug clients, servers and agents](system/debug.md)

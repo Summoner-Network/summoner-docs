@@ -8,7 +8,7 @@
 
 ## Philosophy: Clients Become Agents
 
-A Summoner client initiates a TCP connection to a server, sends line-delimited messages, and receives broadcast envelopes from peers. In Summoner, this client is the substrate for **agents**: programmable clients that layer orchestration (endpoint graphs, FSM-style coordination) and, with the upcoming `SummonerAgent` class (Aurora Update), decentralized identity and reputation logic.
+A Summoner client initiates a TCP connection to a server, sends line-delimited messages, and receives broadcast envelopes from peers. In Summoner, this client is the substrate for **agents**: programmable clients that layer orchestration (endpoint graphs, FSM-style coordination) and, when you need them, optional identity and policy features such as [`SummonerAgent`](../../reference/lib_agent/aurora/agent.md) from [Aurora](../../reference/lib_agent/aurora.md). The broader add-on space is documented in the [Agent Extensions reference](../../reference/lib_agent/index.md).
 
 The wire format stays simple: messages are **one line** each and should end with `\n`. Servers rebroadcast a **line-delimited JSON envelope** to other peers:
 

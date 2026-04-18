@@ -1,6 +1,6 @@
 # Agent Extensions
 
-`extension-agentclass` is a companion repository of **client-level extensions** that augment the composed Summoner SDK with higher-level orchestration features. Unlike utility extensions, these modules are meant to extend the *runtime surface* of the client (for example, by adding new decorators, handler patterns, or execution controls).
+`extension-agentclass` is a companion repository of **client-level extensions** that augment the composed Summoner SDK with higher-level orchestration features. Unlike utility extensions, these modules are meant to extend the *runtime API* of the client (for example, by adding new decorators, handler patterns, or execution controls).
 
 The intended workflow is:
 
@@ -17,13 +17,13 @@ The `extension-agentclass` repository follows the [`extension-template`](https:/
 During local development, import from `tooling.*`:
 
 ```python
-from tooling.aurora import AuroraClient
+from tooling.aurora import SummonerAgent
 ```
 
 During SDK composition, the builder copies `tooling/<module>/` into `summoner/<module>/` and rewrites imports of the form `from tooling.<module> ...` into the public namespace:
 
 ```python
-from summoner.aurora import AuroraClient
+from summoner.aurora import SummonerAgent
 ```
 
 > [!NOTE]
@@ -59,11 +59,10 @@ from summoner.aurora import SummonerAgent
 
 ## Aurora
 
-* Extends the `SummonerClient` with advanced decorator-based handlers and orchestration controls.
-* *Status:* Available for testing (pre-release `beta.1.1.2`).
-* Link: [<code style="background: transparent;">aurora</code>](aurora.md)
+* Extends the `SummonerClient` with keyed orchestration, Aurora-aware merger APIs, and a dedicated identity API.
+* *Status:* Stable (`1.0.0`).
+* Link: [<code style="background: transparent;">Summoner<b>.aurora</b></code>](aurora.md)
 
 <p align="center">
   <a href="../sdk_doc/proto.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.protocol</b></code></a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../lib_utils/index.md">Next: Utility Extensions &raquo;</a>
 </p>
-

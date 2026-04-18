@@ -365,11 +365,13 @@ class Event
 
 Wraps a `Signal` as a typed protocol event. The module defines three event subclasses:
 
-* `Move(signal)`
-* `Stay(signal)`
-* `Test(signal)`
+* `Move(signal, data=None)`
+* `Stay(signal, data=None)`
+* `Test(signal, data=None)`
 
 `Test` is marked with `__test__ = False` to avoid certain test discovery behaviors.
+
+An event can also carry arbitrary `data`. This is the payload consumed by reactive senders that register with `use_data=True`.
 
 ### Inputs
 
@@ -377,6 +379,12 @@ Wraps a `Signal` as a typed protocol event. The module defines three event subcl
 
 * **Type:** `Signal`
 * **Meaning:** The underlying signal carried by the event.
+
+#### `data`
+
+* **Type:** `Any`
+* **Meaning:** Optional event payload forwarded to data-aware senders and available as `event.data`.
+* **Default:** `None`
 
 ### Outputs
 
@@ -389,11 +397,12 @@ from summoner.protocol.triggers import Signal, Move, Stay, Test
 
 s = Signal((0,), "OK")
 
-e1 = Move(s)
+e1 = Move(s, data={"origin": "receiver"})
 e2 = Stay(s)
-e3 = Test(s)
+e3 = Test(s, data=123)
 
 assert e1.signal is s
+assert e1.data == {"origin": "receiver"}
 ```
 
 ## `class Action`

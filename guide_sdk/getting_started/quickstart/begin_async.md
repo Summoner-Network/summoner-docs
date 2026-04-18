@@ -10,7 +10,7 @@
 
 Summoner's Python client rides on `asyncio`. The model is cooperative: your coroutines *yield* at `await` points, and the loop gives time to other tasks. This is perfect for network I/O — such as sockets, databases, and files — where most time is spent waiting. It is not automatic parallelism: CPU-heavy work in a handler will pause everything else until you move it off the loop (threads or processes). In practice, aim for short, mostly-I/O handlers that always `await` their external calls.
 
-Under the hood, some pieces delegate to Rust via PyO3 and run on **Tokio**. That does not change your code shape — you still `await` — but it does mean the heavy lifting on the wire happens in non-blocking Rust, often with the GIL released. The net effect is a responsive Python loop with predictable back-pressure.
+The client remains an `asyncio` program even when you connect it to the Rust-backed server. In that setup, the **server side** runs on **Tokio**, but the client side uses the same `asyncio` coroutines and `await` points. The result is a responsive Python event loop with predictable back-pressure.
 
 ## Where `async` lives in the client
 
@@ -19,7 +19,7 @@ Everything you register is asynchronous. The runtime awaits your coroutines. The
 | Registration                   | Handler shape                                      | Purpose                                                              |
 | ------------------------------ | -------------------------------------------------- | -------------------------------------------------------------------- |
 | `@client.receive(route=...)`   | `async def (payload) -> Optional[Event]`           | Normalize input; propose outcomes (`Move` / `Stay` / `Test`).        |
-| `@client.send(route=..., ...)` | `async def () -> Optional[Union[str, dict, list]]` | Emit messages (ticks or hubs). `multi=True` returns a list to batch. |
+| `@client.send(route=..., ...)` | `async def ()` or `async def (data)` with `use_data=True` | Emit messages as ticks, hubs, or timed senders. `multi=True` returns a list to batch. |
 | `@client.hook(...)`            | `async def (payload) -> Optional[payload]`         | Pre/post processing (auth, schema, stamping, rate limits).           |
 | `@client.upload_states()`      | `async def (payload) -> state-shape`               | Advertise current node(s) to the flow engine.                        |
 | `@client.download_states()`    | `async def (proposals) -> None`                    | Commit chosen node(s) from the proposals.                            |
@@ -32,7 +32,7 @@ Behind those handlers is a plain TCP socket with newline-delimited frames (JSON 
 `client.run(...)` starts the client and keeps two long-lived coroutines in flight:
 
 * **Receiver**: reads, runs RECEIVE hooks, selects eligible `@receive` by route/state, awaits each, and aggregates outcomes into a single proposal set.
-* **Sender**: ticks and hubs run independently; SEND hooks stamp payloads; writes go out with back-pressure (`drain()`), so the loop never busy-spins.
+* **Sender**: untimed senders, hubs, and timed senders run through the client's send-side scheduling loops; SEND hooks stamp payloads; writes go out with back-pressure (`drain()`), so the loop never busy-spins.
 
 These two loops *overlap*. There is no polling and no shared sleep you need to manage. On a single inbound frame, you will see:
 
@@ -41,7 +41,7 @@ upload_states ──► select receivers ──► run @receive ──► aggreg
       ▲                                                 │
       └───────────── download_states ◄──────────────────┘
                                   │
-                                  └──► @send (ticks + hubs) ──► socket
+                                  └──► @send (untimed + timed + hubs) ──► socket
 ```
 
 A few details matter in practice:
@@ -60,19 +60,22 @@ Inside a single client you can compose coroutines freely — `await`, `asyncio.g
 ```python
 import threading
 
-def launch(client, host, port, cfg):
+def launch(client, host, port):
     def boot():
         # decorators must be imported before booting
+        # if you use config, apply it before this point
         # if you use flow arrows, define styles and call flow.compile_arrow_patterns() first
         client.loop.run_until_complete(
-            client.run_client(host=host, port=port, config_path=cfg)
+            client.run_client(host=host, port=port)
         )
     t = threading.Thread(target=boot, daemon=True)
     t.start()
     return t
 ```
 
-`.run(...)` adds "bookends" (config load, flow activation, signal handlers, graceful shutdown). If you call `run_client(...)` directly, perform whatever prep your client needs (especially `flow.add_arrow_style(...)` and `flow.compile_arrow_patterns()` if you use routes with arrows).
+For most applications, prefer `client.run(...)` unless you deliberately want to own the loop and startup sequence yourself.
+
+`.run(...)` adds "bookends" (config load, flow initialization, waiting for decorator registration, signal handlers, graceful shutdown). It **does not** activate flow for you; that requires an explicit `client.flow().activate()` in your code when you want flow-aware routing. If you call `run_client(...)` directly, perform whatever prep your client needs first (especially loading/applying config if you use one, plus `flow.add_arrow_style(...)` and `flow.compile_arrow_patterns()` when you use routes with arrows).
 
 ## Fan-out safely with `gather`
 
@@ -133,9 +136,8 @@ async def count(msg: Any) -> None:
     await _db.execute("INSERT OR REPLACE INTO hits(k,n) VALUES(?,?)", (msg["k"], n))
     await _db.commit()
 
-@client.send(route="")
+@client.send(route="", every=2.0)
 async def report():
-    await asyncio.sleep(2)  # gentle pacing; yields the loop
     async with _db.execute("SELECT SUM(n) FROM hits") as cur:
         row = await cur.fetchone()
     return {"kind": "stats", "total_hits": int(row[0] or 0)}
@@ -161,7 +163,7 @@ client.loop.run_until_complete(teardown())
 
 ## Queues for producer/consumer
 
-In practice, `asyncio.Queue` is the easiest way to stage work between receivers and senders without blocking. While receivers *produce* normalized items, tick senders *consume* and emit:
+In practice, `asyncio.Queue` is the easiest way to stage work between receivers and senders without blocking. This remains the right tool when you need buffering, batching, retries, or explicit producer/consumer decoupling. While receivers *produce* normalized items, a timed sender can *consume* and emit on a gentle cadence:
 
 ```python
 import asyncio
@@ -176,20 +178,19 @@ async def enqueue(msg: Any):
     if isinstance(msg, dict):
         await inbox.put({"when": asyncio.get_running_loop().time(), **msg})
 
-@client.send(route="")
+@client.send(route="", every=0.2)
 async def drain() -> Optional[dict]:
     try:
         item = inbox.get_nowait()
     except asyncio.QueueEmpty:
-        await asyncio.sleep(0.2)  # polite idle yield
         return
     return {"kind": "processed", **item}
 ```
 
-You can also batch: declare `multi=True` on the sender and drain multiple items per tick to smooth bursts.
+You can also batch: declare `multi=True` on the sender and drain multiple items per due run to smooth bursts.
 
 ```python
-@client.send(route="", multi=True)
+@client.send(route="", multi=True, every=0.2)
 async def drain_batch():
     items = []
     for _ in range(10):
@@ -198,10 +199,11 @@ async def drain_batch():
         except asyncio.QueueEmpty:
             break
     if not items:
-        await asyncio.sleep(0.2)
         return
     return [{"kind": "processed", **it} for it in items]
 ```
+
+If you do **not** need staging or batching, a reactive sender with `use_data=True` is often simpler than introducing a queue. In that pattern, a receiver returns `Move(...)`, `Stay(...)`, or `Test(...)` with `data=...`, and the matching sender consumes that payload directly. Use queues when you want to smooth bursts or decouple work across tasks; use `use_data=True` when one matching event should directly feed one sender invocation.
 
 ## Why asyncio streams (client) and Tokio (server)?
 
@@ -236,9 +238,9 @@ Most problems come from blocking the loop or mismatched expectations about owner
 | ------------------------------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `time.sleep(...)` in a handler                                | Blocks the event loop                                     | Replace with `await asyncio.sleep(...)`.                                                                                                                                                                                                                                                                                            |
 | Sync console I/O in hot paths (`BlockingIOError`, mixed logs) | Stdout/stderr are not awaitable                            | Use `aioconsole.aprint/ainput` **everywhere inside async handlers** (or the client's logger). Avoid `print` in coroutines.                                                                                                                                                                                                          |
-| "Queue 80% full" warnings                                     | You are producing faster than you can send                 | Pace tick senders, batch (`multi=True`), or lower per-tick fan-out.                                                                                                                                                                                                                                                                 |
+| "Queue 80% full" warnings                                     | You are producing faster than you can send                 | Increase the cadence interval on timed senders, batch with `multi=True`, or lower per-run fan-out.                                                                                                                                                                                                                                  |
 | Long transactions pin other work                              | Locks held across awaits                                  | Keep them short; avoid `await` while holding a lock when you can refactor.                                                                                                                                                                                                                                                          |
-| `asyncio.gather(client.run(...), ...)` across clients         | Each client owns its loop; `.run(...)` blocks that thread | Run each client in its own thread or process and call `.run(...)`. For an advanced setup, drive `client.run_client(...)` on that client's event loop inside a dedicated thread using `client.loop.run_until_complete(...)`. If you bypass `.run(...)`, replicate its setup and teardown: load configuration, define arrow styles, call `flow.compile_arrow_patterns()`, and install signal handlers. |
+| `asyncio.gather(client.run(...), ...)` across clients         | Each client owns its loop; `.run(...)` blocks that thread | Run each client in its own thread or process and call `.run(...)`. For an advanced setup, drive `client.run_client(...)` on that client's event loop inside a dedicated thread using `client.loop.run_until_complete(...)`. If you bypass `.run(...)`, replicate its setup and teardown: load configuration if needed, activate flow when you actually use it, define arrow styles, call `flow.compile_arrow_patterns()`, and install signal handlers. |
 | CPU-heavy work slows everything                               | Concurrency ≠ parallelism                                 | Offload with `asyncio.to_thread(...)` or a process pool; keep handlers I/O bound. Rust/Tokio code may run without the GIL, but that does not make Python handlers parallel.                                                                                                                                                          |
 | Long-running tasks ignore shutdown                            | Not handling `CancelledError`                             | Wrap long loops with `try/except asyncio.CancelledError: ...` and clean up (close DB cursors, flush queues).                                                                                                                                                                                                                        |
 <p align="center">

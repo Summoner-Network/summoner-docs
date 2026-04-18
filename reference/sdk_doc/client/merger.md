@@ -1,4 +1,4 @@
-# <code style="background: transparent;">Summoner<b>.client.merger</b></code>
+# <code style="background: transparent;">Summoner<b>.client.merger</b></code> (core v1.2.0)
 
 This page documents the **Python SDK interface** for composing clients from other clients or from DNA artifacts. It focuses on how to use the public classes and their methods, and what behavior to expect when you call them.
 
@@ -37,6 +37,8 @@ A "source" can be any of:
 * or a dict wrapper with one of: `{"client": ...}`, `{"dna_list": ...}`, `{"dna_path": ...}`.
 
 The merger **does not** automatically register handlers on construction. You must call `initiate_all()` (or individual `initiate_*` methods) before calling `run(...)`.
+
+If the replayed client depends on flow-aware sender activation, configure flow on the merger before replaying senders. In practice, that means enabling flow before `initiate_all()` or `initiate_senders()`.
 
 If `close_subclients=True`, the merger attempts to **clean up imported template clients** after extracting their handlers (to reduce pending-task and event-loop warnings when importing agent scripts as templates).
 
@@ -144,6 +146,8 @@ Replays all supported handler types from every source onto the merged client, in
 3. `hook`
 4. `receive`
 5. `send`
+
+If the replayed sender behavior depends on flow-aware activation, call `agent.flow().activate()` before `initiate_all()` so the later send replay step can succeed.
 
 This should be called before `run(...)`.
 
@@ -289,7 +293,23 @@ def initiate_senders(self) -> None
 
 ### Behavior
 
-Replays `@send(route, multi, on_triggers, on_actions)` handlers from every source onto the merged client.
+Replays `@send(...)` handlers from every source onto the merged client.
+
+For everyday usage, this simply means the merged client regains the outbound handler behavior recorded on its sources. The extra work during replay is resolving any named trigger/action references from DNA and rebuilding optional sender guards such as `run_while`.
+
+<details>
+<summary>Sender replay details</summary>
+
+The merger replays sender fields such as:
+
+* `route`
+* `multi`
+* `on_triggers`
+* `on_actions`
+* `use_data`
+* `data_mode`
+* `every`
+* `run_while`
 
 For DNA sources, triggers/actions are stored by **name** and are resolved as follows:
 
@@ -302,7 +322,19 @@ For DNA sources, triggers/actions are stored by **name** and are resolved as fol
 
   * resolved by name against the protocol `Action` container.
 
-If trigger/action names cannot be resolved, replay may fail for that sender.
+Callable `run_while` guards are also rehydrated from serialized metadata when possible. The merger first tries the direct callable stored on imported-client DNA, then falls back to serialized name/source reconstruction for DNA-based sources.
+
+Important replay rules:
+
+* If the merger is not flow-enabled, replay fails early when any source requires:
+
+  * `use_data=True`, or
+  * a reactive timed sender (`every` together with `on_triggers` and/or `on_actions`).
+
+* DNA replay now reads `route` as a required field. Missing routes fail clearly instead of producing a partially replayed sender.
+* If trigger/action names or serialized `run_while` callables cannot be resolved, replay may fail for that sender.
+
+</details>
 
 ### Inputs
 
@@ -339,6 +371,24 @@ agent = ClientMerger(
 agent.initiate_senders()
 ```
 
+#### Replay a timed reactive sender from DNA
+
+```python
+from summoner.client.merger import ClientMerger
+from summoner.protocol.triggers import load_triggers
+
+Trigger = load_triggers()
+
+agent = ClientMerger(
+    [{"dna_path": "agent_dna.json"}],
+    name="merged",
+    rebind_globals={"Trigger": Trigger},
+)
+
+agent.flow().activate()
+agent.initiate_senders()
+```
+
 ## `ClientTranslation.__init__`
 
 ```python
@@ -367,6 +417,8 @@ Key properties of translation:
   * optional `rebind_globals` may be injected.
 
 This class also attempts best-effort cleanup of "template clients" that may have been created as a side effect of importing modules referenced by DNA entries.
+
+If the translated client depends on flow-aware sender activation, activate flow before `initiate_all()` or `initiate_senders()`.
 
 ### Inputs
 
@@ -440,6 +492,8 @@ Replays all handler types from the DNA list onto this translated client, in the 
 5. `send`
 
 Call this before `run(...)`.
+
+If the replayed sender behavior depends on flow-aware activation, call `agent.flow().activate()` before `initiate_all()`.
 
 ### Inputs
 
@@ -581,6 +635,11 @@ def initiate_senders(self) -> None
 
 Replays `@send(...)` entries from DNA onto this translated client.
 
+For everyday usage, this means the translated client regains the outbound handler behavior recorded in DNA. The extra replay work is resolving named trigger/action references and rebuilding optional sender guards such as `run_while`.
+
+<details>
+<summary>Sender replay details</summary>
+
 Triggers and actions are stored in DNA by name and are resolved as follows:
 
 * **Triggers**:
@@ -591,6 +650,20 @@ Triggers and actions are stored in DNA by name and are resolved as follows:
 * **Actions**:
 
   * resolved by name against the protocol `Action` container.
+
+The translated client also replays sender fields such as `use_data`, `data_mode`, `every`, and serialized `run_while`.
+
+Important replay rules:
+
+* If translation is not flow-enabled, replay fails early when DNA requires:
+
+  * `use_data=True`, or
+  * a reactive timed sender.
+
+* `route` is treated as a required DNA field.
+* Callable `run_while` guards are reconstructed from the serialized `run_while_*` fields when possible.
+
+</details>
 
 ### Inputs
 
@@ -615,6 +688,7 @@ agent = ClientTranslation(
     name="translated",
     rebind_globals={"Trigger": Trigger},
 )
+agent.flow().activate()
 agent.initiate_senders()
 ```
 

@@ -18,22 +18,18 @@ Once agents are connected, you can link them to the desktop app to simplify depl
 
 ### Why it Matters
 
-> [!NOTE]  
-> ✨ The features described in this section are part of the upcoming **Aurora** update.
-
-
 Summoner's SDK aims to **minimize the work required** to connect your agents to the internet and enable communication across networks. Once connected, your agents can interact freely with others — either within the Summoner ecosystem or across other platforms — using a shared protocol layer.
 
-This includes:
+At the **core** layer, this includes:
 
-* **Decentralized agent identities** for traceability, reputation, and trust
-* **Smart communication** protocols for exchanging tools, properties, or tasks between agents
-* **Orchestration handshakes** to ensure proper task completion and information flow
-* **Cryptographic primitives** to ensure secure and private interaction
+* **Async clients and relays** for open TCP-based communication
+* **Routes, flows, triggers, and hooks** for structuring agent behavior
+* **DNA portability** so client behavior can be exported, merged, or reconstructed
+
+On top of that, **optional extensions** such as [Aurora](../../reference/lib_agent/aurora.md) can add identity records, envelope handling, policy hooks, and richer handshake layers when your agents need them. The broader extension space is documented in the [Agent Extensions reference](../../reference/lib_agent/index.md), and Aurora's main client class is documented on [`SummonerAgent`](../../reference/lib_agent/aurora/agent.md).
 
 
 
 <p align="center">
   <a href="index.md">&laquo; Previous: Getting Started</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="prerequisites.md">Next: Prerequisites &raquo;</a>
 </p>
-

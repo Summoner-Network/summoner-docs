@@ -8,7 +8,7 @@ The intended workflow is:
 * add them to your SDK composition list (via `build.txt`)
 * import them from the composed SDK like normal Python modules (for example `from summoner.visionary import ...`)
 
-These utilities are protocol-level in the sense that they help you operate agents (visualization, parsing, budgeting, cryptographic helpers). They do not change the agent execution model or networking semantics implemented in `summoner-core`.
+These utilities are protocol-level in the sense that they help you operate agents through visualization, parsing, and budgeting support. They do not change the agent execution model or networking semantics implemented in `summoner-core`.
 
 ## Repository and import model
 
@@ -68,18 +68,6 @@ from summoner.visionary import ClientFlowVisualizer
 * *Status:* Stable.
 * Link: [<code style="background: transparent;">visionary</code>](visionary.md)
 
-## PDF Tools
-
-* Utilities for reading, parsing, and extracting structured data from PDF files.
-* *Status:* Experimental.
-* Link: [<code style="background: transparent;">pdf_tools</code>](pdf_tools.md)
-
-## Code Tools
-
-* Utilities for reading, analyzing, and interpreting source code files.
-* *Status:* In progress.
-* Link: [<code style="background: transparent;">code_tools</code>](code_tools.md)
-
 ## cURL Tools
 
 * Utilities for parsing and interpreting `curl` commands into structured protocol calls.
@@ -91,12 +79,6 @@ from summoner.visionary import ClientFlowVisualizer
 * Cost control and safety utilities for managing LLM usage and execution constraints.
 * *Status:* Experimental.
 * Link: [<code style="background: transparent;">gpt_guardrails</code>](gpt_guardrails.md)
-
-## Crypto Utils
-
-* Cryptographic helpers for signing, verification, and secure protocol interactions.
-* *Status:* Experimental.
-* Link: [<code style="background: transparent;">crypto_utils</code>](crypto_utils.md)
 
 <p align="center">
   <a href="../lib_agent/index.md">&laquo; Previous: Agent Extentions</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="../../development/index.md">Next: Developer & Contribution &raquo;</a>

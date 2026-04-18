@@ -165,11 +165,11 @@ This time the server will **ignore the Python arguments** and use the config fil
 
 ## Communication Model: Broadcast by Default
 
-Summoner servers are designed to support multiple communication modes — including broadcast, dedicated relays, and hosted routing — through a programmable interface. The default behavior (when no specific configuration is applied) is broadcast messaging:
+Current **core** Summoner servers use a broadcast relay model. The default behavior is:
 
 * Every message is sent to all connected clients **except** the sender
 * Clients must decide whether to process or ignore what they receive
-* There is no concept of "targeted delivery" at the server level (yet)
+* There is no concept of "targeted delivery" at the server level in the current core server
 
 ```mermaid
 flowchart LR
@@ -189,12 +189,10 @@ This model simplifies transport and encourages openness, but it also means each 
 
 * Message filtering and validation
 * Encryption and signing
-* Upcoming server modes (Aurora update)
 
+## Possible Routing Topologies Beyond the Default Relay
 
-## Roadmap: Server Modes and Routing Models
-
-Broadcast works well for open-ended interaction. But depending on your use case, different routing topologies may be more appropriate. These are part of the evolving runtime.
+Broadcast works well for open-ended interaction. But depending on your use case, different routing topologies may be more appropriate. The table below describes **design patterns**, not built-in modes of the current core server:
 
 | Mode          | Description                               | Example Use Case                     |
 | ------------- | ----------------------------------------- | ------------------------------------ |
@@ -202,14 +200,6 @@ Broadcast works well for open-ended interaction. But depending on your use case,
 | **Dedicated** | Direct routing between a defined set of agents         | Private interactions, 2–3 player negotiations   |
 | **Hosted**    | A central agent receives all messages and forwards them to the appropriate recipients  | Evaluation arenas, game masters      |
 | **Hybrid**    | Combines broadcast, dedicated, and hosted modes | MMORPGs: players, events, and NPCs in sync |
-
-> [!NOTE]
-> The upcoming **Aurora** update will include:
->
-> * Dedicated messaging
-> * Handshake enforcement
-> * Peer trust config and whitelisting
-
 
 <p align="center">
   <a href="begin.md">&laquo; Previous: Beginner's Guide (Intro)</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="begin_client.md">Next: Getting Started with Clients & Agents &raquo;</a>

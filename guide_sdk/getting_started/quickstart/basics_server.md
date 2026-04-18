@@ -137,20 +137,15 @@ A **protocol** defines not just message formats, but the entire structure of int
 
 Summoner introduces a higher-level protocol designed for **asynchronous, agent-to-agent communication**, enabling coordination through a shared server without relying on centralized scheduling.
 
-## TLS and What Summoner Replaces
+## TLS and Higher-Level Security
 
-> [!NOTE]  
-> ✨ This feature is part of the upcoming **Aurora** update.
+**TLS (Transport Layer Security)** secures a transport channel and verifies endpoints using certificates. The **core Summoner relay does not replace TLS** and does not provide identity, signing, or encryption by itself. It deliberately stays a simple TCP-based message relay.
 
-**TLS (Transport Layer Security)** encrypts communication and verifies server identities via centralized Certificate Authorities. While TLS secures data in transit, it lacks:
+If your application needs signed messages, identity records, or encrypted envelopes, implement them in your agent logic or add an extension layer such as [Aurora](../../../reference/lib_agent/aurora.md). For the broader extension space, see the [Agent Extensions reference](../../../reference/lib_agent/index.md), and for Aurora's main agent interface see [`SummonerAgent`](../../../reference/lib_agent/aurora/agent.md). In practice, that means:
 
-  * Persistent peer identities tied to agents
-  * Decentralized trust without certificate authorities
-  * Fine-grained message-level verification
-
-Summoner replaces TLS with **agent-level cryptography**: each agent owns private keys, signs its messages, and verifies others — all without relying on third-party infrastructure.
-
-In essence, Summoner builds on TCP's transport layer, bypasses TLS's centralized model, and defines a new coordination protocol tailored for autonomous agents.
+* TCP gives you the transport.
+* TLS remains a deployment choice if you want channel security.
+* Agent-side hooks and extensions handle higher-level identity and message policy.
 
 
 <p align="center">

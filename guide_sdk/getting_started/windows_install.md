@@ -84,8 +84,8 @@ https://github.com/Summoner-Network/extension-agentclass.git:
 aurora
 ```
 
-> [!WARNING]
-> **Aurora** is coming soon. You can keep it listed now or add it later and re-run setup.
+> [!TIP]
+> **Aurora** is optional. You can include it from the start or add it later and re-run setup. For the extension overview, see [Agent Extensions](../../reference/lib_agent/index.md). For the Aurora API itself, see [aurora](../../reference/lib_agent/aurora.md) and the [`SummonerAgent` reference](../../reference/lib_agent/aurora/agent.md).
 
 You can modify `build.txt` any time and re-run the installer.
 

@@ -1,7 +1,5 @@
 # Basics of Summoner Clients
 
-<!-- Given that we still have the server page and the intro page to review, the following modification might be enough? -->
-
 > [!NOTE] 
 > **Definition.** A _client_ is a program that initiates a connection to a server to send requests and receive responses. In Summoner, clients evolve into programmable agents that go far beyond this basic role.
 
@@ -9,20 +7,14 @@
 
 ## From Summoner Client to Summoner Agent
 
-> [!NOTE]  
-> ✨ The features described in this section are part of the upcoming **Aurora** update.
-
 At the lowest level, a **Summoner agent** is just a Summoner client: it connects to a TCP server and exchanges messages. But Summoner layers additional capabilities on top:
 
-<!-- A **Summoner agent** begins as a Summoner client, but adds two essential layers: -->
-
 * **Orchestration**: the ability to initiate or complete tasks through a [programmable graph of handlers](#graphs-of-endpoints), allowing the agent to behave as a coordinated system.
-* **Decentralized Identity**: each agent cryptographically signs messages, owns a verifiable identity, and participates in secure agent-to-agent communication.
-* **Reputation Logic**: the combination of orchestration and decentralized identity enables richer control over protocol event validity, allowing agents to infer trust through reputation metrics.
+* **Optional identity and policy layers**: extensions such as [Aurora](../../../reference/lib_agent/aurora.md) can add signed envelopes, identity records, and policy-driven validation when you need them. The broader add-on space is documented in the [Agent Extensions reference](../../../reference/lib_agent/index.md), and Aurora's main ready-made class is [`SummonerAgent`](../../../reference/lib_agent/aurora/agent.md).
 
 This leads to the working definition:
 
-> **Agent = TCP Client + Orchestration + Decentralized Identity + Reputation Logic**
+> **Agent = TCP Client + Orchestration (+ optional identity / policy layers)**
 
 
 ## Graphs of Endpoints
@@ -95,7 +87,7 @@ This allows you to:
 
 ---
 
-Summoner clients, therefore, are not just TCP sockets with callbacks. They are the structural foundation for programmable, composable agents — each carrying its own identity, behavior graph, and orchestration model.
+Summoner clients, therefore, are not just TCP sockets with callbacks. They are the structural foundation for programmable, composable agents — each carrying a behavior graph and orchestration model, and optionally an identity/policy layer when your application needs one.
 
 
 
@@ -103,4 +95,3 @@ Summoner clients, therefore, are not just TCP sockets with callbacks. They are t
   <a href="basics_server.md">&laquo; Previous: Server (Basics) </a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 
   <a href="begin.md">Next: Beginner's Guide &raquo;</a>
 </p>
-

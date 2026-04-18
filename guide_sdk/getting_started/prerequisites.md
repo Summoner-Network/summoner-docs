@@ -27,7 +27,7 @@ If you use the **Rust server**, you also need:
 > If you are using our **automated installation scripts** (typically described in each repository's `README.md`), the scripts will install the required Python packages into your environment, and will also build/install Rust components when the Rust toolchain is available. This includes:
 >
 > * All dependencies listed in the `setup.py` file of [`summoner-core`](https://github.com/Summoner-Network/summoner-core)
-> * Any dependencies listed in the `requirements.txt` files of SDK extensions you include in `build.txt` (e.g. `extension-utilities`, `extension-agentclass`). These extensions are typically hosted in repositories created from our [extension template](https://github.com/Summoner-Network/extension-template).
+> * Any dependencies listed in the `requirements.txt` files of SDK extensions you include in `build.txt` (e.g. `extension-utilities`, `extension-agentclass`). These extensions are typically hosted in repositories created from our [extension template](https://github.com/Summoner-Network/extension-template). Their public APIs are documented in the [Utility Extensions reference](../../reference/lib_utils/index.md) and the [Agent Extensions reference](../../reference/lib_agent/index.md).
 
 Our installation script usually sets up a Python virtual environment (`venv`). If you are using VS Code, be sure to select the interpreter from that environment — it's where all Python and Rust dependencies are installed. If you're not already inside the virtual environment, you can activate it with:
 
@@ -66,4 +66,3 @@ For users interested in the **theoretical foundations of agent design**, the SDK
 <p align="center">
   <a href="what_is.md">&laquo; Previous: What Does the Summoner SDK Do?</a>  &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="installation.md">Next: Installation &raquo;</a>
 </p>
-

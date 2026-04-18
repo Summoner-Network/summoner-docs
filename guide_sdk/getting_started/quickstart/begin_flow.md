@@ -408,22 +408,21 @@ Here is the loop: the runtime calls **upload** to learn the current node, runs t
 > **Why this policy?** In a tick, multiple receivers can run (across priorities or per-key subgraphs). If they update shared variables inline, you risk inconsistent intermediates and races, both between receivers and with senders. Let the runtime aggregate all outcomes first and call your `download(...)` with the unified proposals, then apply the mutation once. If you need side effects (I/O or messages) in reaction to those outcomes, do them in a **reactive sender** (for example, `@send(..., on_actions={...}, on_triggers={...})` or a consolidated `/all --> /all` hub) so effects run after the relevant receivers finish, deterministically.
 
 
-### Sending: Ticks vs. Hubs
+### Sending: Periodic senders vs. hubs
 
 <p align="center">
   <img width="640px" src="../../../assets/img/tick_hub_send_rounded.png"/>
 </p>
 
-There are two ways an agent emits. A **tick sender** runs every cycle and decides on each pass whether to return a payload (and therefore send) or `None` (and remain quiet). A **hub sender** is *event-driven*: it runs immediately after a receiver has returned an Event that matches the hub's filters. Tick is how you do heartbeats and maintenance; hubs are how you react *right after* specific outcomes.
+At the beginner level, two emission patterns matter most. A **periodic sender** emits on a cadence you declare with `every=...`, which is ideal for heartbeats, telemetry, and maintenance. A **hub sender** is *event-driven*: it runs immediately after a receiver has returned an Event that matches the hub's filters. Periodic senders cover recurring work; hubs are how you react *right after* specific outcomes.
 
-A tick sender is straightforward. Pace it with `await asyncio.sleep(...)`; return a value to send, or `None` to stay quiet.
+The older untimed tick pattern still exists: a plain `@send(route=...)` may return a payload or `None` each untimed cycle, and `await asyncio.sleep(...)` inside the body remains a valid tool when the delay is part of the sender's own logic. But when the goal is simply "run every N seconds", `every=...` is the clearer way to teach and read the code.
+
+A periodic sender is straightforward. Give it an interval, return a value to send, or `None` to stay quiet on that due run.
 
 ```python
-import asyncio
-
-@client.send(route="telemetry")
+@client.send(route="telemetry", every=1.0)
 async def heartbeat():
-    await asyncio.sleep(1.0)  # pacing
     return {"kind": "hb"}
 ```
 
@@ -450,6 +449,27 @@ async def after_A_to_B():
     # runs only when the A→B receiver just returned Move(Trigger.ok)
     return {"kind": "transition", "from": "A", "to": "B"}
 ```
+
+When the receiver already computed a useful payload, a reactive sender can consume that `Event.data` directly. This removes the need for temporary shared variables or a queue when all you want is "receive, decide, then emit with the resulting payload."
+
+```python
+from summoner.protocol import Action, Move
+
+@client.receive(route="A --> B")
+async def on_A(msg):
+    return Move(Trigger.ok, data={"kind": "transition", "payload": msg})
+
+@client.send(
+    route="A --> B",
+    on_actions={Action.MOVE},
+    on_triggers={Trigger.ok},
+    use_data=True,
+)
+async def after_A_to_B_with_data(data):
+    return data
+```
+
+If the payload is mutable and you want a copied handoff instead of shared-reference behavior, add `data_mode="snapshot"` to the sender.
 
 Sometimes a single hub should react to several transitions. That is where `/all --> /all` helps, but it is narrower than it sounds: it listens to **any complete arrow route** (those of the form `source --> target`) and ignores object routes (no arrow) or dangling arrows (missing a side). It only makes sense when your receivers themselves use concrete arrow routes, typically at least two, such as `"A --> B"` and `"B --> C"`.
 
@@ -491,14 +511,11 @@ async def fanout_after_A_to_B():
     return [{"to": u, "kind": "transition", "from": "A", "to": "B"} for u in recipients]
 ```
 
-If you prefer a periodic batch instead of an event-driven one, the exact same `multi=True` applies to a tick sender:
+If you prefer a periodic batch instead of an event-driven one, the exact same `multi=True` applies to a timed sender:
 
 ```python
-import asyncio
-
-@client.send(route="batch", multi=True)
+@client.send(route="batch", multi=True, every=2.0)
 async def batch_tick():
-    await asyncio.sleep(2)
     return [{"kind": "chunk", "i": i} for i in range(1, 4)]
 ```
 
@@ -814,7 +831,8 @@ To conclude, a **Summoner flow** uses the following pieces:
 | **Route**       | Pattern over source, label, target.       | `A --[x]--> B`, `opened,notify`, `--> booted`                                | Declared on `@receive` / `@send`                             |
 | **Upload**      | Current node(s), one of four shapes.      | `"opened"`, `["chat","hb"]`, `{k:"n"}`, `{k:["n1","n2"]}`                    | Implemented by `@upload_states`                              |
 | **Download**    | Commit chosen node(s) from proposals.     | receives `list[Node]` or `dict[key, list[Node]]`                             | Implemented by `@download_states`                            |
-| **Tick sender** | Runs every cycle; may emit or stay quiet. | `@send(route="telemetry")` returning value or `None`                         | Producer of outputs                                          |
+| **Timed sender** | Runs on a declared cadence.              | `@send(route="telemetry", every=1.0)`                                        | Producer of periodic outputs                                 |
+| **Tick sender** | Runs every untimed cycle; may emit or stay quiet. | `@send(route="telemetry")` returning value or `None`                         | Producer of untimed outputs                                  |
 | **Hub sender**  | Fires right after matching Events.        | `@send(route="A --> B", on_actions={Action.MOVE}, on_triggers={Trigger.ok})` | Producer of reactive outputs                                 |
 
 Together, they form the atomic life cycle of a Summoner agent: absorb, jump, emit, settle.

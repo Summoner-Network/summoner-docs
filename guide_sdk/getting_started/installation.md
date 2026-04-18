@@ -6,7 +6,7 @@ This script-based approach is consistent across key components of the platform, 
 
 * [`summoner-desktop`](https://github.com/Summoner-Network/summoner-desktop): the Electron-based desktop app
 * [`summoner-core`](https://github.com/Summoner-Network/summoner-core): the core logic of the SDK
-* [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass): agent extensions and features
+* [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass): agent extensions and features (see the [Agent Extensions reference](../../reference/lib_agent/index.md), especially the [Aurora module reference](../../reference/lib_agent/aurora.md))
 
 Each of these repositories contains its own `setup.sh`, `install.sh` or build script, and these scripts **chain together** during installation. For example, installing the SDK via `summoner-desktop` will trigger the `summoner-sdk` script, which in turn calls the setup scripts from `summoner-core` and any modules specified in `build.txt`.
 
@@ -127,15 +127,15 @@ cd <your_repo>
 
 ### Step 2: Define the SDK in `build.txt`
 
-Edit the `build.txt` file to include the modules you want. For example, to include the `aurora` agent module from `extension-agentclass`:
+Edit the `build.txt` file to include the modules you want. For example, to include the [aurora](../../reference/lib_agent/aurora.md) module from `extension-agentclass`:
 
 ```txt
 https://github.com/Summoner-Network/extension-agentclass.git:
 aurora
 ```
 
-> [!WARNING]
-> The `aurora` module is experimental. It is available for early access, but the interface and behavior may change. Documentation and status updates can be found on the reference page: [aurora](../../reference/lib_agent/aurora.md)
+> [!TIP]
+> `aurora` is an optional module. You can include it from the start or add it later and rerun setup. For the extension overview, see [Agent Extensions](../../reference/lib_agent/index.md). For the Aurora API itself, see [aurora](../../reference/lib_agent/aurora.md) and the [`SummonerAgent` reference](../../reference/lib_agent/aurora/agent.md).
 
 You can modify this file at any time to add or remove modules.
 

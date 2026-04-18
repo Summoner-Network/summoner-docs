@@ -1,8 +1,8 @@
-# <code style="background: transparent;">Summoner<b>.client.client</b></code> (core v1.1.1)
+# <code style="background: transparent;">Summoner<b>.client.client</b></code> (core v1.2.0)
 
 This page documents the **Python SDK interface** for running a Summoner client via `SummonerClient`. It focuses on how to use the class and its methods, and what behavior to expect when you call them.
 
-A Summoner client connects to a Summoner server over TCP, continuously receives newline-delimited messages, runs user-defined handlers registered via decorators (for receive/send/hooks/state sync), and optionally emits messages back to the server. The client also supports **reconnection**, **fallback**, and **agent travel** (switching host/port at runtime) through the SDK surface.
+A Summoner client connects to a Summoner server over TCP, continuously receives newline-delimited messages, runs user-defined handlers registered via decorators (for receive/send/hooks/state sync), and optionally emits messages back to the server. The client also supports **reconnection**, **fallback**, **agent travel** (switching host/port at runtime), and sender behavior for **reactive event data**, **timed senders**, and **DNA replay of sender scheduling rules**.
 
 `SummonerClient` is the primary SDK entry point for running a client process. It handles configuration loading (from a file path or in-memory dict), logger initialization, termination signal handling (where supported), handler registration, and the overall client lifecycle (connect, run loops, shutdown).
 
@@ -389,6 +389,8 @@ Decorator used to register an **async receiver handler** that is called when mes
 
 Receivers are grouped and executed in batches by `priority`. When flow is enabled, the route may be parsed and used for activation logic; otherwise the raw route is used as the index key.
 
+If the handler returns an `Event`, that event may also carry `data`. Flow-aware sender logic can forward that payload to reactive senders registered with `use_data=True`.
+
 The decorated function must:
 
 * be `async`
@@ -436,7 +438,11 @@ def send(
     multi: bool = False,
     on_triggers: Optional[set[Signal]] = None,
     on_actions: Optional[set[Type]] = None,
-) -> Callable[[Callable[[], Awaitable[Any]]], Callable[..., Any]]
+    use_data: bool = False,
+    data_mode: Optional[str] = None,
+    every: Optional[float] = None,
+    run_while: Any = None,
+) -> Callable[[Callable[..., Awaitable[Any]]], Callable[..., Any]]
 ```
 
 ### Behavior
@@ -449,6 +455,46 @@ Senders are executed by the sender loop and enqueue output payloads to be encode
 * If `multi=True`, the sender returns a list of payloads (or `None` entries).
 
 When flow is enabled, `on_triggers` / `on_actions` can be used to make a sender reactive to activation events. From an SDK perspective, these parameters declare when a sender is eligible to run.
+
+The sender API adds four important controls:
+
+* `use_data=True` passes the matched event payload (`Event.data`) into the sender.
+* `data_mode` controls how that payload is transferred:
+
+  * `"live"` keeps shared-reference semantics.
+  * `"snapshot"` deep-copies at capture and again at dispatch.
+
+* `every=<seconds>` turns the sender into a timed sender.
+* `run_while=...` lets a timed sender keep running only while a bool or callable condition allows it.
+
+From the user's point of view, there are three common sender modes:
+
+* **Untimed sender:** no `every`; runs in the legacy round-based sender loop.
+* **Reactive sender:** uses `on_triggers` and/or `on_actions`; runs only for matching events.
+* **Timed sender:** uses `every`; once admitted, it is scheduled independently from the untimed batch loop.
+
+Two practical runtime details matter for advanced sender logic:
+
+* With untimed reactive senders, `use_data=True` keeps one invocation per matching event. Matching events are not collapsed into one run, because the event payload itself is part of the sender input.
+* For reactive timed senders, cadence does not arm the sender by itself. A matching event must arm the runtime first; after that, `run_while` can keep the sender active or stop it.
+
+Important validation rules:
+
+* `route` must be a string.
+* `multi` and `use_data` must be booleans.
+* `every` must be `None` or a positive number.
+* `on_triggers` must be `None` or a `set[Signal]`.
+* `on_actions` must be `None` or a set of `Action.MOVE`, `Action.STAY`, and/or `Action.TEST`.
+* `use_data=True` requires a non-empty reactive filter and `client.flow().activate()` before registration.
+* Timed reactive senders also require `client.flow().activate()` before registration.
+* `data_mode` requires `use_data=True`.
+* `run_while` requires `every`.
+
+Handler signature rules:
+
+* If `use_data=False`, the sender must accept **zero** parameters.
+* If `use_data=True`, the sender must accept **exactly one** parameter.
+* When `use_data=True`, the SDK enforces the parameter count but intentionally does not require a specific annotation type.
 
 ### Inputs
 
@@ -472,6 +518,33 @@ When flow is enabled, `on_triggers` / `on_actions` can be used to make a sender 
 
 * **Type:** `Optional[set[Type]]`
 * **Meaning:** Optional action set that gates sender execution in flow-enabled mode. This is validated against allowed action event classes.
+
+#### `use_data`
+
+* **Type:** `bool`
+* **Meaning:** Whether the sender receives the matched event payload as a single argument.
+* **Default:** `False`
+* **Important rule:** Requires a non-empty reactive filter and flow activation before registration.
+
+#### `data_mode`
+
+* **Type:** `Optional[str]`
+* **Meaning:** Transfer policy for event payloads when `use_data=True`.
+* **Accepted values:** `None`, `"live"`, `"snapshot"`
+* **Default behavior:** Normalizes to `"live"` when `use_data=True`.
+
+#### `every`
+
+* **Type:** `Optional[float]`
+* **Meaning:** Repeat cadence in seconds for timed senders.
+* **Default:** `None`
+* **Validation:** Must be positive when provided.
+
+#### `run_while`
+
+* **Type:** `Any`
+* **Meaning:** Optional timed-sender guard. May be `None`, a bool, or a callable returning `bool` / awaitable `bool`.
+* **Important rule:** Only valid when `every` is set.
 
 ### Outputs
 
@@ -501,6 +574,41 @@ client = SummonerClient(name="summoner:client")
 @client.send(route="chat.send", multi=True)
 async def send_many():
     return [{"data": "a"}, {"data": "b"}, {"data": "c"}]
+```
+
+#### Reactive sender that consumes `Event.data`
+
+```python
+from summoner.client import SummonerClient
+from summoner.protocol.triggers import load_triggers, Action
+
+client = SummonerClient(name="summoner:client")
+Trigger = load_triggers(text="OK\n  minor")
+client.flow().activate()
+
+@client.send(
+    route="chat.send",
+    on_actions={Action.STAY},
+    on_triggers={Trigger.minor},
+    use_data=True,
+    data_mode="snapshot",
+)
+async def reply(event_data):
+    return {"seen": event_data}
+```
+
+#### Timed sender guarded by `run_while`
+
+```python
+from summoner.client import SummonerClient
+
+client = SummonerClient(name="summoner:client")
+
+keep_running = True
+
+@client.send(route="heartbeat", every=5.0, run_while=lambda: keep_running)
+async def heartbeat():
+    return {"kind": "heartbeat"}
 ```
 
 ## `SummonerClient.travel_to`
@@ -594,7 +702,22 @@ At the SDK level, DNA is used to support cloning and merging workflows by captur
 * handler type (receive/send/hook/upload_states/download_states),
 * route keys and priorities (where applicable),
 * handler source code,
+* sender scheduling metadata such as `use_data`, `data_mode`, `every`, and serialized `run_while`,
 * optional context metadata when `include_context=True`.
+
+For `@send(...)` handlers, DNA now writes the full sender contract, including:
+
+* `multi`
+* `on_triggers` and `on_actions` by name
+* `use_data`
+* `data_mode`
+* `every`
+* `run_while_kind`
+* `run_while_value`
+* `run_while_name`
+* `run_while_source` when the SDK can serialize fallback source text
+
+When `include_context=True`, DNA also scans registered handlers and callable `run_while` guards so translation and merger workflows can recover referenced imports, globals, recipes, and explicit "missing" bindings.
 
 ### Inputs
 
@@ -746,6 +869,7 @@ Runs a single connected session: one receiver loop and one sender loop concurren
 * Runs `message_receiver_loop(...)` and `message_sender_loop(...)` concurrently.
 * Ends the session when one side completes (disconnect, travel, quit), then cancels the other side.
 * Closes the connection and cleans up workers and tracked tasks.
+* Clears timed-sender runtime state both at session start and during cleanup so timed senders do not leak scheduling state across reconnects.
 
 In typical SDK usage, you do not call this directly; it is used as part of the reconnection logic.
 
@@ -791,7 +915,7 @@ At a high level:
 * Decodes the message into a relayed payload type.
 * Applies receiving hooks in priority order.
 * Runs receiver handlers in batches (by priority). If flow is enabled, batches may be activation-driven.
-* If flow is enabled, forwards activation events across the event bridge to the sender side.
+* If flow is enabled, forwards activation events across the event bridge to the sender side, including any `Event.data` payload carried by the receiver result.
 * Exits when `stop_event` is set, the server disconnects, or the task is cancelled.
 
 ### Inputs
@@ -830,12 +954,33 @@ Continuously schedules and enqueues sender handlers for execution, then ensures 
 
 At a high level:
 
-* Builds a sender batch from registered senders.
-* If flow is enabled, may gate senders based on pending activation events and route matching.
-* Enqueues work to a bounded queue (backpressure to producers when full).
-* Waits for the queue batch to finish (`send_queue.join()`).
-* Drains the writer according to `batch_drain`.
-* Exits when `stop_event` is set, travel/quit intent is detected, or the task is cancelled.
+* Starts two internal loops together:
+
+  * an **untimed batch loop** that preserves the legacy round-based sender contract,
+  * a **timed scheduler loop** that services `every=...` senders independently.
+
+* The untimed batch loop:
+
+  * snapshots the sender registry,
+  * consumes pending receiver events,
+  * matches reactive senders by route and event filters,
+  * keeps one invocation per matching event when `use_data=True`,
+  * enqueues a bounded batch of send invocations,
+  * waits for that untimed batch to finish before starting the next untimed round.
+
+* The timed scheduler loop:
+
+  * lets non-reactive timed senders become due immediately on the first scheduler pass,
+  * arms timed reactive senders from matching events,
+  * does not treat `run_while` as an arming mechanism on its own,
+  * tracks one runtime record per sender registration,
+  * polls `run_while`,
+  * emits due invocations on cadence,
+  * optionally replays buffered payloads when `use_data=True`, which means one due tick can emit more than one invocation if several payloads were buffered.
+
+* Both loops share the same bounded send queue and writer workers.
+* `batch_drain` still controls when the socket is flushed, but timed senders are no longer forced to wait for unrelated untimed batches before becoming due.
+* On shutdown, the loop cancels any in-flight `run_while` tasks and shuts down both internal loops cleanly.
 
 ### Inputs
 

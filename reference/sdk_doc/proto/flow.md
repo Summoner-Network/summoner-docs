@@ -404,7 +404,7 @@ Steps:
    * If matched:
 
      * extracts raw `source`, `label`, `target` strings (depending on variant)
-     * tokenizes each segment using the style’s `separator` with `get_token_list`
+     * tokenizes each segment using the style's `separator` with `get_token_list`
      * validates tokens against the token regex
      * returns a `ParsedRoute(source=..., label=..., target=..., style=style)`
 4. If no arrow pattern matches:

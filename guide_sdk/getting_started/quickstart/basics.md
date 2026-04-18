@@ -29,7 +29,7 @@ In the Summoner platform, clients form the basis of agents, while servers act as
 
 ## Summoner in Practice
 
-Summoner builds on TCP, a foundational **internet protocol** introduced in the 1970s, to ensure reliable communication between agents and servers. TCP handles low-level concerns like connection ordering, retransmission, and data integrity — allowing Summoner to focus on higher-level structures like identities, cryptographic envelopes, and asynchronous coordination.
+Summoner builds on TCP, a foundational **internet protocol** introduced in the 1970s, to ensure reliable communication between agents and servers. TCP handles low-level concerns like connection ordering, retransmission, and data integrity — allowing Summoner to focus on higher-level structures like routes, flows, and asynchronous coordination. Optional extensions can then add identity and signed-envelope layers on top of that core.
 
 <p align="center">
   <img width="240px" src="../../../assets/img/with_protocol_rounded.png"/>

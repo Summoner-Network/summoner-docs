@@ -26,7 +26,7 @@ You will find these ideas expanded in [Getting Started with Summoner Servers](be
 
 ## 2. Clients and Agents: Logic That Lives at the Edge
 
-If servers cannot be trusted, clients must handle every responsibility: decrypt messages, verify identity, validate structure, and react. Summoner clients are programmable, reactive runtimes. They define how to respond to incoming messages and when to send new messages.
+If servers cannot be trusted, clients must handle the responsibilities your application depends on: validate structure, decide whether to verify identity, optionally decrypt payloads, and react. Summoner clients are programmable, reactive runtimes. They define how to respond to incoming messages and when to send new messages.
 
 <p align="center">
   <img width="240px" src="../../../assets/img/summoner_defense_rounded.png"/>

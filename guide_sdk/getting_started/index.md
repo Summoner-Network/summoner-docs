@@ -17,7 +17,7 @@ To begin, you can clone the [`summoner-sdk`](https://github.com/Summoner-Network
 >
 > This section of the documentation focuses on the SDK: how to install it, run clients and servers locally, and use sample agents from the [`summoner-agents`](https://github.com/Summoner-Network/summoner-agents) repository.
 
-The SDK is modular by design. It is built around a core library (`summoner-core`) and includes optional components that you can add or remove as needed. We will showcase the SDK using both its core modules and common extensions — for example, the agent classes from [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass), which add decentralized identity, cryptographic tools, and other runtime capabilities.
+The SDK is modular by design. It is built around a core library (`summoner-core`) and includes optional components that you can add or remove as needed. We will showcase the SDK using both its core modules and common extensions — for example, the agent classes from [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass), which add identity, policy, and orchestration capabilities on top of the core runtime. For the public API of those add-ons, see the [Agent Extensions reference](../../reference/lib_agent/index.md), including the [Aurora module reference](../../reference/lib_agent/aurora.md).
 
 ---
 
@@ -49,7 +49,7 @@ The SDK is modular by design. It is built around a core library (`summoner-core`
 
 ---
 
-Whether you are exploring agent-based programming for the first time or integrating Summoner into a larger system, the upcoming pages will equip you with practical tools and a clear mental model of how everything fits together.
+Whether you are exploring agent-based programming for the first time or integrating Summoner into a larger system, the pages below will equip you with practical tools and a clear mental model of how everything fits together.
 
 <p align="center">
   <a href="../index.md">&laquo; Previous: Summoner SDK Guides</a>

@@ -2,7 +2,7 @@
 
 This page explains how to configure `SummonerClient.run(...)` in a way that is understandable to readers who do not want to study the implementation. Each setting is described by its purpose, behavior, default value, and the practical consequences of changing it.
 
-A Summoner client is an async runtime that connects to a TCP relay, receives newline-delimited messages, runs your registered handlers (`@receive`, `@send`, `@hook`), and optionally uses flow-aware routing (parsed routes, a state tape, and reactive senders). Most configuration exists to answer three operational questions:
+A Summoner client is an async runtime that connects to a TCP relay, receives newline-delimited messages, runs your registered handlers (`@receive`, `@send`, `@hook`), and optionally uses flow-aware routing (parsed routes, a state tape, reactive senders, timed senders, and `Event.data` delivery). Most configuration exists to answer three operational questions:
 
 1. Where does the client connect (`host`, `port`), and how does it reconnect (`hyper_parameters.reconnection`)?
 2. What is recorded for observability (`logger`)?
@@ -422,13 +422,13 @@ If omitted, it defaults to `true`.
 ### `hyper_parameters.sender.event_bridge_maxsize`
 
 <details>
-<summary><b>Purpose:</b> The parameter <code>event_bridge_maxsize</code> sets the capacity of the internal bridge from receivers to reactive senders when flow is enabled.</summary>
+<summary><b>Purpose:</b> The parameter <code>event_bridge_maxsize</code> sets the capacity of the internal bridge from receivers to reactive and timed senders when flow is enabled.</summary>
 
 #### Idea
 
 Config path: `hyper_parameters.sender.event_bridge_maxsize`.
 
-When flow-aware routing is enabled, receiver batches can produce events that trigger reactive senders. Those events are passed through an internal queue (the "event bridge"). If the bridge is full, the receiver side blocks, which slows input processing and applies backpressure.
+When flow-aware routing is enabled, receiver batches can produce events that trigger reactive senders and arm timed sender runtimes. Those events are passed through an internal queue (the "event bridge"). If the bridge is full, the receiver side blocks, which slows input processing and applies backpressure.
 
 #### Default if omitted
 
@@ -518,7 +518,7 @@ Goal: stop quickly when handler code is unhealthy.
   "port": 8888,
 
   "logger": {
-    "level": "INFO"
+    "log_level": "INFO"
   },
 
   "hyper_parameters": {

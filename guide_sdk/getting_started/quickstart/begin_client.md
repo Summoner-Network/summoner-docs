@@ -13,10 +13,10 @@ A **Summoner client** is a TCP program that connects to a Summoner server, **rec
 However, a client focuses on messaging and orchestration primitives; it does not include the security and policy layers needed to operate safely on an open server with untrusted peers. To address this, we provide **agent classes**. An **agent** is a client with additional behavior:
 
 * `SummonerClient` is the base class.
-* An *agent class* **subclasses** `SummonerClient` and adds features such as cryptographic envelopes, handshake logic, DID utilities, SummonerAPI helpers, and orchestration helpers. You are free to design your own agent class for your project.
+* An *agent class* **subclasses** `SummonerClient` and adds features such as identity records, envelope handling, policy hooks, handshake logic, and orchestration helpers. You are free to design your own agent class for your project.
 
 > [!NOTE]
-> A **reference agent class** will ship with the **Aurora** update (via [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass)). It provides an opinionated baseline for orchestration: message signing and verification, handshake scaffolding, DID utilities, policy-driven validation, and route/flow helpers. Use it as a ready-made starting point if you prefer not to build these pieces yourself.
+> A **reference agent class** is available through **[Aurora](../../../reference/lib_agent/aurora.md)** (implemented in [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass)). It provides an opinionated baseline for orchestration: identity records, message signing and verification, handshake scaffolding, policy-driven validation, and route/flow helpers. Use it as a ready-made starting point if you prefer not to build these pieces yourself. For the broader add-on space, see the [Agent Extensions reference](../../../reference/lib_agent/index.md), and for the concrete class interface see [`SummonerAgent`](../../../reference/lib_agent/aurora/agent.md).
 
 
 ## Running a client
@@ -174,7 +174,7 @@ agent.run(host="127.0.0.1", port=8888)
 With an empty subclass of `SummonerClient` as above, the output is the same as the base client; the difference is you now have a place to attach **handlers** and **hooks**.
 
 > [!NOTE]
-> Our upcoming `SummonerAgent` class (coming soon in our **Aurora** update) will propose what we think should be a solid baseline for agent-to-agent communication. The module will be available via [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass) and can be installed alongside the SDK. You can continue to build your own agent classes; this reference class is meant to save time for common orchestration needs.
+> [`SummonerAgent`](../../../reference/lib_agent/aurora/agent.md) is available as part of **[Aurora](../../../reference/lib_agent/aurora.md)** via [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass). You can continue to build your own agent classes; the Aurora reference class is simply a faster starting point for common orchestration, identity, and policy needs. If you want the wider module map first, start with the [Agent Extensions reference](../../../reference/lib_agent/index.md).
 
 ## Building interactive agents
 
@@ -211,24 +211,22 @@ agent.run(host="127.0.0.1", port=8888)
 
 ### Minimal send (keeps sending)
 
-The simplest sender can emit a message every second:
+The clearest way to express a steady heartbeat is to register a timed sender with `every=...`:
 
 ```python
-import asyncio
 from summoner.client import SummonerClient
 
 agent = SummonerClient()
 
-@agent.send(route="")
+@agent.send(route="", every=1.0)
 async def heartbeat():
     print("Sending 'ping'")
-    await asyncio.sleep(1.0)   # sets the pace; sender is polled repeatedly
     return "ping"
 
 agent.run(host="127.0.0.1", port=8888)
 ```
 
-This keeps sending because the send loop polls registered senders. The `await asyncio.sleep(...)` sets the pace.
+This keeps sending because the SDK schedules the sender every second. Older patterns that put `await asyncio.sleep(...)` inside the sender body still work, but `every=...` is usually clearer when all you want is a recurring cadence.
 
 ### Controlling sends (send once)
 
@@ -252,7 +250,7 @@ async def hello_once():
 agent.run(host="127.0.0.1", port=8888)
 ```
 
-Returning `None` means *no message this cycle.* You can also flip flags from a `@receive` handler to make sending reactive.
+Returning `None` means *no message this cycle.* Later, when you use flows, a reactive sender can also consume `Event.data` directly with `use_data=True` instead of coordinating through shared flags or helper queues by hand.
 
 ## Composition: thinking in "capabilities"
 
@@ -270,7 +268,6 @@ Composition is central to how you scale an agent without rewriting it. The pract
 **Small two-capability example**
 
 ```python
-import asyncio
 from typing import Any
 from summoner.client import SummonerClient
 
@@ -281,15 +278,13 @@ agent = SummonerClient()
 async def echo_rx(msg: Any) -> None:
     print(f"[echo] {msg!r}")
 
-@agent.send(route="echo")
+@agent.send(route="echo", every=2.0)
 async def echo_tx():
-    await asyncio.sleep(2)
     return {"kind": "echo", "text": "hello"}
 
 # Capability 2: heartbeat
-@agent.send(route="heartbeat")
+@agent.send(route="heartbeat", every=5.0)
 async def hb_tx():
-    await asyncio.sleep(5)
     return "hb"
 
 agent.run(host="127.0.0.1", port=8888)

@@ -47,24 +47,20 @@
 | Travel          | Adept      | [Command-gating your agent](guide_sdk/fundamentals/design.md#command-gating-your-agent)                                       |
 | Events          | Apprentice | [Route DSL & semantics](guide_sdk/getting_started/quickstart/begin_flow.md#route-dsl--semantics)                              |
 
-### Aurora (upcoming release)
+### Aurora
 
-Learn more about the Aurora release through the following links:
+Aurora is the client-side extension layer for Summoner. The pages below are the most relevant if you want to include it in your SDK build, understand where it fits, and move from the general client/agent guides into Aurora's own reference pages.
 
 * [What does the Summoner SDK do?](guide_sdk/getting_started/what_is.md)
-* [Update Installation](guide_sdk/getting_started/installation.md)
+* [Installation](guide_sdk/getting_started/installation.md)
 * [Windows Installation](guide_sdk/getting_started/windows_install.md)
-* [Server's basics](guide_sdk/getting_started/quickstart/basics_server.md)
 * [Client's basics](guide_sdk/getting_started/quickstart/basics_client.md)
-* [Getting started: Server](guide_sdk/getting_started/quickstart/begin_server.md)
-* [Getting started: clients & agents](guide_sdk/getting_started/quickstart/basics_client.md)
-* [How to run and configure a server](guide_sdk/fundamentals/server_relay.md)
+* [Getting started: clients & agents](guide_sdk/getting_started/quickstart/begin_client.md)
 * [How to run and configure agents](guide_sdk/fundamentals/client_agent.md)
-* [SDK reference](reference/index.md)
-    * [Agent extensions](reference/lib_agent/index.md)
-    * [Aurora extension](reference/lib_agent/aurora.md)
-* [Advanced usage: server](guide_sdk/advanced_usage/server_setup.md)
-* [Advanced usage: agent](guide_sdk/advanced_usage/agent_setup.md)
+* [Agent extensions](reference/lib_agent/index.md)
+* [Aurora reference](reference/lib_agent/aurora.md)
+* [Aurora agent class: `SummonerAgent`](reference/lib_agent/aurora/agent.md)
+* [Aurora identity API: `SummonerIdentity` and `SummonerIdentityControls`](reference/lib_agent/aurora/identity/index.md)
 
 
 </details>
@@ -89,7 +85,7 @@ Learn more about the Aurora release through the following links:
 - [**🚀 Summoner SDK Guides**](guide_sdk/index.md)
     - [***Getting started***](guide_sdk/getting_started/index.md)
         - [What does the Summoner SDK do?](guide_sdk/getting_started/what_is.md)
-        - [Prerequisites](getting_started/prerequesites.md)
+        - [Prerequisites](guide_sdk/getting_started/prerequisites.md)
         - [Installation](guide_sdk/getting_started/installation.md)
         - [Quickstart](guide_sdk/getting_started/quickstart/index.md)
             * [Basics](guide_sdk/getting_started/quickstart/basics.md) 
@@ -124,11 +120,8 @@ Learn more about the Aurora release through the following links:
         - [<code style="background: transparent;">Summoner<b>.aurora</b></code>](reference/lib_agent/aurora.md)
     - [***Utility Extensions***](reference/lib_utils/index.md)
         - [<code style="background: transparent;">Summoner<b>.visionary</b></code>](reference/lib_utils/visionary.md)
-        - [<code style="background: transparent;">Summoner<b>.pdf_tools</b></code>](reference/lib_utils/pdf_tools.md)
-        - [<code style="background: transparent;">Summoner<b>.code_tools</b></code>](reference/lib_utils/code_tools.md)
         - [<code style="background: transparent;">Summoner<b>.curl_tools</b></code>](reference/lib_utils/curl_tools.md)
         - [<code style="background: transparent;">Summoner<b>.gpt_guardrails</b></code>](reference/lib_utils/gpt_guardrails.md)
-        - [<code style="background: transparent;">Summoner<b>.crypto_utils</b></code>](reference/lib_utils/crypto_utils.md)
 
 - [**🔧 Developer & Contribution**](development/index.md)
     - [**Development and infrastructure**](development/infrastructure/index.md)

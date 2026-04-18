@@ -6,7 +6,7 @@ This page documents the **Python SDK interface** for running the **Visionary** b
   <img width="550px" src="../../assets/mov2gif/gifs/demo_visionary.gif" />
 </p>
 
-**Visionary** is a lightweight browser visualizer for **Summoner client flow graphs**. It is meant to make your client’s control structure visible while it runs by showing three things at the same time:
+**Visionary** is a lightweight browser visualizer for **Summoner client flow graphs**. It is meant to make your client's control structure visible while it runs by showing three things at the same time:
 
 * The **static graph** extracted from `client.dna()`, meaning nodes and labeled arrows.
 * The **active snapshot** you provide at runtime, meaning a set of tokens that should be highlighted.
@@ -59,7 +59,7 @@ You initialize the visualizer by selecting a port and passing it to the construc
 viz = ClientFlowVisualizer(title="...", port=8765)
 ```
 
-**Visionary** starts a local HTTP server on `127.0.0.1:<port>`. The port must be free. When running multiple agents locally, the port should be **different for each agent process**. Avoid hardcoding a single shared port if you routinely run agents concurrently, and treat the port as part of your agent’s runtime configuration (similar to a client name).
+**Visionary** starts a local HTTP server on `127.0.0.1:<port>`. The port must be free. When running multiple agents locally, the port should be **different for each agent process**. Avoid hardcoding a single shared port if you routinely run agents concurrently, and treat the port as part of your agent's runtime configuration (similar to a client name).
 
 A simple rule that works well is:
 
@@ -620,5 +620,5 @@ client.run(host="127.0.0.1", port=8888)
 
 
 <p align="center">
-  <a href="index.md">&laquo; Previous: Utility Extensions</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="pdf_tools.md">Next: <code style="background: transparent;">Summoner<b>.pdf_tools</b></code> &raquo;</a>
+  <a href="index.md">&laquo; Previous: Utility Extensions</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="curl_tools.md">Next: <code style="background: transparent;">Summoner<b>.curl_tools</b></code> &raquo;</a>
 </p>

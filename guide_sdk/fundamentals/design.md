@@ -48,7 +48,7 @@ agents/
 
 ## Concurrency: cooperative I/O, bounded work
 
-Summoner clients run on `asyncio` with non-blocking sockets. Handlers must `await` I/O and keep CPU work short. If a handler does CPU-heavy work that could block the loop, move it to a thread or process. Prefer queues and tasks over sleeps.
+Summoner clients run on `asyncio` with non-blocking sockets. Handlers must `await` I/O and keep CPU work short. If a handler does CPU-heavy work that could block the loop, move it to a thread or process. Prefer queues, timed senders, and tasks over ad hoc sleeps.
 
 **Send and receive are concurrent.** Input and output progress independently. Treat them as decoupled loops that may observe state at slightly different times. Avoid races by coordinating through routes and flows rather than mutating shared state from both sides.
 
@@ -82,7 +82,7 @@ async def on_text(payload: Any) -> Optional["Event"]:
 
 > If flows are **on**, route tokens must be valid **Node** names (plain tokens like `opened`, `locked`, plus reserved forms such as `/all`, `/oneof(...)`, `/not(...)`). Avoid embedding `/` in ordinary node names. Slash-prefixed forms are reserved by the DSL. If flows are **off**, route strings are just labels and match exactly.
 
-**Sending.** Use `@send` for outbound paths. A send handler is `async`, takes **no arguments**, and **returns** either a single payload (str/dict) or, with `multi=True`, a **list** of payloads. Returning `None` means "stay quiet this tick." Never `yield`. Generators are not supported by the SDK.
+**Sending.** Use `@send` for outbound paths. By default, a send handler is `async`, takes **no arguments**, and **returns** either a single payload (str/dict) or, with `multi=True`, a **list** of payloads. If you opt into `use_data=True`, the handler instead receives **one event-data argument**. Use `every=<seconds>` for recurring cadence and `run_while=...` when a timed sender should keep running only while a guard allows it. Returning `None` means "stay quiet this cycle." Never `yield`. Generators are not supported by the SDK.
 
 ```python
 @client.send(route="/msgs/text", multi=True)
@@ -90,6 +90,14 @@ async def broadcast_text() -> list[dict]:
     targets = get_targets()
     body = build_payload()
     return [{"to": t, **body} for t in targets]
+```
+
+When the job is simply "emit every N seconds", prefer a timed sender over hand-written `await asyncio.sleep(...)` inside the body:
+
+```python
+@client.send(route="heartbeat", every=5.0)
+async def heartbeat() -> dict:
+    return {"kind": "hb"}
 ```
 
 **Hooks.** Use `@hook(Direction.RECEIVE|SEND)` for cross-cutting concerns: schema checks, replay drop, reputation, signing/encryption. A hook is `async`, accepts **one** payload, and returns a (possibly modified) payload or `None` to drop it. Keep hooks free of business logic. They should be small, deterministic filters. (You can order multiple hooks with the `priority` tuple. Lower tuples run earlier.)
@@ -431,6 +439,7 @@ For public agent implementations that illustrate validation hooks, replay handli
 
 Queues are your shock absorbers. Use them to decouple hot receive paths from heavier aggregation or fan-out, and to shape bursty workloads into predictable sends.
 
+* **Direct event-data transfer.** If a sender only needs the payload already attached to a matching `Event`, prefer `use_data=True` (and `data_mode="snapshot"` when you want a copied handoff). Reach for queues when you need buffering, batching, retries, or cross-task decoupling.
 * **Batch and summarize.** Collect items for *N* seconds, emit one consolidated report.
 * **Fan-out with backpressure.** Enqueue jobs and let a single sender task respect `multi=True` semantics and queue limits.
 
