@@ -14,7 +14,7 @@ At its core, the SDK is designed to **orchestrate agents**. These agents can:
 * Be built with other frameworks and connected to Summoner's network through simple wrappers or interfaces
 * Be written natively using our SDK (see examples in our [`summoner-agents`](https://github.com/Summoner-Network/summoner-agents) repository)
 
-Once agents are connected, you can link them to the desktop app to simplify deployment and setup. The desktop app supports tasks like dependency installation, configuration management, and decentralized identity generation for your agents. For more, see the [Desktop App Guide](../../guide_app/index.md).
+Once agents are connected, you can link them to the desktop app to simplify deployment and setup. The desktop app supports tasks like dependency installation, configuration management, and self-signed agent identity generation for your agents. For more, see the [Desktop App Guide](../../guide_app/index.md).
 
 ### Why it Matters
 

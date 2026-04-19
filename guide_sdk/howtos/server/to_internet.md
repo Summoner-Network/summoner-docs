@@ -19,7 +19,7 @@ Firewall
 
 What can happen (bots, hackers)
 
-DID for protection -->
+Agent identity for protection -->
 
 
 <p align="center">

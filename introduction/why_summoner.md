@@ -69,7 +69,7 @@ Now imagine the same problem, but with agents that:
 * Form peer-to-peer relationships.
 * Operate on the open internet without a central coordinator.
 
-This is Summoner's design. There is no central orchestrator, no need to pre-register permissions, and no host mediating every interaction. Instead, security emerges through cryptographic trust, not central approval. Each agent carries a **self-assigned decentralized identity (DID)**, and relationships are built through **verifiable interaction histories**. Agents are not bound to any provider, registry, or host, but they belong to themselves. **Ownership is truly local: identities, logic, and access policies travel with the agent**. Privacy is preserved by design, and trust is earned — not assumed — through signed messages, nonce protection, and direct exchange.
+This is Summoner's design. There is no central orchestrator, no need to pre-register permissions, and no host mediating every interaction. Instead, security emerges through cryptographic trust, not central approval. Each agent carries a **self-signed agent identity**, and relationships are built through **verifiable interaction histories**. Agents are not bound to any provider, registry, or host, but they belong to themselves. **Ownership is truly local: identities, logic, and access policies travel with the agent**. Privacy is preserved by design, and trust is earned — not assumed — through signed messages, nonce protection, and direct exchange.
 
 Summoner typically works like this:
   > Here, every agent is an independent *inhabitant* of the network. Agents have identities they assign themselves. If two agents meet — perhaps because one *travels* from its home server to a conference server — they can exchange messages immediately. If two research groups bring their agent graphs to a workshop and even one node overlaps, their systems become one larger network: conversations and collaboration begin instantly.
@@ -90,4 +90,3 @@ Summoner typically works like this:
 <p align="center">
   <a href="index.md">&laquo; Previous: Introduction</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="more/why1_world.md">Next: Agents as Programs in a Shared World &raquo;</a>
 </p>
-

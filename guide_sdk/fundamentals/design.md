@@ -270,12 +270,12 @@ You rarely ship a single, monolithic "behavior." Robust agents are **composition
 
 When peers are untrusted or links are flaky, put a **handshake layer** *under* your domain logic. The point is to stabilize transport-level invariants first (liveness, identity, replay safety), then run business flows on top. Practically, you validate on the way **in** (hooks), record minimal state, and only after the echo or signature checks succeed do you let domain receivers fire.
 
-Start simple with a **nonce echo** (prove freshness and drop replays). Where integrity matters, move to **DID-based identity** and signatures. Treat these as transport guarantees enforced in hooks, not sprinkled across business handlers. With a clean base, your buy/sell or chat flows become a thin **overlay**. Their states (offers, counters, acceptances) remain independent from the transport handshake (nonces, keys, references). This separation makes restarts and reconnection behavior predictable.
+Start simple with a **nonce echo** (prove freshness and drop replays). Where integrity matters, move to **signed agent identity** and signature checks. Treat these as transport guarantees enforced in hooks, not sprinkled across business handlers. With a clean base, your buy/sell or chat flows become a thin **overlay**. Their states (offers, counters, acceptances) remain independent from the transport handshake (nonces, keys, references). This separation makes restarts and reconnection behavior predictable.
 
 For complete, public illustrations of layered designs, see:
 
 * [agents/agent_HSAgent_0](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_HSAgent_0): Nonce-echo handshake with finalize/reconnect and replay protection.
-* [agents/agent_HSAgent_1](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_HSAgent_1): Handshake upgraded with DID signatures; identity verified in hooks.
+* [agents/agent_HSAgent_1](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_HSAgent_1): Handshake upgraded with signed agent identity; identity verified in hooks.
 * [agents/agent_HSBuyAgent_0](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_HSBuyAgent_0): Buyer negotiation overlay (offer/counter/accept) atop the handshake.
 * [agents/agent_HSSellAgent_0](https://github.com/Summoner-Network/summoner-agents/tree/main/agents/agent_HSSellAgent_0): Seller negotiation overlay (quote/accept) atop the handshake.
 

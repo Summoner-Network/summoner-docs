@@ -25,7 +25,7 @@ Our exploration of a finite state machine (FSM)–driven miniSummoner prototype 
 * **Integrated ecosystem features.**
   The Summoner SDK bundles essential infrastructure for real-world deployment, including:
 
-  * **Decentralized identity** management and self-issued credentials
+  * **Self-signed agent identity** management and self-issued credentials
   * **Validation** and **reputation** processing to filter or weight incoming messages
   * **Cryptographic envelopes**, signature checking, and optional encryption layers
 

@@ -786,7 +786,7 @@ This is the atom and electron analogy: **absorb** (receive), **jump** (Move/Stay
 > Representative examples of complex agent orchestration can be found in:
 > * [`ExamAgent_1`](https://github.com/Summoner-Network/summoner-agents/blob/main/agents/agent_ExamAgent_1/agent.py): Demonstrates use of <code>@receive</code> and <code>@send</code> with queues and delays to run an automated Q&amp;A round while delegating state handling to the flow engine.
 > * [`HSAgent_0`](https://github.com/Summoner-Network/summoner-agents/blob/main/agents/agent_HSAgent_0/agent.py): Explores a nonce-echo handshake to initiate and finalize an exchange.
-> * [`HSAgent_1`](https://github.com/Summoner-Network/summoner-agents/blob/main/agents/agent_HSAgent_1/agent.py): Explores a cryptographic handshake with persistent DID identity to initiate and finalize an exchange.
+> * [`HSAgent_1`](https://github.com/Summoner-Network/summoner-agents/blob/main/agents/agent_HSAgent_1/agent.py): Explores a cryptographic handshake with persistent agent identity to initiate and finalize an exchange.
 > * [`HSSellAgent_0`](https://github.com/Summoner-Network/summoner-agents/blob/main/agents/agent_HSSellAgent_0/agent.py): Explores a selling negotiation overlay on top of the handshake to initiate and finalize a deal.
 > * [`HSBuyAgent_0`](https://github.com/Summoner-Network/summoner-agents/blob/main/agents/agent_HSBuyAgent_0/agent.py): Explores a buying negotiation overlay on top of the handshake to initiate and finalize a deal.
 >
