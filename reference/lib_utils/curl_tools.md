@@ -12,17 +12,17 @@ The mental model is as follows:
 
 This reference covers three things:
 
-* how to compile a tool from either a cURL snippet or an explicit schema,
+* how to compile a tool from a cURL snippet, an explicit schema, or GPT-assisted extraction,
 * how runtime placeholders work when you execute the tool (env secrets and input variables),
 * how to freeze a tool spec as JSON and reload it later without changing its meaning.
 
 The typical usage pattern is:
 
-1. Compile a tool via deterministic cURL parsing (`compiler.parse(...)`) or an explicit schema (`compiler.request_schema(...)`):
+1. Compile a tool via deterministic cURL parsing (`compiler.parse(...)`), an explicit schema (`compiler.request_schema(...)`), or GPT-assisted extraction (`compiler.gpt_parse(...)`):
 
     ```python
     compiler = CurlToolCompiler()
-    tool = compiler.parse(curl_text)  # or: compiler.request_schema(...)
+    tool = compiler.parse(curl_text)  # or: compiler.request_schema(...), await compiler.gpt_parse(...)
     ```
 
 2. Optionally snapshot the tool spec via `tool.to_dict()` for deterministic persistence:
@@ -60,6 +60,24 @@ The public symbols exported by this extension are:
 * `SecretResolver`
 * `BasicAuthSpec`
 * `parse_curl_command`
+
+## Pick the right entry point
+
+| You want to… | Use | Why |
+| ------------ | --- | --- |
+| Turn a real docs/example `curl ...` snippet into a callable tool | `CurlToolCompiler.parse(...)` | Deterministic parsing of a practical subset of cURL |
+| Build a request with no inference at all | `CurlToolCompiler.request_schema(...)` | You control every field directly |
+| Extract a first draft tool from prose docs or mixed docs + snippets | `CurlToolCompiler.gpt_parse(...)` | Uses OpenAI structured outputs with token/cost guardrails |
+| Persist a tool spec and restore it later | `HttpTool.to_dict(...)` + `CurlToolCompiler.request_schema_from_dict(...)` | Gives deterministic reload after the one-time parse step |
+| Parse a cURL snippet into a raw spec without creating a tool | `parse_curl_command(...)` | Returns `HttpRequestSpec` directly |
+
+## Capabilities at a glance
+
+* **Deterministic cURL parsing**: turn a practical subset of `curl` syntax into `HttpRequestSpec`.
+* **Explicit request construction**: build the same runtime object without any parsing or inference.
+* **GPT-assisted extraction**: generate a `CurlToolBlueprint` from docs text, then compile it into a normal `HttpTool`.
+* **Templated execution**: resolve `{{env:...}}` and `{{var}}` placeholders at call time.
+* **Persistence and reload**: freeze a tool spec as JSON, then rehydrate it later with the same request meaning.
 
 ## Installation in a summoner-sdk workflow
 
@@ -193,7 +211,7 @@ This constructor returns a `SecretResolver` instance.
 
 ```python
 secrets = SecretResolver(auto_dotenv=True)
-token = secrets.require("HUBSPOT_TOKEN")
+token = secrets.require("HUBSPOT_ACCESS_TOKEN")
 ```
 
 ## `SecretResolver.get`
@@ -226,7 +244,7 @@ Returns `Optional[str]`.
 ### Examples
 
 ```python
-token = secrets.get("HUBSPOT_TOKEN")
+token = secrets.get("HUBSPOT_ACCESS_TOKEN")
 if token is None:
     raise RuntimeError("Missing token")
 ```
@@ -259,7 +277,7 @@ Returns `str`.
 ### Examples
 
 ```python
-token = secrets.require("HUBSPOT_TOKEN")
+token = secrets.require("HUBSPOT_ACCESS_TOKEN")
 ```
 
 ## `HttpRequestSpec.__init__`
@@ -659,8 +677,8 @@ Constructor responsibilities:
 * Optionally loads `.env` via `load_dotenv(...)` when `auto_dotenv=True`.
 * Stores a `SecretResolver` on `self.secrets`. If none is provided, a default resolver is created.
 * Configures budgeting parameters used by `gpt_parse(...)`.
-* If an OpenAI API key is available, initializes an `AsyncOpenAI` client for `gpt_parse(...)`.
-* If `validate_model_name=True`, it may attempt to list available model IDs. If model listing fails, it fails open and continues without blocking `gpt_parse(...)`.
+* If an OpenAI API key is available, bootstraps internal `HttpTool` instances for OpenAI `/v1/responses` and `/v1/models` using the same cURL parsing path exposed by this module.
+* If `validate_model_name=True`, `gpt_parse(...)` may perform a best-effort lookup of available OpenAI model IDs through `/v1/models`. If model listing fails, it fails open and continues without blocking `gpt_parse(...)`.
 
 ### Inputs
 
@@ -817,6 +835,35 @@ This method is deterministic. It delegates curl parsing to `parse_curl_command(.
 * `input_model` (validated against `inputs` before sending the request)
 * `output_model` (validated against JSON responses when possible)
 
+### Inputs
+
+#### `curl_text`
+
+* **Type:** `str`
+* **Meaning:** cURL command text to parse. This may include `$ENV_VAR`, `${ENV_VAR}`, headers, body flags, auth flags, and supported transport options.
+
+#### `description`
+
+* **Type:** `Optional[str]`
+* **Meaning:** Optional human-readable description stored on the resulting request spec.
+* **Default:** `None`
+
+#### `input_model`
+
+* **Type:** `Optional[Type[BaseModel]]`
+* **Meaning:** Optional Pydantic model used to validate `inputs` before template rendering during `tool.call(...)`.
+* **Default:** `None`
+
+#### `output_model`
+
+* **Type:** `Optional[Type[BaseModel]]`
+* **Meaning:** Optional Pydantic model used to validate parsed JSON responses after the request runs.
+* **Default:** `None`
+
+### Outputs
+
+Returns an `HttpTool`.
+
 ### Example
 
 ```python
@@ -824,7 +871,7 @@ compiler = CurlToolCompiler(secrets=SecretResolver(auto_dotenv=True))
 
 curl_text = r"""
 curl https://api.hubapi.com/crm/v3/objects/companies?limit={{limit}} \
-  -H "Authorization: Bearer $HUBSPOT_TOKEN"
+  -H "Authorization: Bearer $HUBSPOT_ACCESS_TOKEN"
 """.strip()
 
 tool = compiler.parse(curl_text, description="HubSpot: list companies")
@@ -866,13 +913,35 @@ Use this when you want full control over:
 * timeouts
 * optional Pydantic input/output validation
 
+### Inputs
+
+The parameters mirror `HttpRequestSpec.__init__(...)`:
+
+* `method`: HTTP method used for the request.
+* `url`: endpoint URL, optionally containing `{{env:...}}` or `{{var}}` placeholders.
+* `headers`: optional request headers.
+* `params`: optional query parameters.
+* `body`: optional request payload.
+* `body_mode`: one of `"json"`, `"form"`, or `"raw"`.
+* `auth`: optional `BasicAuthSpec`.
+* `timeout_s`: optional timeout passed to `httpx`.
+* `follow_redirects`: whether redirects are followed.
+* `verify_tls`: whether TLS certificates are verified.
+* `description`: optional human-readable description stored on the spec.
+* `input_model`: optional Pydantic input validator.
+* `output_model`: optional Pydantic output validator.
+
+### Outputs
+
+Returns an `HttpTool`.
+
 ### Example
 
 ```python
 tool = compiler.request_schema(
     method="GET",
     url="https://api.hubapi.com/crm/v3/objects/companies",
-    headers={"Authorization": "Bearer {{env:HUBSPOT_TOKEN}}"},
+    headers={"Authorization": "Bearer {{env:HUBSPOT_ACCESS_TOKEN}}"},
     params={"limit": "{{limit}}"},
     body=None,
     body_mode="json",
@@ -896,6 +965,17 @@ Deterministically rehydrates a tool spec produced by `HttpTool.to_dict()`.
 Special fixup:
 
 * if `body_mode == "form"`, it converts stored list pairs back into tuple pairs so form encoding works after JSON reload.
+
+### Inputs
+
+#### `d`
+
+* **Type:** `Mapping[str, Any]`
+* **Meaning:** JSON-safe tool snapshot, typically produced by `HttpTool.to_dict(...)`.
+
+### Outputs
+
+Returns an `HttpTool`.
 
 ### Example
 
@@ -925,13 +1005,43 @@ async def gpt_parse(
 Extracts a request description from documentation text using OpenAI structured outputs, then compiles it into an `HttpTool`.
 
 1. Requires `OPENAI_API_KEY` (or `openai_api_key` passed at compiler init). If missing, raises `RuntimeError`.
-2. Optionally validates `model_name` by listing available OpenAI models (fail-open if listing fails).
+2. If `validate_model_name=True`, optionally validates `model_name` by fetching available OpenAI models through `/v1/models` (fail-open if listing fails).
 3. Redacts probable secrets in `docs` before sending them to the model.
 4. Enforces token and cost ceilings using `gpt_guardrails` (`count_chat_tokens`, `estimate_chat_request_cost`).
-5. Calls `AsyncOpenAI.responses.parse(..., text_format=CurlToolBlueprint)`.
-6. Converts the resulting `CurlToolBlueprint` into an `HttpRequestSpec` and returns an `HttpTool`.
+5. Builds an internal OpenAI `/v1/responses` request using the same `curl` -> `HttpTool` path used elsewhere in this module, and submits a strict JSON-schema request derived from `CurlToolBlueprint`.
+6. Extracts `output_text` from the JSON response, validates it as `CurlToolBlueprint`, and raises `RuntimeError` if the response is malformed, refused, incomplete, or schema-invalid.
+7. Converts the resulting `CurlToolBlueprint` into an `HttpRequestSpec` and returns an `HttpTool`.
 
 The returned tool is no different from tools built via `parse(...)` or `request_schema(...)`.
+
+### Inputs
+
+#### `docs`
+
+* **Type:** `str`
+* **Meaning:** Documentation text, examples, snippets, or mixed prose+cURL content used to infer the request blueprint.
+
+#### `model_name`
+
+* **Type:** `str`
+* **Meaning:** OpenAI model id used for structured extraction.
+* **Default:** `"gpt-4o-mini"`
+
+#### `cost_limit`
+
+* **Type:** `Optional[float]`
+* **Meaning:** Optional per-call USD ceiling. If `None`, `default_cost_limit` from the compiler is used instead.
+* **Default:** `None`
+
+#### `debug`
+
+* **Type:** `bool`
+* **Meaning:** When `True`, prints prompt token and cost diagnostics, and prints actual usage when available.
+* **Default:** `False`
+
+### Outputs
+
+Returns an `HttpTool`.
 
 ### Example
 
@@ -989,6 +1099,43 @@ Special case:
 
 * `-G/--get` plus `-d` treats the `-d` payload as query params (best-effort)
 
+Common parsing errors:
+
+* empty cURL text raises `ValueError("Empty curl command.")`
+* missing URL raises `ValueError("curl: no URL found")`
+* malformed `-u/--user` auth or missing required flag arguments raise `ValueError`
+* unsupported HTTP methods raise `ValueError`
+
+## Inputs
+
+### `curl_text`
+
+* **Type:** `str`
+* **Meaning:** cURL command text to parse into a deterministic `HttpRequestSpec`.
+
+## Outputs
+
+Returns an `HttpRequestSpec`.
+
+## Example
+
+```python
+spec = parse_curl_command(
+    r'''
+    curl --request POST \
+      --url 'https://api.twilio.com/2010-04-01/Accounts/$TWILIO_ACCOUNT_SID/Messages.json' \
+      --user '$TWILIO_ACCOUNT_SID:$TWILIO_AUTH_TOKEN' \
+      --data-urlencode 'To=+15551234567' \
+      --data-urlencode 'From=+15557654321' \
+      --data-urlencode 'Body=Hello from Summoner'
+    '''.strip()
+)
+
+assert spec.method == "POST"
+assert spec.body_mode == "form"
+assert spec.auth is not None
+```
+
 ## Troubleshooting
 
 * **My tool output is not a dict**
@@ -1005,6 +1152,9 @@ Special case:
 
 * **`gpt_parse` fails with token/cost ceiling errors**
   Reduce the docs text, increase `max_chat_input_tokens`, reduce `max_chat_output_tokens`, or raise the cost limit.
+
+* **`gpt_parse` says the model name is invalid**
+  By default, `CurlToolCompiler(validate_model_name=True)` performs a best-effort preflight against OpenAI `/v1/models`. Use a valid model id or disable the preflight check with `validate_model_name=False` if you intentionally want to skip local validation.
 
 <p align="center">
   <a href="visionary.md">&laquo; Previous: <code style="background: transparent;">Summoner<b>.visionary</b></code></a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <a href="gpt_guardrails.md">Next: <code style="background: transparent;">Summoner<b>.gpt_guardrails</b></code> &raquo;</a>
