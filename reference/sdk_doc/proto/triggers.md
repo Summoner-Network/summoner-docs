@@ -371,7 +371,7 @@ Wraps a `Signal` as a typed protocol event. The module defines three event subcl
 
 `Test` is marked with `__test__ = False` to avoid certain test discovery behaviors.
 
-An event can also carry arbitrary `data`. This is the payload consumed by reactive senders that register with `use_data=True`.
+An event can also carry arbitrary `data`. This is the payload consumed by reactive senders that register with `use_data=True`; sender-side `data_mode` decides whether that payload is observed live or as a snapshot, and `when_data` can filter it before the sender runs.
 
 ### Inputs
 

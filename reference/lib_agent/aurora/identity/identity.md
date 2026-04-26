@@ -888,13 +888,14 @@ async def start_session(
 
 Creates a start-form session proof, always with `sender_role = 0`, and persists it.
 
-If `peer_public_id` is provided, the method may include an encrypted `history_proof` so the peer can validate continuity against earlier history.
+If `peer_public_id` is provided, the method includes an encrypted `history_proof` so the peer can validate continuity against prior finalized history or reset/bootstrap state.
 
 ### Important behavior
 
 * The method allows only one active role-0 lane per peer.
 * `force_reset=True` clears the active lane when policy allows a reset.
 * `stream=True` creates a stream start and requires both a peer identity and a positive `stream_ttl`.
+* Proof-less bootstrap is only valid when `history_proof` is `null` and `age == 0`.
 
 For the full stream-mode contract, see [Streaming](streaming.md).
 
@@ -975,6 +976,8 @@ The method derives the local role from the peer record, checks the current store
 * Role `1` fails closed rather than silently restarting as role `0`.
 * `stream=True` starts a responder-owned stream turn.
 * `peer_public_id=None` uses the generic public/discovery lane rather than a durable per-peer continuity lane.
+* Non-start replies emit `history_proof = null` and `age = null`; the
+  authoritative continuity age is preserved in local active-session state.
 
 For the stream-specific contract, see [Streaming](streaming.md).
 

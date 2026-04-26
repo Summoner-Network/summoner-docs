@@ -46,7 +46,7 @@ Representative shape:
   "ts": 1730000000,
   "ttl": 120,
   "history_proof": null,
-  "age": 0,
+  "age": null,
   "mode": "stream",
   "stream": {
     "id": "a1b2c3d4e5f6a7b8",
@@ -58,6 +58,15 @@ Representative shape:
 ```
 
 The method that interprets these fields for you is `classify_session_record(...)`.
+
+The example above shows a responder-owned stream start created by
+`continue_session(..., stream=True, ...)`. Initiator-owned stream starts created
+by `start_session(..., stream=True, ...)` still carry integer `age` on the
+start-form record.
+
+For non-start stream frames, the continuity age is preserved as local active
+session state rather than authoritative mid-session wire metadata. In the built-
+in fallback store, that value lives in `current_link.age`.
 
 ## `SummonerIdentity.start_session`
 
@@ -136,6 +145,9 @@ When `stream=True`, `continue_session(...)` starts a responder-owned stream turn
 * Stream start requires a positive `stream_ttl`.
 * Stream mode on a public/discovery boundary returns `stream_mode_unsupported`.
 * If the current link is stale or missing, role `0` may recover through `start_session(...)`, while role `1` fails closed.
+* Non-start stream starts created by `continue_session(..., stream=True, ...)`
+  emit `age: null` and preserve the authoritative continuity age in local
+  active-session state.
 
 ### Inputs
 
@@ -186,6 +198,8 @@ The method requires:
 * The runtime increments `seq` by exactly `+1`.
 * `end_stream=False` emits a `chunk` frame and requires a positive `stream_ttl`.
 * `end_stream=True` emits an `end` frame, applies the normal handoff `ttl`, and stores `stream_ttl=None` in the generated end frame.
+* Generated `chunk` and `end` frames emit `age: null`; the authoritative age
+  stays in local active-session state.
 
 ### Inputs
 
@@ -270,6 +284,7 @@ If you replace the built-in local store with custom hooks, the safest path is to
 
 | Field | Purpose |
 | --- | --- |
+| `age` | Authoritative local continuity age for the active lane. |
 | `stream_mode` | Tracks whether the current link is single-message or stream-mode. |
 | `stream_id` | Active or closed stream identifier. |
 | `stream_phase` | Last accepted stream phase. |

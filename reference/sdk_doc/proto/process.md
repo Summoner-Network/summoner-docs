@@ -384,14 +384,15 @@ Represents a sending handler registered by a client:
 * `actions`: optional set of event classes that gate execution
 * `triggers`: optional set of `Signal` values that gate execution
 * `use_data`: whether matched event payloads are passed into the sender
-* `data_mode`: how event payloads are transferred (`"live"` or `"snapshot"`)
+* `data_mode`: whether payload delivery is live or snapshot-based
+* `when_data`: optional payload admission predicate for reactive `use_data=True` senders
 * `every`: optional cadence for timed senders
 * `run_while`: optional timed-sender guard
 * `registration_id`: stable runtime identifier used by the sender scheduler
 
 Senders are "reactive" when `actions` or `triggers` is set. The runtime calls `responds_to(event)` to decide whether a sender should run for a given event.
 
-The `Sender` record also carries the metadata needed for data-aware and timed senders. In normal SDK usage, you rarely instantiate this class yourself; it is created by `SummonerClient.send(...)` or replayed by merger/translation tools.
+The `Sender` record also carries the metadata needed for data-aware and timed senders. After an event matches, the runtime may apply `when_data` to the delivered payload before invoking a reactive `use_data=True` sender. In normal SDK usage, you rarely instantiate this class yourself; it is created by `SummonerClient.send(...)` or replayed by merger/translation tools.
 
 ### Fields
 
@@ -401,6 +402,7 @@ The `Sender` record also carries the metadata needed for data-aware and timed se
 * `triggers`: `Optional[set[Signal]]`
 * `use_data`: `bool`
 * `data_mode`: `Optional[str]`
+* `when_data`: `Any`
 * `every`: `Optional[float]`
 * `run_while`: `Any`
 * `registration_id`: `Optional[str]`

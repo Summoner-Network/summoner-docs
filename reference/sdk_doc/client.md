@@ -31,7 +31,7 @@ Most users only need `SummonerClient`. Use `merger` when you want to compose mul
 ## Capabilities at a glance
 
 * **Async handler runtime**: receivers (inbound), senders (outbound), hooks (pre/post processing).
-* **Flexible sender behavior**: one sender surface supports plain outbound handlers, flow-driven reactions, and scheduled sender work.
+* **Flexible sender behavior**: one sender surface supports plain outbound handlers, flow-driven reactions, payload-aware filtering with `when_data`, and scheduled sender work.
 * **Flow-aware routing**: parse routes into `ParsedRoute`, maintain a `StateTape`, and trigger reactive senders from returned events.
 * **Hooks with ordering**: structured interception on send/receive paths (priority tuples).
 * **Lifecycle management**: reconnect strategy, graceful shutdown, travel/quit intents.
