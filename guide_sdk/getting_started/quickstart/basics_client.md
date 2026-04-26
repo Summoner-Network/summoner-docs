@@ -5,11 +5,13 @@
 
 **Summoner clients** are built on top of Python's `asyncio` TCP functionality, but they go far beyond basic socket connections. The client architecture forms the foundation for **Summoner agents**, which add orchestration logic and a security layer, transforming a simple TCP client into a programmable, composable agent.
 
+For the raw SDK surface behind that statement, see [`SummonerClient.run(...)`](../../../reference/sdk_doc/client/client.md#summonerclientrun), [`@receive`](../../../reference/sdk_doc/client/client.md#summonerclientreceive), [`@send`](../../../reference/sdk_doc/client/client.md#summonerclientsend), and [`Flow`](../../../reference/sdk_doc/proto/flow.md#class-flow).
+
 ## From Summoner Client to Summoner Agent
 
 At the lowest level, a **Summoner agent** is just a Summoner client: it connects to a TCP server and exchanges messages. But Summoner layers additional capabilities on top:
 
-* **Orchestration**: the ability to initiate or complete tasks through a [programmable graph of handlers](#graphs-of-endpoints), allowing the agent to behave as a coordinated system.
+* **Orchestration**: the ability to initiate or complete tasks through a [programmable graph of handlers](#graphs-of-endpoints), allowing the agent to behave as a coordinated system. The concrete surfaces are [`@receive`](../../../reference/sdk_doc/client/client.md#summonerclientreceive), [`@send`](../../../reference/sdk_doc/client/client.md#summonerclientsend), and [`Flow`](../../../reference/sdk_doc/proto/flow.md#class-flow).
 * **Optional identity and policy layers**: extensions such as [Aurora](../../../reference/lib_agent/aurora.md) can add signed envelopes, identity records, and policy-driven validation when you need them. The broader add-on space is documented in the [Agent Extensions reference](../../../reference/lib_agent/index.md), and Aurora's main ready-made class is [`SummonerAgent`](../../../reference/lib_agent/aurora/agent.md).
 
 This leads to the working definition:
@@ -22,7 +24,7 @@ This leads to the working definition:
 
 Summoner clients and agents are not monolithic. Internally, they are structured as **graphs of endpoints**:
 
-* Each **endpoint** is a self-contained handler for a route or message type.
+* Each **endpoint** is a self-contained handler for a route or message type, usually a [`@receive`](../../../reference/sdk_doc/client/client.md#summonerclientreceive) or [`@send`](../../../reference/sdk_doc/client/client.md#summonerclientsend) registration.
 * Endpoints can act independently or in cooperation, enabling **subagents** to form inside larger agent structures.
 
 > [!NOTE]

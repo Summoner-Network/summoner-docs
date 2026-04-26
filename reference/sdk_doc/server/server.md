@@ -6,6 +6,7 @@ A Summoner server is a TCP broadcast relay: clients connect to a host and port, 
 
 `SummonerServer` is the primary SDK entry point for running a server process. It handles configuration loading (from a file path or in-memory dict), logger initialization, termination signal handling (where supported), and the overall server lifecycle (start, run, and shutdown).
 
+<a id="summonerserver__init__"></a>
 ## `SummonerServer.__init__`
 
 ```python
@@ -46,6 +47,7 @@ from summoner.server import SummonerServer
 server = SummonerServer(name="summoner:server")
 ```
 
+<a id="summonerserverrun"></a>
 ## `SummonerServer.run`
 
 ```python
@@ -174,6 +176,7 @@ server.run(
 )
 ```
 
+<a id="summonerserverrun_server"></a>
 ## `SummonerServer.run_server`
 
 ```python
@@ -278,6 +281,7 @@ An awaitable coroutine (the method is `async`). It returns when the client disco
 
 This method is not typically called directly; it is provided as the callback to `asyncio.start_server(...)`.
 
+<a id="summonerserverset_termination_signals"></a>
 ## `SummonerServer.set_termination_signals`
 
 ```python
@@ -308,6 +312,7 @@ Returns `None`.
 
 You normally do not call this directly because `run(...)` calls it as part of normal startup.
 
+<a id="summonerservershutdown"></a>
 ## `SummonerServer.shutdown`
 
 ```python

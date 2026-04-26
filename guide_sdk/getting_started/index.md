@@ -17,7 +17,9 @@ To begin, you can clone the [`summoner-sdk`](https://github.com/Summoner-Network
 >
 > This section of the documentation focuses on the SDK: how to install it, run clients and servers locally, and use sample agents from the [`summoner-agents`](https://github.com/Summoner-Network/summoner-agents) repository.
 
-The SDK is modular by design. It is built around a core library (`summoner-core`) and includes optional components that you can add or remove as needed. We will showcase the SDK using both its core modules and common extensions — for example, the agent classes from [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass), which add identity, policy, and orchestration capabilities on top of the core runtime. For the public API of those add-ons, see the [Agent Extensions reference](../../reference/lib_agent/index.md), including the [Aurora module reference](../../reference/lib_agent/aurora.md).
+The SDK is modular by design. It is built around a core library (`summoner-core`) and includes optional components that you can add or remove as needed. This **Getting Started** section focuses first on the core runtime: clients, servers, routes, flows, and local development. Some later examples may mention optional add-ons such as the agent classes from [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass), but they are not required for the basic SDK walkthrough. If and when you want those add-ons, their public API is documented in the [Agent Extensions reference](../../reference/lib_agent/index.md), including the [Aurora module reference](../../reference/lib_agent/aurora.md).
+
+When you want the exact core SDK surface while reading this guide, jump into the [client reference](../../reference/sdk_doc/client.md), [server reference](../../reference/sdk_doc/server.md), and [protocol reference](../../reference/sdk_doc/proto.md).
 
 ---
 

@@ -263,6 +263,7 @@ from summoner.protocol.triggers import parse_signal_tree
 tree = parse_signal_tree("TRIGGERS")
 ```
 
+<a id="class-signal"></a>
 ## `class Signal`
 
 ```python
@@ -355,6 +356,7 @@ assert Trigger.acceptable.path == (0, 0)
 assert Trigger.name_of(1, 0) == "major"
 ```
 
+<a id="class-event"></a>
 ## `class Event`
 
 ```python
@@ -405,6 +407,7 @@ assert e1.signal is s
 assert e1.data == {"origin": "receiver"}
 ```
 
+<a id="class-action"></a>
 ## `class Action`
 
 ```python
@@ -479,6 +482,7 @@ assert extract_signal(e) is s
 assert extract_signal(None) is None
 ```
 
+<a id="load_triggers"></a>
 ## `load_triggers`
 
 ```python

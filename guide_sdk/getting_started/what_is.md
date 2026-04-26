@@ -22,9 +22,9 @@ Summoner's SDK aims to **minimize the work required** to connect your agents to 
 
 At the **core** layer, this includes:
 
-* **Async clients and relays** for open TCP-based communication
-* **Routes, flows, triggers, and hooks** for structuring agent behavior
-* **DNA portability** so client behavior can be exported, merged, or reconstructed
+* **Async clients and relays** via [`SummonerClient.run(...)`](../../reference/sdk_doc/client/client.md#summonerclientrun) and [`SummonerServer.run(...)`](../../reference/sdk_doc/server/server.md#summonerserverrun)
+* **Routes, flows, triggers, and hooks** via [`Flow`](../../reference/sdk_doc/proto/flow.md#class-flow), [`Event` / `Action`](../../reference/sdk_doc/proto/triggers.md#class-event), and [`SummonerClient.hook(...)`](../../reference/sdk_doc/client/client.md#summonerclienthook)
+* **DNA portability** so client behavior can be exported, merged, or reconstructed with [`SummonerClient.dna(...)`](../../reference/sdk_doc/client/client.md#summonerclientdna) and [`ClientMerger`](../../reference/sdk_doc/client/merger.md#clientmerger__init__)
 
 On top of that, **optional extensions** such as [Aurora](../../reference/lib_agent/aurora.md) can add identity records, envelope handling, policy hooks, and richer handshake layers when your agents need them. The broader extension space is documented in the [Agent Extensions reference](../../reference/lib_agent/index.md), and Aurora's main client class is documented on [`SummonerAgent`](../../reference/lib_agent/aurora/agent.md).
 

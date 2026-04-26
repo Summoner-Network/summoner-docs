@@ -21,6 +21,8 @@ The wire format stays simple: messages are **one line** each and should end with
 
 On the client, outgoing payloads are wrapped into typed, newline-terminated frames; incoming lines are recovered to their original types. This keeps agents observable and composable without hiding the network model.
 
+For the raw runtime surface, see [`SummonerClient.run(...)`](../../reference/sdk_doc/client/client.md#summonerclientrun) and the [client configuration reference](../../reference/sdk_doc/client/configs.md).
+
 > [!NOTE]
 > **Typed envelopes (SDK).** On send, the SDK wraps your payload in a versioned, self-describing frame using the keys:
 >
@@ -45,6 +47,8 @@ The client/agent runtime is **Python-only**. Client configuration is kept in its
 Keep client configs minimal and focused on the client's needs (address selection, reconnection, receiver/sender limits, and logging).
 
 ## Running a Client
+
+The entrypoint behavior here is the guide-friendly view of [`SummonerClient.run(...)`](../../reference/sdk_doc/client/client.md#summonerclientrun).
 
 The minimal entrypoint:
 
@@ -72,7 +76,7 @@ client.run(config_path="client_config.json")
 client.run(config_dict={"logger": {"log_level": "INFO"}})
 ```
 
-Because configs can coexist with `.run(...)` arguments, it is important to know which values take effect (next section).
+Because configs can coexist with `.run(...)` arguments, it is important to know which values take effect (next section). The exact field reference is in [client/configs.md](../../reference/sdk_doc/client/configs.md).
 
 ## Configuration Sources and Precedence
 
@@ -152,6 +156,8 @@ SummonerClient(name="local").run(config_dict=cfg)
 > A dict overrides a file if both are provided. For connectivity, the client prefers `host`/`port` from config when **present and non-null**.
 
 ## Config File Shape
+
+For the exact JSON shape and stable anchors for each field, see the [client configuration reference](../../reference/sdk_doc/client/configs.md).
 
 Top-level keys you can set (Python client):
 
@@ -275,6 +281,8 @@ The sections below follow the JSON structure. Each parameter has a clear purpose
 
 ## `host` and `port`
 
+See also [`host`](../../reference/sdk_doc/client/configs.md#host), [`port`](../../reference/sdk_doc/client/configs.md#port), and the [reconnection section](../../reference/sdk_doc/client/configs.md#reconnection) in the reference docs.
+
 <details>
 <summary><b>(Click to expand)</b></summary>
 
@@ -310,6 +318,8 @@ If both your code and the config specify `host`/`port`, the **config value wins*
 </details>
 
 ## `logger` (Python)
+
+See also [`logger`](../../reference/sdk_doc/client/configs.md#logger-object) and [what the client logger emits](../../reference/sdk_doc/client/configs.md#what-the-client-logger-emits).
 
 <details>
 <summary><b>(Click to expand)</b></summary>
@@ -409,6 +419,8 @@ Larger files and more backups consume disk; set limits that fit your environment
 </details>
 
 ## `hyper_parameters`
+
+See also the reference sections for [reconnection](../../reference/sdk_doc/client/configs.md#reconnection), [receiver](../../reference/sdk_doc/client/configs.md#receiver), and [sender](../../reference/sdk_doc/client/configs.md#sender).
 
 <details>
 <summary><b>(Click to expand)</b> Client runtime behavior beyond basic connectivity.</summary>

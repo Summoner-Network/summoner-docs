@@ -15,6 +15,8 @@ However, a client focuses on messaging and orchestration primitives; it does not
 * `SummonerClient` is the base class.
 * An *agent class* **subclasses** `SummonerClient` and adds features such as identity records, envelope handling, policy hooks, handshake logic, and orchestration helpers. You are free to design your own agent class for your project.
 
+For the raw core surface, see [`SummonerClient.run(...)`](../../../reference/sdk_doc/client/client.md#summonerclientrun), [`SummonerClient.receive(...)`](../../../reference/sdk_doc/client/client.md#summonerclientreceive), [`SummonerClient.send(...)`](../../../reference/sdk_doc/client/client.md#summonerclientsend), and [`SummonerClient.hook(...)`](../../../reference/sdk_doc/client/client.md#summonerclienthook).
+
 > [!NOTE]
 > A **reference agent class** is available through **[Aurora](../../../reference/lib_agent/aurora.md)** (implemented in [`extension-agentclass`](https://github.com/Summoner-Network/extension-agentclass)). It provides an opinionated baseline for orchestration: identity records, message signing and verification, handshake scaffolding, policy-driven validation, and route/flow helpers. Use it as a ready-made starting point if you prefer not to build these pieces yourself. For the broader add-on space, see the [Agent Extensions reference](../../../reference/lib_agent/index.md), and for the concrete class interface see [`SummonerAgent`](../../../reference/lib_agent/aurora/agent.md).
 
@@ -77,11 +79,11 @@ You should see the client connect to the local server
 <br>
 
 > [!TIP]
-> You control retry delays and limits via the **client config** (next section).
+> You control retry delays and limits via the **client config** (next section). For the exact knobs, see the [reconnection reference](../../../reference/sdk_doc/client/configs.md#reconnection), especially [`retry_delay_seconds`](../../../reference/sdk_doc/client/configs.md#retry_delay_seconds), [`primary_retry_limit`](../../../reference/sdk_doc/client/configs.md#primary_retry_limit), and the fallback [`default_host` / `default_port`](../../../reference/sdk_doc/client/configs.md#default_host).
 
 ### Run a client with a config file
 
-Configuration can override address selection and tune reconnection behavior.
+Configuration can override address selection and tune reconnection behavior. The full config surface is documented in the [client configuration reference](../../../reference/sdk_doc/client/configs.md).
 
 To see this, create a configuration file `client_config.json` containing the following JSON structure:
 
@@ -183,7 +185,7 @@ Agents typically do two things:
 * **receive** messages from the server and react
 * **send** messages to the server (periodically or in reaction to input)
 
-Both are declared with decorators on the **instance**.
+Both are declared with decorators on the **instance**. The precise decorator contracts live in the references for [`@receive`](../../../reference/sdk_doc/client/client.md#summonerclientreceive), [`@send`](../../../reference/sdk_doc/client/client.md#summonerclientsend), and [`@hook`](../../../reference/sdk_doc/client/client.md#summonerclienthook).
 
 > [!IMPORTANT]
 > Handlers must be **async**. The client validates signatures at registration.
@@ -209,6 +211,8 @@ agent.run(host="127.0.0.1", port=8888)
 * Receive handlers run concurrently with senders.
 * The function receives whatever other peers send (string or JSON-like dict).
 
+For options such as `priority` and flow-aware route matching, see the [`SummonerClient.receive(...)` reference](../../../reference/sdk_doc/client/client.md#summonerclientreceive).
+
 ### Minimal send (keeps sending)
 
 The clearest way to express a steady heartbeat is to register a timed sender with `every=...`:
@@ -226,7 +230,7 @@ async def heartbeat():
 agent.run(host="127.0.0.1", port=8888)
 ```
 
-This keeps sending because the SDK schedules the sender every second. Older patterns that put `await asyncio.sleep(...)` inside the sender body still work, but `every=...` is usually clearer when all you want is a recurring cadence.
+This keeps sending because the SDK schedules the sender every second. Older patterns that put `await asyncio.sleep(...)` inside the sender body still work, but `every=...` is usually clearer when all you want is a recurring cadence. The broader send surface, including `multi=True`, `use_data=True`, `when_data`, `run_while`, and `data_mode="snapshot"`, is documented in the [`SummonerClient.send(...)` reference](../../../reference/sdk_doc/client/client.md#summonerclientsend).
 
 ### Controlling sends (send once)
 
@@ -250,11 +254,11 @@ async def hello_once():
 agent.run(host="127.0.0.1", port=8888)
 ```
 
-Returning `None` means *no message this cycle.* Later, when you use flows, a reactive sender can also consume `Event.data` directly with `use_data=True` instead of coordinating through shared flags or helper queues by hand.
+Returning `None` means *no message this cycle.* Later, when you use flows, a reactive sender can also consume [`Event.data`](../../../reference/sdk_doc/proto/triggers.md#class-event) directly with `use_data=True` instead of coordinating through shared flags or helper queues by hand. The full reactive sender options are in the [`@send` reference](../../../reference/sdk_doc/client/client.md#summonerclientsend).
 
 ## Composition: thinking in "capabilities"
 
-Composition is central to how you scale an agent without rewriting it. The practical unit of reuse is a **capability**: a small set of `@receive`/`@send` handlers tied to a set of **routes**, or sometimes a set of route types classified through node logic (see [SDK Reference on the `Node` class](../../../reference/sdk_doc/proto/process.md#classes-and-data-types)). You can copy these blocks between agents to add or remove skills.
+Composition is central to how you scale an agent without rewriting it. The practical unit of reuse is a **capability**: a small set of `@receive`/`@send` handlers tied to a set of **routes**, or sometimes a set of route types classified through [`Node`](../../../reference/sdk_doc/proto/process.md#class-node) logic. You can copy these blocks between agents to add or remove skills.
 
 **Mental model**
 
@@ -290,7 +294,7 @@ async def hb_tx():
 agent.run(host="127.0.0.1", port=8888)
 ```
 
-This single agent exposes two clear capabilities on distinct routes. In a larger project, you can keep each capability in its own file and register them onto the same `agent` instance. If you later need to assemble capabilities authored in separate agents, see the **[`Merger`](../../../reference/sdk_doc/client/merger.md)** utility in the SDK reference; it replays handlers from multiple agents into one process.
+This single agent exposes two clear capabilities on distinct routes. In a larger project, you can keep each capability in its own file and register them onto the same `agent` instance. If you later need to assemble capabilities authored in separate agents, see [`ClientMerger`](../../../reference/sdk_doc/client/merger.md#clientmerger__init__) in the SDK reference; it replays handlers from multiple agents into one process.
 
 > [!TIP]
 > Choose short, stable route names. Routes are your namespace for composition. Keeping them consistent makes it easy to move capabilities between agents.

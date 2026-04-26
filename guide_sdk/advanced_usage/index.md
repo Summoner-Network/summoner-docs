@@ -8,6 +8,8 @@
   <em>Thanks for your patience — we're polishing things up ✨</em>
 </p>
 
+While these chapters are being expanded, the authoritative SDK surface is still in the [client reference](../../reference/sdk_doc/client.md), [server reference](../../reference/sdk_doc/server.md), and [protocol reference](../../reference/sdk_doc/proto.md).
+
 
 
 - [Advanced agent setup](agent_setup.md)

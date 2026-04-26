@@ -8,6 +8,8 @@
 
 This handbook is repository-agnostic. It explains principles first. When relevant, it includes **optional example links** to public implementations for reference only. Your own agents can live in any repository, provided each agent folder follows the `agent_<some_name>/agent.py` convention if you use the desktop app.
 
+When you want the raw API behind the ideas on this page, start with [`SummonerClient.run(...)`](../../reference/sdk_doc/client/client.md#summonerclientrun), [`@receive`](../../reference/sdk_doc/client/client.md#summonerclientreceive), [`@send`](../../reference/sdk_doc/client/client.md#summonerclientsend), [`@hook`](../../reference/sdk_doc/client/client.md#summonerclienthook), [`Flow`](../../reference/sdk_doc/proto/flow.md#class-flow), and [`Node`](../../reference/sdk_doc/proto/process.md#class-node).
+
 ## The mental model: receive → transition → send
 
 A Summoner agent is a small state machine that reacts to messages. You **receive** an input, **transition** local state, then **send** outputs when the new state requires it. Keep these steps explicit in code. Avoid hiding transitions in side effects. When a state change does not imply an outgoing message, record the change and return.
@@ -36,9 +38,9 @@ agents/
 
 **Naming for desktop compatibility.** If you use the desktop app, name folders with the `agent_` prefix (for example, `agent_MyAgent`). The desktop scans `agents/agent_*` for launchable entries and expects `agent.py` and `requirements.txt` inside each agent folder.
 
-**Entry point.** Your `agent.py` should expose a single `main()` that parses an optional `--config`, builds the client, wires handlers and hooks, **declares** `@upload_states` / `@download_states` (and initializes any in-memory variables those functions read), then calls `client.run(...)`. Keep CLI flags thin. Drive behavior from config so environments can change without code edits.
+**Entry point.** Your `agent.py` should expose a single `main()` that parses an optional `--config`, builds the client, wires handlers and hooks, **declares** [`@upload_states`](../../reference/sdk_doc/client/client.md#summonerclientupload_states) / [`@download_states`](../../reference/sdk_doc/client/client.md#summonerclientdownload_states) (and initializes any in-memory variables those functions read), then calls [`client.run(...)`](../../reference/sdk_doc/client/client.md#summonerclientrun). Keep CLI flags thin. Drive behavior from config so environments can change without code edits.
 
-**Configuration practice.** Keep addresses, retry limits, timeouts, queue sizes, and logging settings in `configs/client_config.json`. The launch code should provide safe defaults but defer to the config file when present. Keep secrets out of the repo and load them at startup if the SDK supports it.
+**Configuration practice.** Keep addresses, retry limits, timeouts, queue sizes, and logging settings in `configs/client_config.json`. The launch code should provide safe defaults but defer to the config file when present. Keep secrets out of the repo and load them at startup if the SDK supports it. The exact config surface is documented in the [client configuration reference](../../reference/sdk_doc/client/configs.md).
 
 **Persistence.** If the agent needs durable state, place lightweight DB files under `state/` and use async drivers. Avoid synchronous file I/O in handlers. Centralize writes so that state is consistent even when the process restarts.
 
@@ -54,19 +56,19 @@ Summoner clients run on `asyncio` with non-blocking sockets. Handlers must `awai
 
 **Race-reduction patterns.**
 
-* Keep `@receive` handlers small and mostly pure. Validate, normalize, and compute outcomes. Defer side effects.
-* Commit state in one place per key. If you use flows, consolidate commits in `@download_states` and run post-effects via hub senders gated by actions/triggers.
+* Keep [`@receive`](../../reference/sdk_doc/client/client.md#summonerclientreceive) handlers small and mostly pure. Validate, normalize, and compute outcomes. Defer side effects.
+* Commit state in one place per key. If you use flows, consolidate commits in [`@download_states`](../../reference/sdk_doc/client/client.md#summonerclientdownload_states) and run post-effects via hub senders gated by actions/triggers.
 * Use a single driver task per data domain (for example, a periodic retry sender) to serialize expensive or out-of-order work.
 
 **Split send loops to tame races.** A practical pattern is to separate a periodic **tick sender** (maintenance like register, finalize retries, reconnect) from an **event-driven hub** (chatty steps tied to triggers/actions). This ensures receivers finish clearing or updating transient fields (like nonces) before new outbound payloads mint fresh values.
 
-**Backpressure.** On the send side, rely on the writer's drain semantics (the SDK drains either per batch or per payload, depending on configuration). On the receive side, return quickly under surge and push heavier work to tasks or queues.
+**Backpressure.** On the send side, rely on the writer's drain semantics (the SDK drains either per batch or per payload, depending on configuration). See [`SummonerClient.message_sender_loop`](../../reference/sdk_doc/client/client.md#summonerclientmessage_sender_loop) plus [`batch_drain`](../../reference/sdk_doc/client/configs.md#batch_drain) and [`queue_maxsize`](../../reference/sdk_doc/client/configs.md#queue_maxsize). On the receive side, return quickly under surge and push heavier work to tasks or queues.
 
 ## Messaging primitives and idioms
 
 The SDK gives you three surfaces: **receivers** (ingest & decide), **senders** (emit), and **hooks** (cross-cutting filters). Keep each surface small and predictable so you can layer flows on top cleanly.
 
-**Receiving.** Use `@receive` for narrow, intention-revealing handlers. A receive handler is `async`, takes **exactly one** argument (the payload), and returns an `Event` (`Move`/`Stay`/`Test`) or `None`. Keep the body mostly pure: normalize, validate, and compute an outcome. Defer side effects to senders or to your download commit.
+**Receiving.** Use [`@receive`](../../reference/sdk_doc/client/client.md#summonerclientreceive) for narrow, intention-revealing handlers. A receive handler is `async`, takes **exactly one** argument (the payload), and returns an [`Event`](../../reference/sdk_doc/proto/triggers.md#class-event) (`Move`/`Stay`/`Test`) or `None`. Keep the body mostly pure: normalize, validate, and compute an outcome. Defer side effects to senders or to your download commit.
 
 ```python
 from typing import Any, Optional
@@ -80,9 +82,11 @@ async def on_text(payload: Any) -> Optional["Event"]:
     return None                           # (if flows are off, Events have no effect)
 ```
 
-> If flows are **on**, route tokens must be valid **Node** names (plain tokens like `opened`, `locked`, plus reserved forms such as `/all`, `/oneof(...)`, `/not(...)`). Avoid embedding `/` in ordinary node names. Slash-prefixed forms are reserved by the DSL. If flows are **off**, route strings are just labels and match exactly.
+> If flows are **on**, route tokens must be valid [`Node`](../../reference/sdk_doc/proto/process.md#class-node) names (plain tokens like `opened`, `locked`, plus reserved forms such as `/all`, `/oneof(...)`, `/not(...)`). Avoid embedding `/` in ordinary node names. Slash-prefixed forms are reserved by the DSL. If flows are **off**, route strings are just labels and match exactly.
 
-**Sending.** Use `@send` for outbound paths. By default, a send handler is `async`, takes **no arguments**, and **returns** either a single payload (str/dict) or, with `multi=True`, a **list** of payloads. If you opt into `use_data=True`, the handler instead receives **one event-data argument**. Use `every=<seconds>` for recurring cadence and `run_while=...` when a timed sender should keep running only while a guard allows it. Returning `None` means "stay quiet this cycle." Never `yield`. Generators are not supported by the SDK.
+**Sending.** Use [`@send`](../../reference/sdk_doc/client/client.md#summonerclientsend) for outbound paths. A sender is always `async`, but there are a few distinct patterns worth teaching separately.
+
+**Plain senders.** By default, a sender takes **no arguments** and returns either one payload (str/dict) or, with `multi=True`, a **list** of payloads.
 
 ```python
 @client.send(route="/msgs/text", multi=True)
@@ -92,7 +96,17 @@ async def broadcast_text() -> list[dict]:
     return [{"to": t, **body} for t in targets]
 ```
 
-When the job is simply "emit every N seconds", prefer a timed sender over hand-written `await asyncio.sleep(...)` inside the body:
+**Quiet cycles.** Returning `None` means "send nothing this cycle." That is the normal way to skip work without unregistering the sender.
+
+```python
+@client.send(route="/msgs/text")
+async def maybe_broadcast():
+    if not has_pending_message():
+        return None
+    return build_payload()
+```
+
+**Timed senders.** When the job is simply "emit every N seconds", prefer `every=...` over hand-written `await asyncio.sleep(...)` inside the body. Add [`run_while=...`](../../reference/sdk_doc/client/client.md#summonerclientsend) when the cadence should stop as soon as a guard says so.
 
 ```python
 @client.send(route="heartbeat", every=5.0)
@@ -100,7 +114,24 @@ async def heartbeat() -> dict:
     return {"kind": "hb"}
 ```
 
-**Hooks.** Use `@hook(Direction.RECEIVE|SEND)` for cross-cutting concerns: schema checks, replay drop, reputation, signing/encryption. A hook is `async`, accepts **one** payload, and returns a (possibly modified) payload or `None` to drop it. Keep hooks free of business logic. They should be small, deterministic filters. (You can order multiple hooks with the `priority` tuple. Lower tuples run earlier.)
+**Reactive senders with data.** With flows active, a sender can consume the payload already attached to a matching event. Add [`when_data=...`](../../reference/sdk_doc/client/client.md#summonerclientsend) when only some payloads should be admitted before the sender runs.
+
+```python
+from summoner.protocol import Action
+
+@client.send(
+    route="inbox",
+    on_actions={Action.STAY},
+    use_data=True,
+    when_data=lambda data: data.get("ready") is True,
+)
+async def emit_ready(data):
+    return {"id": data["id"], "payload": data}
+```
+
+**Never `yield`.** Senders return a payload, a list of payloads, or `None`. Generators are not supported by the SDK.
+
+**Hooks.** Use [`@hook(Direction.RECEIVE|SEND)`](../../reference/sdk_doc/client/client.md#summonerclienthook) for cross-cutting concerns: schema checks, replay drop, reputation, signing/encryption. A hook is `async`, accepts **one** payload, and returns a (possibly modified) payload or `None` to drop it. Keep hooks free of business logic. They should be small, deterministic filters. The direction enum is documented on [`Direction`](../../reference/sdk_doc/proto/process.md#class-direction). (You can order multiple hooks with the `priority` tuple. Lower tuples run earlier.)
 
 ```python
 from summoner.protocol import Direction
@@ -129,7 +160,7 @@ A flow turns your agent into a small, explicit automaton. Instead of sprinkling 
 
 ### Step 0: Minimal setup (do this *before* any arrow-route decorators register)
 
-This flips on the flow engine and defines the arrow syntax so your route strings become a real DSL (nodes, labels, transitions). It then compiles the patterns and loads your **Trigger** tokens. If you skip this before registering `@receive/@send` with arrows, those routes will be treated as plain labels and will not participate in state-based routing or hub matching.
+This flips on the flow engine and defines the arrow syntax so your route strings become a real DSL (nodes, labels, transitions). It then compiles the patterns and loads your **Trigger** tokens. If you skip this before registering [`@receive`](../../reference/sdk_doc/client/client.md#summonerclientreceive) / [`@send`](../../reference/sdk_doc/client/client.md#summonerclientsend) with arrows, those routes will be treated as plain labels and will not participate in state-based routing or hub matching. See [`SummonerClient.flow()`](../../reference/sdk_doc/client/client.md#summonerclientflow), [`Flow.activate()`](../../reference/sdk_doc/proto/flow.md#flowactivate), [`Flow.add_arrow_style()`](../../reference/sdk_doc/proto/flow.md#flowadd_arrow_style), [`Flow.compile_arrow_patterns()`](../../reference/sdk_doc/proto/flow.md#flowcompile_arrow_patterns), and [`Flow.triggers()`](../../reference/sdk_doc/proto/flow.md#flowtriggers).
 
 ```python
 from summoner.protocol import Move, Stay, Node
@@ -150,7 +181,7 @@ Trigger = flow.triggers()  # e.g., Trigger.ok, Trigger.error
 
 ### Step 1: Upload/Download — the shape-preserving contract
 
-Think of `@upload_states` as your agent's **self-report** and `@download_states` as the **commit point**. On each tick (with flows active), the runtime:
+Think of [`@upload_states`](../../reference/sdk_doc/client/client.md#summonerclientupload_states) as your agent's **self-report** and [`@download_states`](../../reference/sdk_doc/client/client.md#summonerclientdownload_states) as the **commit point**. On each tick (with flows active), the runtime:
 
 1. calls **upload** to learn where you are (a node, a list, or a per-key map).
 2. runs receivers whose **source** gates accept that upload, collecting their returned `Event`s.
@@ -209,14 +240,14 @@ async def commit(proposed: dict[Optional[str], list[Node]]) -> None:
         slots[peer] = next((p for p in PREFS if p in names), slots.get(peer, "ready"))
 ```
 
-> **Notes**
+> [!NOTE]
 >
-> • **Left-dangling routes** (e.g., `"--> boot"`) deliver proposals under `None` when your upload is a dict. Handle that bucket explicitly if you want it to affect a specific key.
-> • Keep **upload** fast and side-effect-free. Do durable writes in **download** so you consolidate multiple receiver outcomes before committing.
+> * **Left-dangling routes** (e.g., `"--> boot"`) deliver proposals under `None` when your upload is a dict. Handle that bucket explicitly if you want it to affect a specific key.
+> * Keep **upload** fast and side-effect-free. Do durable writes in **download** so you consolidate multiple receiver outcomes before committing.
 
 ### Step 2: Gate behavior with routes (state-gated receivers)
 
-With flows active, routes become selectors. Only receivers whose **source** matches what you uploaded are eligible to run. Each receiver returns an `Event` (`Move`/`Stay`) that *proposes* the next node. **Download** commits the winner.
+With flows active, routes become selectors. Only receivers whose **source** matches what you uploaded are eligible to run. Each receiver returns an [`Event`](../../reference/sdk_doc/proto/triggers.md#class-event) (`Move`/`Stay`) that *proposes* the next node. **Download** commits the winner.
 
 In this example, `on_confirm` proposes **`ready → exchange`** on a valid confirm. `on_exchange` proposes to **stay** in `exchange` for chatty messages. Another receiver would later propose **`exchange → finalize`**.
 
@@ -247,16 +278,41 @@ async def on_exchange(payload) -> Optional["Event"]:
 ### Reactive hubs (send after specific outcomes)
 
 > [!CAUTION]
-> Hubs require flows to be **activated**. If flows are off, `on_actions` / `on_triggers` filters will not match anything.
+> Hubs require flows to be **activated**. If flows are off, `on_actions` / `on_triggers` filters will not match anything. The exact hub contract is documented on [`SummonerClient.send(...)`](../../reference/sdk_doc/client/client.md#summonerclientsend).
 
-Hubs are `@send` paths that fire **right after** matching receiver events:
+Hubs are [`@send`](../../reference/sdk_doc/client/client.md#summonerclientsend) paths that fire **right after** matching receiver events:
 
-* `on_actions` filters by event kind: `{Action.MOVE, Action.STAY, Action.TEST}`.
-* `on_triggers` filters by **Trigger** values from `flow.triggers()`.
+* `on_actions` filters by event kind: [`{Action.MOVE, Action.STAY, Action.TEST}`](../../reference/sdk_doc/proto/triggers.md#class-action).
+* `on_triggers` filters by **Trigger** values from [`flow.triggers()`](../../reference/sdk_doc/proto/flow.md#flowtriggers).
 * A hub fires only when **both** filters (if provided) match.
 * The runtime **deduplicates** hub firings once per tick by `(route, key, sender_fn)`, so you do not get duplicates for the same activation.
 
 This lets you keep receivers pure (just propose outcomes) while doing side effects *after* the state decision is made.
+
+When a receiver already computed the outbound payload, pass it through [`use_data=True`](../../reference/sdk_doc/client/client.md#summonerclientsend). If only some payloads should reach the hub, put that qualification in [`when_data=...`](../../reference/sdk_doc/client/client.md#summonerclientsend) instead of doing a quick in-body `return None`.
+
+```python
+from summoner.protocol import Action, Move
+
+# assumes flow is activated and Trigger = flow.triggers()
+
+@client.receive(route="A --> B")
+async def on_A(msg):
+    return Move(Trigger.ok, data={"payload": msg, "emit": str(msg).strip() == "go"})
+
+def should_emit(data: dict) -> bool:
+    return data.get("emit") is True
+
+@client.send(
+    route="A --> B",
+    on_actions={Action.MOVE},
+    on_triggers={Trigger.ok},
+    use_data=True,
+    when_data=should_emit,
+)
+async def after_A_to_B(data: dict) -> dict:
+    return {"kind": "transition", "payload": data["payload"]}
+```
 
 ## Composing behaviors
 
@@ -290,10 +346,10 @@ For complete, public illustrations of layered designs, see:
 
 Sometimes you want operators (or even other agents) to **control** an agent by sending commands. Ask it to **travel** to a different server, **quit** cleanly, **activate** a behavior (start a crawler, enable a buyer), or **stop/pause** it. Those controls are powerful, so they need guardrails. The clean pattern is **command = parse → ask permission (gate) → propose transition**. You enforce the gate with flow nodes (for example, `opened/locked` or `idle/active/paused`) so a stray or out-of-policy message cannot flip state.
 
-Self-commands (local control like `client.quit()` / `client.travel_to(...)`) are always available. **Remote** commands must consult the current gate and log a short reason when closed. After a transition is proposed, your `@download_states` commits exactly once per key so other receivers and hubs route correctly on the next tick.
+Self-commands (local control like [`client.quit()`](../../reference/sdk_doc/client/client.md#summonerclientquit) / [`client.travel_to(...)`](../../reference/sdk_doc/client/client.md#summonerclienttravel_to)) are always available. **Remote** commands must consult the current gate and log a short reason when closed. After a transition is proposed, your [`@download_states`](../../reference/sdk_doc/client/client.md#summonerclientdownload_states) commits exactly once per key so other receivers and hubs route correctly on the next tick.
 
 > [!NOTE]
-> The snippet below assumes flows are **activated**, an arrow style is **declared**, and `Trigger = flow.triggers()` is loaded. `@receive` returns `Move/Stay` (or `None` to drop). The engine aggregates proposals and then calls your `@download_states` to commit.
+> The snippet below assumes flows are **activated**, an arrow style is **declared**, and `Trigger = flow.triggers()` is loaded. [`@receive`](../../reference/sdk_doc/client/client.md#summonerclientreceive) returns `Move/Stay` (or `None` to drop). The engine aggregates proposals and then calls your [`@download_states`](../../reference/sdk_doc/client/client.md#summonerclientdownload_states) to commit.
 
 ```python
 from typing import Optional
@@ -315,14 +371,14 @@ async def on_open(payload) -> Optional["Event"]:
 
 Common command families you can gate this way:
 
-* **Liveness/placement:** `travel_to`, `quit`
+* **Liveness/placement:** [`travel_to`](../../reference/sdk_doc/client/client.md#summonerclienttravel_to), [`quit`](../../reference/sdk_doc/client/client.md#summonerclientquit)
 * **Behavior toggles:** `start_<feature>`, `stop_<feature>`, `pause`, `resume`
 * **Mode switches:** `idle ↔ active`, `read-only ↔ write-enabled`
 * **Rate controls:** `set_rate`, `throttle`, `unthrottle`
 
 #### Addressing, travel, and the control surface (concrete patterns)
 
-Agents may switch servers at runtime and expose **self-commands** and **remote orders**. Treat location as state and gate remote orders via your flow. This is where the abstract "command gating" meets concrete methods (`quit()` / `travel_to(...)`) and careful routing so registrations do not collide.
+Agents may switch servers at runtime and expose **self-commands** and **remote orders**. Treat location as state and gate remote orders via your flow. This is where the abstract "command gating" meets concrete methods ([`quit()`](../../reference/sdk_doc/client/client.md#summonerclientquit) / [`travel_to(...)`](../../reference/sdk_doc/client/client.md#summonerclienttravel_to)) and careful routing so registrations do not collide.
 
 > [!NOTE]
 > If you use arrow routes anywhere (e.g., `/all --> /all`), be sure you have **activated flows** and declared an arrow style *before* decorator registration:
@@ -339,19 +395,19 @@ Use distinct routes to avoid accidental registration overlap and to keep intent 
 
 ```python
 # Quit the client gracefully
-@client.send(route="control.self.quit")
+@client.send(route="control_self_quit")
 async def self_quit():
     await client.quit()    # sets intent; session exits cleanly
     return None            # nothing is sent on the wire
 
 # Travel to a new server (host, port)
-@client.send(route="control.self.travel")
+@client.send(route="control_self_travel")
 async def self_travel():
     await client.travel_to(host="127.0.0.2", port=9999)  # sets travel intent
     return None
 ```
 
-**Behavior.** Both methods are `async` and thread-safe. They set internal intent flags. The current session shuts down **cleanly** at the next safe point. On `client.travel_to(host, port)`, the client reconnects to the new `(host, port)` and resumes. On `client.quit()`, the client exits after cleanup.
+**Behavior.** Both methods are `async` and thread-safe. They set internal intent flags. The current session shuts down **cleanly** at the next safe point. See [`SummonerClient.travel_to(...)`](../../reference/sdk_doc/client/client.md#summonerclienttravel_to) and [`SummonerClient.quit()`](../../reference/sdk_doc/client/client.md#summonerclientquit). On `client.travel_to(host, port)`, the client reconnects to the new `(host, port)` and resumes. On `client.quit()`, the client exits after cleanup.
 
 **Remote orders (receive then act)**
 If you accept orders over the wire, validate and then call the methods. Keep the control API uniform across agents so orchestration tools can script them.
@@ -382,39 +438,39 @@ For public agent implementations that demonstrate gated commands and control sur
 
 ### Asynchronous programming in Summoner
 
-Summoner runs on `asyncio`, and each client owns its own event loop. Treat your agent as a cooperative, non-blocking participant in that loop. Await I/O, keep CPU work short, and do setup/teardown on the same loop so ownership is clear.
+Summoner runs on `asyncio`, and each client owns its own event loop. Treat your agent as a cooperative, non-blocking participant in that loop. Await I/O, keep CPU work short, and do setup/teardown on the same loop so ownership is clear. For the runtime entrypoints, see [`SummonerClient.run(...)`](../../reference/sdk_doc/client/client.md#summonerclientrun), [`SummonerClient.run_client(...)`](../../reference/sdk_doc/client/client.md#summonerclientrun_client), [`message_receiver_loop`](../../reference/sdk_doc/client/client.md#summonerclientmessage_receiver_loop), and [`message_sender_loop`](../../reference/sdk_doc/client/client.md#summonerclientmessage_sender_loop).
 
 * **One loop per client.** The SDK creates a fresh event loop per `SummonerClient` and sets it for the current thread. If you need multiple clients, give each its **own thread or process** so loops do not clash.
 * **No blocking in handlers.** Avoid `time.sleep` and tight CPU loops. Always `await` I/O and offload heavy CPU elsewhere.
-* **Setup/teardown.** Run pre-run async setup on the client's loop (for example, `client.loop.run_until_complete(setup())`) **before** `client.run(...)`. Close files, DBs, and tasks after `run(...)` returns.
+* **Setup/teardown.** Run pre-run async setup on the client's loop (for example, `client.loop.run_until_complete(setup())`) **before** [`client.run(...)`](../../reference/sdk_doc/client/client.md#summonerclientrun). Close files, DBs, and tasks after `run(...)` returns.
 * **Task management.** Schedule background tasks on the client's loop. The SDK will cancel worker pools and active tasks cleanly on shutdown.
-* **Signal handling.** On non-Windows, SIGINT/SIGTERM handlers are installed for graceful termination.
+* **Signal handling.** On non-Windows, SIGINT/SIGTERM handlers are installed for graceful termination. See [`SummonerClient.set_termination_signals()`](../../reference/sdk_doc/client/client.md#summonerclientset_termination_signals).
 
 ### Configuration & runtime defaults
 
-Configuration lives in JSON and drives the runtime. Treat it as the single source of truth for limits and addresses so code stays stable across environments.
+Configuration lives in JSON and drives the runtime. Treat it as the single source of truth for limits and addresses so code stays stable across environments. The exhaustive field-by-field reference is in [client/configs.md](../../reference/sdk_doc/client/configs.md).
 
 * **Receiver:**
 
-  * `max_bytes_per_line=65536` (64 KiB),
-  * `read_timeout_seconds=None` (block until data).
+  * [`max_bytes_per_line=65536`](../../reference/sdk_doc/client/configs.md#max_bytes_per_line) (64 KiB),
+  * [`read_timeout_seconds=None`](../../reference/sdk_doc/client/configs.md#read_timeout_seconds) (block until data).
 
 * **Sender:**
 
-  * `concurrency_limit=50` (default),
-  * `batch_drain=True` by default,
-  * `queue_maxsize=concurrency_limit`,
-  * `event_bridge_maxsize=1000`,
-  * `max_worker_errors=3`.
+  * [`concurrency_limit=50`](../../reference/sdk_doc/client/configs.md#concurrency_limit) (default),
+  * [`batch_drain=True`](../../reference/sdk_doc/client/configs.md#batch_drain) by default,
+  * [`queue_maxsize=concurrency_limit`](../../reference/sdk_doc/client/configs.md#queue_maxsize),
+  * [`event_bridge_maxsize=1000`](../../reference/sdk_doc/client/configs.md#event_bridge_maxsize),
+  * [`max_worker_errors=3`](../../reference/sdk_doc/client/configs.md#max_worker_errors).
 
 * **Reconnection:**
 
-  * `retry_delay_seconds=3`,
-  * `primary_retry_limit=3`,
-  * `default_retry_limit=2`,
-  * plus optional `default_host`/`default_port` for failover.
+  * [`retry_delay_seconds=3`](../../reference/sdk_doc/client/configs.md#retry_delay_seconds),
+  * [`primary_retry_limit=3`](../../reference/sdk_doc/client/configs.md#primary_retry_limit),
+  * [`default_retry_limit=2`](../../reference/sdk_doc/client/configs.md#default_retry_limit),
+  * plus optional [`default_host`](../../reference/sdk_doc/client/configs.md#default_host) / [`default_port`](../../reference/sdk_doc/client/configs.md#default_port) for failover.
 
-* **Precedence:** If the config provides `host`/`port`, those populate `self.host`/`self.port` and **override** the `run(...)` host/port at connection time.
+* **Precedence:** If the config provides `host`/`port`, those populate `self.host`/`self.port` and **override** the [`run(...)`](../../reference/sdk_doc/client/client.md#summonerclientrun) host/port at connection time.
 
 The sender warns when the queue is about to exceed **80%** capacity. Take that as your cue to slow producers, increase capacity, or batch more aggressively.
 
@@ -439,7 +495,8 @@ For public agent implementations that illustrate validation hooks, replay handli
 
 Queues are your shock absorbers. Use them to decouple hot receive paths from heavier aggregation or fan-out, and to shape bursty workloads into predictable sends.
 
-* **Direct event-data transfer.** If a sender only needs the payload already attached to a matching `Event`, prefer `use_data=True` (and `data_mode="snapshot"` when you want a copied handoff). Reach for queues when you need buffering, batching, retries, or cross-task decoupling.
+Before you add a queue, ask a simpler question: does the sender only need the payload already attached to a matching [`Event`](../../reference/sdk_doc/proto/triggers.md#class-event)? If yes, prefer [`use_data=True`](../../reference/sdk_doc/client/client.md#summonerclientsend). Add [`data_mode="snapshot"`](../../reference/sdk_doc/client/client.md#summonerclientsend) when you want a stable delivered payload, and add [`when_data=...`](../../reference/sdk_doc/client/client.md#summonerclientsend) when only some payloads should be admitted. Reach for queues when you need buffering, batching, retries, or cross-task decoupling.
+
 * **Batch and summarize.** Collect items for *N* seconds, emit one consolidated report.
 * **Fan-out with backpressure.** Enqueue jobs and let a single sender task respect `multi=True` semantics and queue limits.
 
@@ -455,7 +512,7 @@ For public agent implementations that apply queue-backed send/receive and state-
 
 ### Backpressure and rate limiting
 
-Assume the network can stall. Your job is to stay responsive: return quickly on receive, let the writer's drain and the send queue enforce backpressure, and keep optional rate limits in config so you can tune without redeploying.
+Assume the network can stall. Your job is to stay responsive: return quickly on receive, let the writer's drain and the send queue enforce backpressure, and keep optional rate limits in config so you can tune without redeploying. The most relevant knobs are [`queue_maxsize`](../../reference/sdk_doc/client/configs.md#queue_maxsize), [`concurrency_limit`](../../reference/sdk_doc/client/configs.md#concurrency_limit), and, on the relay side, server [`rate_limit_msgs_per_minute`](../../reference/sdk_doc/server/configs.md#rate_limit_msgs_per_minute).
 
 Test under synthetic load. Verify that:
 

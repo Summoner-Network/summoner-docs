@@ -6,6 +6,7 @@ A Summoner client connects to a Summoner server over TCP, continuously receives 
 
 `SummonerClient` is the primary SDK entry point for running a client process. It handles configuration loading (from a file path or in-memory dict), logger initialization, termination signal handling (where supported), handler registration, and the overall client lifecycle (connect, run loops, shutdown).
 
+<a id="summonerclient__init__"></a>
 ## `SummonerClient.__init__`
 
 ```python
@@ -51,6 +52,7 @@ from summoner.client import SummonerClient
 client = SummonerClient(name="summoner:client")
 ```
 
+<a id="summonerclientrun"></a>
 ## `SummonerClient.run`
 
 ```python
@@ -169,6 +171,7 @@ client.run(
 )
 ```
 
+<a id="summonerclientflow"></a>
 ## `SummonerClient.flow`
 
 ```python
@@ -231,6 +234,7 @@ client = SummonerClient(name="summoner:client")
 client.initialize()
 ```
 
+<a id="summonerclientupload_states"></a>
 ## `SummonerClient.upload_states`
 
 ```python
@@ -265,6 +269,7 @@ async def upload():
     return {"stage": "idle", "room": "alpha"}
 ```
 
+<a id="summonerclientdownload_states"></a>
 ## `SummonerClient.download_states`
 
 ```python
@@ -300,6 +305,7 @@ async def download(tape):
     return None
 ```
 
+<a id="summonerclienthook"></a>
 ## `SummonerClient.hook`
 
 ```python
@@ -373,6 +379,7 @@ async def normalize(payload):
     return payload
 ```
 
+<a id="summonerclientreceive"></a>
 ## `SummonerClient.receive`
 
 ```python
@@ -429,6 +436,7 @@ async def on_message(payload):
     return None
 ```
 
+<a id="summonerclientsend"></a>
 ## `SummonerClient.send`
 
 ```python
@@ -452,51 +460,69 @@ Decorator used to register an **async sender handler** that produces outbound pa
 
 Senders are executed by the sender loop and enqueue output payloads to be encoded and written to the server connection.
 
-* If `multi=False`, the sender returns a single payload (or `None`).
-* If `multi=True`, the sender returns a list of payloads (or `None` entries).
+#### Plain sender
 
-When flow is enabled, `on_triggers` / `on_actions` can be used to make a sender reactive to activation events. From an SDK perspective, these parameters declare when a sender is eligible to run.
+If `multi=False`, the sender returns a single payload or `None`. If `multi=True`, it returns a list of payloads (or `None` to stay quiet for that run).
 
-The sender API adds five important controls:
+Returning `None` means "send nothing this cycle." Senders should return payloads, not `yield` them. Generator-based senders are not supported.
 
-* `use_data=True` passes the matched event payload (`Event.data`) into the sender.
-* `data_mode` controls how that payload is delivered:
+#### Reactive sender
 
-  * `"live"` keeps shared-reference semantics, so later mutations may still be visible when the sender runs.
-  * `"snapshot"` gives the sender a stable delivered payload, which is usually the safer choice when the data may be mutated later or buffered for timed delivery.
+When flow is enabled, `on_triggers` and/or `on_actions` make a sender reactive to activation events. From an SDK point of view, those filters decide when the sender is eligible to run.
 
-* `when_data=...` is an optional synchronous payload filter for reactive `use_data=True` senders. It is evaluated on the same payload the sender would receive, before the sender coroutine is queued.
-* `every=<seconds>` turns the sender into a timed sender.
-* `run_while=...` lets a timed sender keep running only while a bool or callable condition allows it.
+If you set `use_data=True`, the sender receives the matched event payload (`Event.data`) as its single argument.
+
+`data_mode` controls how that payload is delivered:
+
+* `"live"` keeps shared-reference semantics, so later mutations may still be visible when the sender runs.
+* `"snapshot"` gives the sender a stable delivered payload, which is usually safer when the data may be mutated later or buffered for timed delivery.
 
 Compared with earlier releases, the snapshot path keeps the same public behavior while doing less unnecessary copy work inside the SDK.
 
-From the user's point of view, there are three common sender modes:
+`when_data=...` is an optional synchronous payload filter for reactive `use_data=True` senders. It is evaluated on the same payload the sender would receive, before the sender coroutine is queued.
+
+Two runtime details matter for advanced reactive senders:
+
+* With untimed reactive senders, `use_data=True` keeps one invocation per matching event. Matching events are not collapsed into one run because the event payload itself is part of the sender input.
+* For reactive timed senders, cadence does not arm the sender by itself. A matching event must arm the runtime first; after that, `run_while` can keep the sender active or stop it.
+
+#### Timed sender
+
+`every=<seconds>` turns the sender into a timed sender. Once admitted, it is scheduled independently from the untimed batch loop.
+
+`run_while=...` lets a timed sender keep running only while a bool or callable condition allows it.
+
+#### Common modes
 
 * **Untimed sender:** no `every`; runs in the legacy round-based sender loop.
 * **Reactive sender:** uses `on_triggers` and/or `on_actions`; runs only for matching events.
-* **Timed sender:** uses `every`; once admitted, it is scheduled independently from the untimed batch loop.
+* **Timed sender:** uses `every`; runs on a cadence once scheduled.
 
-Two practical runtime details matter for advanced sender logic:
+### Validation
 
-* With untimed reactive senders, `use_data=True` keeps one invocation per matching event. Matching events are not collapsed into one run, because the event payload itself is part of the sender input.
-* For reactive timed senders, cadence does not arm the sender by itself. A matching event must arm the runtime first; after that, `run_while` can keep the sender active or stop it.
+Registration enforces a few groups of rules.
 
-Important validation rules:
+**Basic type checks**
 
 * `route` must be a string.
 * `multi` and `use_data` must be booleans.
 * `every` must be `None` or a positive number.
 * `on_triggers` must be `None` or a `set[Signal]`.
 * `on_actions` must be `None` or a set of `Action.MOVE`, `Action.STAY`, and/or `Action.TEST`.
+
+**Flow-related rules**
+
 * `use_data=True` requires a non-empty reactive filter and `client.flow().activate()` before registration.
 * Timed reactive senders also require `client.flow().activate()` before registration.
+
+**Option coupling**
+
 * `data_mode` requires `use_data=True`.
 * `run_while` requires `every`.
 * `when_data` requires `use_data=True`.
 * `when_data` must be `None` or a synchronous callable that accepts exactly one payload argument.
 
-Handler signature rules:
+### Handler signature rules
 
 * If `use_data=False`, the sender must accept **zero** parameters.
 * If `use_data=True`, the sender must accept **exactly one** parameter.
@@ -565,16 +591,19 @@ Returns a decorator.
 
 ### Examples
 
-#### Single-payload sender
+#### Single-payload sender (or quiet cycle)
 
 ```python
 from summoner.client import SummonerClient
 
 client = SummonerClient(name="summoner:client")
+pending_message = {"kind": "chat", "data": "hello"}
 
 @client.send(route="chat.send")
 async def send_one():
-    return {"kind": "chat", "data": "hello"}
+    if pending_message is None:
+        return None
+    return pending_message
 ```
 
 #### Multi-payload sender
@@ -600,7 +629,7 @@ Trigger = load_triggers(text="OK\n  minor")
 client.flow().activate()
 
 @client.send(
-    route="chat.send",
+    route="chat_send",
     on_actions={Action.STAY},
     on_triggers={Trigger.minor},
     use_data=True,
@@ -624,7 +653,7 @@ def ready_only(data):
     return data.get("status") == "ready"
 
 @client.send(
-    route="chat.send",
+    route="chat_send",
     on_actions={Action.STAY},
     on_triggers={Trigger.minor},
     use_data=True,
@@ -648,6 +677,7 @@ async def heartbeat():
     return {"kind": "heartbeat"}
 ```
 
+<a id="summonerclienttravel_to"></a>
 ## `SummonerClient.travel_to`
 
 ```python
@@ -691,6 +721,7 @@ async def on_travel(payload):
     return None
 ```
 
+<a id="summonerclientquit"></a>
 ## `SummonerClient.quit`
 
 ```python
@@ -724,6 +755,7 @@ async def on_quit(payload):
     return None
 ```
 
+<a id="summonerclientdna"></a>
 ## `SummonerClient.dna`
 
 ```python
@@ -792,6 +824,7 @@ client = SummonerClient(name="summoner:client")
 dna_json = client.dna(include_context=True)
 ```
 
+<a id="summonerclientset_termination_signals"></a>
 ## `SummonerClient.set_termination_signals`
 
 ```python
@@ -823,6 +856,7 @@ Returns `None`.
 
 You normally do not call this directly because `run(...)` calls it as part of normal startup.
 
+<a id="summonerclientshutdown"></a>
 ## `SummonerClient.shutdown`
 
 ```python
@@ -854,6 +888,7 @@ client = SummonerClient(name="summoner:client")
 client.shutdown()
 ```
 
+<a id="summonerclientrun_client"></a>
 ## `SummonerClient.run_client`
 
 ```python
@@ -936,6 +971,7 @@ An awaitable coroutine. Returns when the session ends.
 
 This method is usually called internally by `run_client(...)`.
 
+<a id="summonerclientmessage_receiver_loop"></a>
 ## `SummonerClient.message_receiver_loop`
 
 ```python
@@ -979,6 +1015,7 @@ An awaitable coroutine. Returns when the session ends or raises `ServerDisconnec
 
 This method is usually called internally by `handle_session(...)`.
 
+<a id="summonerclientmessage_sender_loop"></a>
 ## `SummonerClient.message_sender_loop`
 
 ```python

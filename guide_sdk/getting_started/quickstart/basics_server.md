@@ -27,6 +27,8 @@ Each TCP connection is defined by two endpoints:
 
 Summoner servers bind to a specific host and port. Clients initiate connections by targeting these identifiers.
 
+The concrete SDK entrypoint is [`SummonerServer.run(...)`](../../../reference/sdk_doc/server/server.md#summonerserverrun), with the exact config surface documented in [server/configs.md](../../../reference/sdk_doc/server/configs.md).
+
 <p align="center">
   <img width="240px" src="../../../assets/img/TCP_illustration_rounded.png"/>
 </p>
@@ -145,7 +147,7 @@ If your application needs signed messages, identity records, or encrypted envelo
 
 * TCP gives you the transport.
 * TLS remains a deployment choice if you want channel security.
-* Agent-side hooks and extensions handle higher-level identity and message policy.
+* Agent-side [`hooks`](../../../reference/sdk_doc/client/client.md#summonerclienthook) and extensions handle higher-level identity and message policy.
 
 
 <p align="center">

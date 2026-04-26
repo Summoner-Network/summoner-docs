@@ -16,6 +16,7 @@ It depends on:
 
 
 
+<a id="route-strings"></a>
 ## Route strings
 
 A route string is parsed into three segments:
@@ -128,6 +129,7 @@ assert get_token_list("  A  ,  B , ", ",") == ["A", "B"]
 
 
 
+<a id="class-flow"></a>
 ## `class Flow`
 
 ```python
@@ -171,6 +173,7 @@ flow = Flow().activate()
 
 
 
+<a id="flowactivate"></a>
 ## `Flow.activate`
 
 ```python
@@ -214,6 +217,7 @@ Sets `in_use=False` and returns `self`.
 
 
 
+<a id="flowadd_arrow_style"></a>
 ## `Flow.add_arrow_style`
 
 ```python
@@ -289,6 +293,7 @@ A>B
 
 
 
+<a id="flowtriggers"></a>
 ## `Flow.triggers`
 
 ```python
@@ -328,6 +333,7 @@ Trigger = Flow().triggers()
 
 
 
+<a id="flowcompile_arrow_patterns"></a>
 ## `Flow.compile_arrow_patterns`
 
 ```python
@@ -385,6 +391,7 @@ flow.compile_arrow_patterns()
 
 
 
+<a id="flowparse_route"></a>
 ## `Flow.parse_route`
 
 ```python

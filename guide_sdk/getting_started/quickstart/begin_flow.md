@@ -17,6 +17,8 @@
 
 A Summoner agent lives in a small rhythm: it **receives** something, evaluates and **transitions** its internal state, and may **send** something in response or on a later tick. The point of a *flow* is to make that rhythm explicit, debuggable, and easy to extend. When you turn the flow engine on, routes stop being just labels and become a tiny Domain Specific Language (DSL) for graph-shaped behavior: nodes, arrows, and outcomes.
 
+For the raw API surface behind this page, see [`SummonerClient.flow()`](../../../reference/sdk_doc/client/client.md#summonerclientflow), [`Flow`](../../../reference/sdk_doc/proto/flow.md#class-flow), [`Node`](../../../reference/sdk_doc/proto/process.md#class-node), [`Event` / `Action`](../../../reference/sdk_doc/proto/triggers.md#class-event), and [`SummonerClient.send(...)`](../../../reference/sdk_doc/client/client.md#summonerclientsend).
+
 The rest of this page builds that model from first principles, then shows how to express it idiomatically in Summoner. You will see the full loop: 
 
 > **upload → receive → (Move/Stay/Test) → download → send**
@@ -27,7 +29,7 @@ along with the minimal examples that make each part click. The style stays pract
 
 ### Core Concepts: Inputs, Events, Triggers, Nodes
 
-A flow advances in response to **inputs** (incoming messages, timers). Receivers return an **Event** that encodes the next step. A **Trigger** labels that outcome. **Nodes** are named gates that select which receivers can run next.
+A flow advances in response to **inputs** (incoming messages, timers). Receivers return an [`Event`](../../../reference/sdk_doc/proto/triggers.md#class-event) that encodes the next step. A [`Trigger`](../../../reference/sdk_doc/proto/flow.md#flowtriggers) labels that outcome. [`Node`](../../../reference/sdk_doc/proto/process.md#class-node) values are named gates that select which receivers can run next.
 
 - **Inputs**: what the agent observes (messages, timers).
 - **Events**: what a receiver returns (`Move`, `Stay`, `Test`).
@@ -38,7 +40,7 @@ The examples below are minimal and runnable. Each illustrates one mechanic.
 
 ### Flow Activation (and what Changes)
 
-A client behaves like a simple message pump until you flip the flow switch. Call `client.flow().activate()` to let the runtime select receivers based on **state** and to interpret **routes** using the flow DSL. Because there is no default **arrow style**, you must declare at least one. A common choice is the ASCII arrow with double dashes and optional labels in square brackets:
+A client behaves like a simple message pump until you flip the flow switch. Call [`client.flow().activate()`](../../../reference/sdk_doc/client/client.md#summonerclientflow) to let the runtime select receivers based on **state** and to interpret **routes** using the flow DSL. Because there is no default **arrow style**, you must declare at least one with [`flow.add_arrow_style(...)`](../../../reference/sdk_doc/proto/flow.md#flowadd_arrow_style). A common choice is the ASCII arrow with double dashes and optional labels in square brackets:
 
 ```python
 from summoner.client import SummonerClient
@@ -51,14 +53,14 @@ Trigger = flow.triggers()  # loads tokens from TRIGGERS (e.g., Trigger.ok, Trigg
 ```
 
 > [!IMPORTANT]
-> If any `@receive`/`@send` uses an **arrow** (e.g. `"A --> B"`), you **must** call `flow.add_arrow_style(...)` **before** those decorators register. Otherwise, the arrow string will be parsed as a plain token and fail validation.
+> If any [`@receive`](../../../reference/sdk_doc/client/client.md#summonerclientreceive) or [`@send`](../../../reference/sdk_doc/client/client.md#summonerclientsend) uses an **arrow** (e.g. `"A --> B"`), you **must** call [`flow.add_arrow_style(...)`](../../../reference/sdk_doc/proto/flow.md#flowadd_arrow_style) **before** those decorators register. Otherwise, the arrow string will be parsed as a plain token and fail validation.
 
-With flows active, `@receive(route=...)` uses the route DSL. See [Routes and Node Logic](#routes-and-node-logic-the-small-dsl-that-decides-who-runs) for the full syntax (arrows, labels, object routes).
+With flows active, `@receive(route=...)` uses the route DSL. See [Routing Semantics: Who Runs When](#routing-semantics-who-runs-when) for the full syntax (arrows, labels, object routes).
 
 
 ### Triggers: Loading & Using
 
-Triggers are outcome tokens attached to the **Event** a receiver returns. After you have created and activated a flow, call:
+Triggers are outcome tokens attached to the [`Event`](../../../reference/sdk_doc/proto/triggers.md#class-event) a receiver returns. After you have created and activated a flow, call:
 
 ```python
 Trigger = flow.triggers()  # loads names from TRIGGERS next to your code
@@ -73,11 +75,11 @@ ok
   error
 ```
 
-You can then write `Move(Trigger.ok)` or `Stay(Trigger.ignore)`. Send hubs filter on *exact* triggers; if you want a hierarchy of outcomes, encode it in the file and in your policy, not by prefix matching.
+You can then write `Move(Trigger.ok)` or `Stay(Trigger.ignore)`. Send hubs filter on *exact* triggers; if you want a hierarchy of outcomes, encode it in the file and in your policy, not by prefix matching. The loader path is documented on [`Flow.triggers()`](../../../reference/sdk_doc/proto/flow.md#flowtriggers) and [`load_triggers`](../../../reference/sdk_doc/proto/triggers.md#load_triggers).
 
 ### Routing Semantics: Who Runs When
 
-A route parses into three parts — **source**, **label**, **target** — each represented as a `Node` set. Write it as `source --[label]--> target`. Omit the label if you do not need one (`source --> target`). Omit one side to get a dangling arrow: `--[boot]--> target` (no source) or `source -->` (no target). A route with no arrow (for example, `"opened,notify"`) is an **object route**. It selects by sources only and never proposes a target.
+A route parses into three parts — **source**, **label**, **target** — each represented as a [`Node`](../../../reference/sdk_doc/proto/process.md#class-node) set. Write it as `source --[label]--> target`. Omit the label if you do not need one (`source --> target`). Omit one side to get a dangling arrow: `--[boot]--> target` (no source) or `source -->` (no target). A route with no arrow (for example, `"opened,notify"`) is an **object route**. It selects by sources only and never proposes a target.
 
 A node can be a plain token like `opened`; the wildcard `/all`; a negative `/not(x,y)`; or a choice `/oneof(a,b,c)`. A receiver is eligible if any source gate accepts any uploaded state for the same key.
 
@@ -136,7 +138,7 @@ except ValueError as e:
 
 **Label activation.** When a receiver returns `Move(trigger)`, the engine activates the label and the target. `Test(trigger)` activates only the label. `Stay(trigger)` keeps the source set. Use labels to stage guard rails or to attach event-driven senders without forcing a node change.
 
-To see how labels are activated, we can set up a flow and parse a simple labeled arrow:
+To see how labels are activated, we can set up a flow and parse a simple labeled arrow with [`Flow.parse_route(...)`](../../../reference/sdk_doc/proto/flow.md#flowparse_route):
 
 ```python
 from summoner.protocol import Move, Test, Stay, Flow
@@ -150,7 +152,7 @@ arr = flow.parse_route("A --[ guard ]--> B")
 ```
 
 > [!NOTE]
-> You rarely need `Flow()` directly; it's used here only to parse a route in isolation.
+> You rarely need [`Flow()`](../../../reference/sdk_doc/proto/flow.md#class-flow) directly; it's used here only to parse a route in isolation.
 
 When a receiver returns `Move`, the label and the target are activated.
 
@@ -211,14 +213,14 @@ obj.activated_nodes(Test(Trigger.ok))  # ()
 ### Upload & Download: State Negotiation
 
 
-Flows are driven by what you **upload** and what you then **commit** in **download**. Upload reports your current position in the graph while download is where you fold the engine's proposals back into your own state.
+Flows are driven by what you [`upload`](../../../reference/sdk_doc/client/client.md#summonerclientupload_states) and what you then **commit** in [`download`](../../../reference/sdk_doc/client/client.md#summonerclientdownload_states). Upload reports your current position in the graph while download is where you fold the engine's proposals back into your own state.
 
 <p align="center">
   <img width="700px" src="../../../assets/img/download_upload_flow_rounded.png"/>
 </p>
 
 
-The contract is simple and strict: upload may return one of four shapes, and download will mirror it with *Nodes* instead of strings.
+The contract is simple and strict: upload may return one of four shapes, and download will mirror it with [`Node`](../../../reference/sdk_doc/proto/process.md#class-node) values instead of strings.
 
 1. **Single**: a single node.
 
@@ -304,7 +306,7 @@ Internally the engine prefixes them during evaluation and strips the prefix in `
 
 ### State-Gated Receiving (Upload → Receive)
 
-Use **object routes** to gate receivers by the node you upload: the uploaded node selects which `@receive(route=...)` runs.
+Use **object routes** to gate receivers by the node you upload: the uploaded node selects which [`@receive(route=...)`](../../../reference/sdk_doc/client/client.md#summonerclientreceive) runs.
 
 Below, when the node is `"opened"`, one receiver runs, and when it is `"locked"`, a different one runs:
 
@@ -351,7 +353,7 @@ The example above **mimics** the electron analogy: **upload** advertises the "le
 
 ### Receiving with Transitions (Pure Receivers)
 
-A receiver has two jobs: normalize the input, then return an **Event** that proposes the next node. The Event can be:
+A receiver has two jobs: normalize the input, then return an [`Event`](../../../reference/sdk_doc/proto/triggers.md#class-event) that proposes the next node. The Event can be:
 - `Move(trigger)`: activate the label and the target.
 - `Stay(trigger)`: keep the source.
 - `Test(trigger)`: activate the label only.
@@ -400,12 +402,12 @@ client.run(host="127.0.0.1", port=8888)
 Here is the loop: the runtime calls **upload** to learn the current node, runs the matching **receive** handler, the handler returns `Move` or `Stay` with a **Trigger**, and then **download** is called with the **possible** nodes. You commit one (B or A), and the agent stabilizes there until the next input.
 
 > [!NOTE]
-> Triggers label outcomes (for example, `ok`, `error`, `ignore`). They do not carry payloads. They **gate** follow-up actions, such as running an "on ok" sender but not an "on error" sender.
+> Triggers label outcomes (for example, `ok`, `error`, `ignore`). They do not carry payloads. They **gate** follow-up actions, such as running an "on ok" sender but not an "on error" sender. See [`Flow.triggers()`](../../../reference/sdk_doc/proto/flow.md#flowtriggers) for the trigger surface.
 
 > [!IMPORTANT]
-> **Best practice.** Keep receivers pure. Emit outcomes (`Move`, `Stay`, `Test`) and do not mutate global state in the receiver. Commit changes only in `download`.
+> **Best practice.** Keep receivers pure. Emit outcomes (`Move`, `Stay`, `Test`) and do not mutate global state in the receiver. Commit changes only in [`download`](../../../reference/sdk_doc/client/client.md#summonerclientdownload_states).
 >
-> **Why this policy?** In a tick, multiple receivers can run (across priorities or per-key subgraphs). If they update shared variables inline, you risk inconsistent intermediates and races, both between receivers and with senders. Let the runtime aggregate all outcomes first and call your `download(...)` with the unified proposals, then apply the mutation once. If you need side effects (I/O or messages) in reaction to those outcomes, do them in a **reactive sender** (for example, `@send(..., on_actions={...}, on_triggers={...})` or a consolidated `/all --> /all` hub) so effects run after the relevant receivers finish, deterministically.
+> **Why this policy?** In a tick, multiple receivers can run (across priorities or per-key subgraphs). If they update shared variables inline, you risk inconsistent intermediates and races, both between receivers and with senders. Let the runtime aggregate all outcomes first and call your `download(...)` with the unified proposals, then apply the mutation once. If you need side effects (I/O or messages) in reaction to those outcomes, do them in a **reactive sender** (for example, [`@send(..., on_actions={...}, on_triggers={...})`](../../../reference/sdk_doc/client/client.md#summonerclientsend) or a consolidated `/all --> /all` hub) so effects run after the relevant receivers finish, deterministically.
 
 
 ### Sending: Periodic senders vs. hubs
@@ -414,9 +416,11 @@ Here is the loop: the runtime calls **upload** to learn the current node, runs t
   <img width="640px" src="../../../assets/img/tick_hub_send_rounded.png"/>
 </p>
 
-At the beginner level, two emission patterns matter most. A **periodic sender** emits on a cadence you declare with `every=...`, which is ideal for heartbeats, telemetry, and maintenance. A **hub sender** is *event-driven*: it runs immediately after a receiver has returned an Event that matches the hub's filters. Periodic senders cover recurring work; hubs are how you react *right after* specific outcomes.
+At the beginner level, two emission patterns matter most. A **periodic sender** emits on a cadence you declare with `every=...`, which is ideal for heartbeats, telemetry, and maintenance. A **hub sender** is *event-driven*: it runs immediately after a receiver has returned an [`Event`](../../../reference/sdk_doc/proto/triggers.md#class-event) that matches the hub's filters. Periodic senders cover recurring work; hubs are how you react *right after* specific outcomes. The full sender surface lives on [`SummonerClient.send(...)`](../../../reference/sdk_doc/client/client.md#summonerclientsend).
 
 The older untimed tick pattern still exists: a plain `@send(route=...)` may return a payload or `None` each untimed cycle, and `await asyncio.sleep(...)` inside the body remains a valid tool when the delay is part of the sender's own logic. But when the goal is simply "run every N seconds", `every=...` is the clearer way to teach and read the code.
+
+#### Periodic sender
 
 A periodic sender is straightforward. Give it an interval, return a value to send, or `None` to stay quiet on that due run.
 
@@ -427,8 +431,10 @@ async def heartbeat():
 ```
 
 > [!NOTE]
-> In the rest of this section, **`Action`** refers to an enumeration (i.e., `Action.MOVE`, `Action.STAY`, `Action.TEST`) used to filter `Event` kinds (`Move`, `Stay`, `Test`) in **send** decorators (hubs). For example:
+> In the rest of this section, [`Action`](../../../reference/sdk_doc/proto/triggers.md#class-action) refers to an enumeration (i.e., `Action.MOVE`, `Action.STAY`, `Action.TEST`) used to filter `Event` kinds (`Move`, `Stay`, `Test`) in **send** decorators (hubs). For example:
 > `@client.send(..., on_actions={Action.MOVE})`.
+
+#### Route-bound hub
 
 When you want a send to happen only because a **specific receive** just fired, bind them by route. Activate the flow, declare an arrow style, and give the hub the **same route** as the receiver.  Then filter by **action** (`Action.MOVE`, `Action.STAY`, `Action.TEST`) and/or by trigger (`Trigger.ok`, etc.). This one-to-one link is the most precise hub you can write.
 
@@ -450,7 +456,9 @@ async def after_A_to_B():
     return {"kind": "transition", "from": "A", "to": "B"}
 ```
 
-When the receiver already computed a useful payload, a reactive sender can consume that `Event.data` directly. This removes the need for temporary shared variables or a queue when all you want is "receive, decide, then emit with the resulting payload."
+#### Hubs that reuse `Event.data`
+
+When the receiver already computed a useful payload, a reactive sender can consume that [`Event.data`](../../../reference/sdk_doc/proto/triggers.md#class-event) directly. This removes the need for temporary shared variables or a queue when all you want is "receive, decide, then emit with the resulting payload." If only some payloads should be admitted, add [`when_data=...`](../../../reference/sdk_doc/client/client.md#summonerclientsend) on the sender instead of checking inside the sender body and returning `None` immediately.
 
 ```python
 from summoner.protocol import Action, Move
@@ -469,7 +477,26 @@ async def after_A_to_B_with_data(data):
     return data
 ```
 
-If the payload is mutable and you want a copied handoff instead of shared-reference behavior, add `data_mode="snapshot"` to the sender.
+If qualification depends only on the delivered payload, put that rule on the decorator:
+
+```python
+def non_empty_payload(data):
+    return bool(str(data["payload"]).strip())
+
+@client.send(
+    route="A --> B",
+    on_actions={Action.MOVE},
+    on_triggers={Trigger.ok},
+    use_data=True,
+    when_data=non_empty_payload,
+)
+async def after_A_to_B_if_non_empty(data):
+    return data
+```
+
+If the payload is mutable and you want a copied handoff instead of shared-reference behavior, add [`data_mode="snapshot"`](../../../reference/sdk_doc/client/client.md#summonerclientsend) to the sender. Pair it with `when_data` when the sender should react only to qualifying payloads.
+
+#### Global hubs and batching
 
 Sometimes a single hub should react to several transitions. That is where `/all --> /all` helps, but it is narrower than it sounds: it listens to **any complete arrow route** (those of the form `source --> target`) and ignores object routes (no arrow) or dangling arrows (missing a side). It only makes sense when your receivers themselves use concrete arrow routes, typically at least two, such as `"A --> B"` and `"B --> C"`.
 
@@ -489,12 +516,13 @@ async def on_any_success():
 ```
 
 > [!TIP]
-> In hubs, use `on_actions` to filter by event kind (`Action.MOVE`/`STAY`/`TEST`) and `on_triggers` to filter by outcome signals (`Trigger.*`):
-> * To react only to transitions, set `on_actions={Action.MOVE}` and leave `on_triggers` unset (i.e., `None`); 
-> * To react only to particular signals, set `on_triggers={Trigger.ok, ...}` and leave `on_actions` unset. 
-> * If you pass both, the hub fires only when **both** filters match (this is logical AND, or equivalently, the event's pair `(action, trigger)` must lie in `on_actions × on_triggers`). 
+> Read hub filters like this:
 >
-> Use `None` to disable a filter. An empty set `{}` matches nothing (i.e. `@send` cannot be triggered).
+> * Use `on_actions={Action.MOVE}` when you care about transitions regardless of signal.
+> * Use `on_triggers={Trigger.ok, ...}` when you care about specific signals regardless of action.
+> * Set both `on_actions` and `on_triggers` when both must match the same event.
+> * Use `None` to disable a filter.
+> * Use an empty set `{}` to match nothing.
 
 
 > [!NOTE]
@@ -647,7 +675,7 @@ async def stamp_identity(payload):
 
 ## Hooks & Priorities: Pre/Post Processing
 
-Hooks are small functions that run around receivers. A **receiving hook** runs before a payload reaches any receiver. A **sending hook** runs just before a payload is emitted. Use hooks for cross-cutting concerns that do not belong in flow logic: authentication, schema validation, deduplication, stamping identity, rate limiting, and similar tasks.
+Hooks are small functions that run around receivers. A **receiving hook** runs before a payload reaches any receiver. A **sending hook** runs just before a payload is emitted. Use [`@hook(...)`](../../../reference/sdk_doc/client/client.md#summonerclienthook) for cross-cutting concerns that do not belong in flow logic: authentication, schema validation, deduplication, stamping identity, rate limiting, and similar tasks.
 
 <p align="center">
   <img width="780px" src="../../../assets/img/hook_illustration_rounded.png"/>
@@ -701,7 +729,7 @@ This agent logs messages only if they pass the `require_dict` filter. It is a si
 
 **Order and priorities**
 
-Both hooks and receivers accept a `priority` tuple; lower values run earlier. Use priorities to build a clear preprocessing chain. For example:
+Both hooks and receivers accept a `priority` tuple; lower values run earlier. Use priorities to build a clear preprocessing chain. See [`SummonerClient.hook(...)`](../../../reference/sdk_doc/client/client.md#summonerclienthook) and [`SummonerClient.receive(...)`](../../../reference/sdk_doc/client/client.md#summonerclientreceive) for the exact contract. For example:
 
 ```python
 @client.hook(direction=Direction.RECEIVE, priority=(0,))
@@ -824,16 +852,16 @@ To conclude, a **Summoner flow** uses the following pieces:
 | Term            | What it is                                | Example / Syntax                                                             | Produced / Consumed by                                       |
 | --------------- | ----------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | **Input**       | What the agent observes each tick.        | message, timer                                                               | Produced externally → consumed by `@receive`                 |
-| **Event**       | The outcome a receiver returns.           | `Move(t)`, `Stay(t)`, `Test(t)`                                              | Produced by `@receive` → consumed by hubs / engine           |
-| **Action**      | Event kind used for hub filtering.        | `Action.MOVE` / `STAY` / `TEST`                                              | Used by `@send(..., on_actions={...})`                       |
-| **Trigger**     | Outcome token labeling an Event.          | `Trigger.ok`, `Trigger.error`                                                | Loaded via `flow.triggers()`; used in `Move/Stay/Test`, hubs |
-| **Node**        | Named behavior gate (state).              | `"opened"`, `"locked"`                                                       | Uploaded by `@upload_states` → matched by routes             |
-| **Route**       | Pattern over source, label, target.       | `A --[x]--> B`, `opened,notify`, `--> booted`                                | Declared on `@receive` / `@send`                             |
-| **Upload**      | Current node(s), one of four shapes.      | `"opened"`, `["chat","hb"]`, `{k:"n"}`, `{k:["n1","n2"]}`                    | Implemented by `@upload_states`                              |
-| **Download**    | Commit chosen node(s) from proposals.     | receives `list[Node]` or `dict[key, list[Node]]`                             | Implemented by `@download_states`                            |
-| **Timed sender** | Runs on a declared cadence.              | `@send(route="telemetry", every=1.0)`                                        | Producer of periodic outputs                                 |
-| **Tick sender** | Runs every untimed cycle; may emit or stay quiet. | `@send(route="telemetry")` returning value or `None`                         | Producer of untimed outputs                                  |
-| **Hub sender**  | Fires right after matching Events.        | `@send(route="A --> B", on_actions={Action.MOVE}, on_triggers={Trigger.ok})` | Producer of reactive outputs                                 |
+| **[Event](../../../reference/sdk_doc/proto/triggers.md#class-event)**       | The outcome a receiver returns.           | `Move(t)`, `Stay(t)`, `Test(t)`                                              | Produced by [`@receive`](../../../reference/sdk_doc/client/client.md#summonerclientreceive) → consumed by hubs / engine           |
+| **[Action](../../../reference/sdk_doc/proto/triggers.md#class-action)**      | Event kind used for hub filtering.        | `Action.MOVE` / `STAY` / `TEST`                                              | Used by [`@send(..., on_actions={...})`](../../../reference/sdk_doc/client/client.md#summonerclientsend)                       |
+| **[Trigger](../../../reference/sdk_doc/proto/flow.md#flowtriggers)**     | Outcome token labeling an Event.          | `Trigger.ok`, `Trigger.error`                                                | Loaded via [`flow.triggers()`](../../../reference/sdk_doc/proto/flow.md#flowtriggers); used in `Move/Stay/Test`, hubs |
+| **[Node](../../../reference/sdk_doc/proto/process.md#class-node)**        | Named behavior gate (state).              | `"opened"`, `"locked"`                                                       | Uploaded by [`@upload_states`](../../../reference/sdk_doc/client/client.md#summonerclientupload_states) → matched by routes             |
+| **Route**       | Pattern over source, label, target.       | `A --[x]--> B`, `opened,notify`, `--> booted`                                | Declared on [`@receive`](../../../reference/sdk_doc/client/client.md#summonerclientreceive) / [`@send`](../../../reference/sdk_doc/client/client.md#summonerclientsend)                             |
+| **[Upload](../../../reference/sdk_doc/client/client.md#summonerclientupload_states)**      | Current node(s), one of four shapes.      | `"opened"`, `["chat","hb"]`, `{k:"n"}`, `{k:["n1","n2"]}`                    | Implemented by [`@upload_states`](../../../reference/sdk_doc/client/client.md#summonerclientupload_states)                              |
+| **[Download](../../../reference/sdk_doc/client/client.md#summonerclientdownload_states)**    | Commit chosen node(s) from proposals.     | receives `list[Node]` or `dict[key, list[Node]]`                             | Implemented by [`@download_states`](../../../reference/sdk_doc/client/client.md#summonerclientdownload_states)                            |
+| **Timed sender** | Runs on a declared cadence.              | `@send(route="telemetry", every=1.0)`                                        | Producer of periodic outputs via [`@send`](../../../reference/sdk_doc/client/client.md#summonerclientsend)                                 |
+| **Tick sender** | Runs every untimed cycle; may emit or stay quiet. | `@send(route="telemetry")` returning value or `None`                         | Producer of untimed outputs via [`@send`](../../../reference/sdk_doc/client/client.md#summonerclientsend)                                  |
+| **Hub sender**  | Fires right after matching Events.        | `@send(route="A --> B", on_actions={Action.MOVE}, on_triggers={Trigger.ok})` | Producer of reactive outputs via [`@send`](../../../reference/sdk_doc/client/client.md#summonerclientsend)                                 |
 
 Together, they form the atomic life cycle of a Summoner agent: absorb, jump, emit, settle.
 

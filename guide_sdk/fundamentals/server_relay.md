@@ -22,6 +22,8 @@ A few implementation details help with interactive workloads. The Rust server se
 
 This configuration layer stays modest on purpose. It gives you control over fairness, resource use, and observability without hiding how the network behaves.
 
+For the raw runtime surface, see [`SummonerServer.run(...)`](../../reference/sdk_doc/server/server.md#summonerserverrun) and the [server configuration reference](../../reference/sdk_doc/server/configs.md).
+
 
 
 ## Two Implementations: Python and Rust
@@ -36,6 +38,8 @@ Both listen on a host and port, use line-delimited frames, and broadcast to all 
 On Windows, the Rust implementation is unavailable; any config with `"version": "rust"` will fall back to the Python server.
 
 ## Running a Server
+
+The examples in this section are the guide-friendly view of [`SummonerServer.run(...)`](../../reference/sdk_doc/server/server.md#summonerserverrun).
 
 The minimal entrypoint is identical for both implementations:
 
@@ -55,7 +59,7 @@ To switch to the Rust implementation on Unix-like systems, pass a tiny inline co
 myserver.run(config_dict={"version": "rust"})
 ```
 
-Because a config can coexist with `.run(...)` arguments, it is important to know which values take effect. The next section explains all configuration sources and their precedence.
+Because a config can coexist with `.run(...)` arguments, it is important to know which values take effect. The next section explains all configuration sources and their precedence. The exact field reference is in [server/configs.md](../../reference/sdk_doc/server/configs.md).
 
 
 ## Configuration Sources and Precedence
@@ -176,6 +180,8 @@ A dict overrides a file if both are provided. For `host` and `port`, Rust reads 
 </details>
 
 ## Config File Shape
+
+For the exact JSON shape and stable anchors for each field, see the [server configuration reference](../../reference/sdk_doc/server/configs.md).
 
 Top-level keys you can set:
 
@@ -329,6 +335,8 @@ The sections below follow the JSON structure. Each parameter has a clear purpose
 
 ## `version`
 
+See also [`version`](../../reference/sdk_doc/server/configs.md#version) in the reference docs.
+
 <details>
 <summary>
 <b>(Click to expand)</b>
@@ -350,6 +358,8 @@ Selects the implementation. On Windows, `"rust"` is ignored and the Python serve
 </details>
 
 ## `host` and `port`
+
+See also [`host`](../../reference/sdk_doc/server/configs.md#host) and [`port`](../../reference/sdk_doc/server/configs.md#port).
 
 <details>
 <summary>
@@ -380,6 +390,8 @@ Opening to `0.0.0.0` pairs naturally with a modest `rate_limit_msgs_per_minute` 
 </details>
 
 ## `logger` (applies to Python and Rust)
+
+See also [what the logger emits](../../reference/sdk_doc/server/configs.md#what-the-logger-emits) and the exact logger fields in [server/configs.md](../../reference/sdk_doc/server/configs.md#logger).
 
 <details>
 <summary>
@@ -475,6 +487,8 @@ How many rotated log files to retain with the Python `RotatingFileHandler`.
 </details>
 
 ## `hyper_parameters` (Rust server only)
+
+See also [hyper parameters](../../reference/sdk_doc/server/configs.md#hyper-parameters), [`rate_limit_msgs_per_minute`](../../reference/sdk_doc/server/configs.md#rate_limit_msgs_per_minute), and the [backpressure policy](../../reference/sdk_doc/server/configs.md#backpressure-policy).
 
 <details>
 <summary>

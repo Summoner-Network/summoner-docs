@@ -8,6 +8,8 @@
   <em>Thanks for your patience — we're polishing things up ✨</em>
 </p>
 
+While this guide is being written, the most relevant references are [`SummonerClient.run(...)`](../../reference/sdk_doc/client/client.md#summonerclientrun), [`@receive`](../../reference/sdk_doc/client/client.md#summonerclientreceive), [`@send`](../../reference/sdk_doc/client/client.md#summonerclientsend), [`@hook`](../../reference/sdk_doc/client/client.md#summonerclienthook), [`Flow`](../../reference/sdk_doc/proto/flow.md#class-flow), and [`ClientMerger`](../../reference/sdk_doc/client/merger.md#clientmerger__init__).
+
 
 <br>
 

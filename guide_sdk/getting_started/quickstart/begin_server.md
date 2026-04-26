@@ -33,6 +33,8 @@ Summoner supports two server modes out of the box:
 
 Before continuing, ensure the Summoner SDK is installed. You can then create and launch a server by following one of the two options below.
 
+For the raw runtime surface, see [`SummonerServer.run(...)`](../../../reference/sdk_doc/server/server.md#summonerserverrun) and the [server configuration reference](../../../reference/sdk_doc/server/configs.md).
+
 ### Option 1: Python Server (No Config Required)
 
 Create a file named `first_server.py` in your working directory:
@@ -160,7 +162,7 @@ This time the server will **ignore the Python arguments** and use the config fil
 > If both code and config specify a host or port, the **config file takes precedence**. This makes it easier to manage server deployments with minimal code changes.
 
 
-📜 See [Summoner server configuration](../../fundamentals/server_relay.md) for additional configuration options (e.g. logging, developer flags).
+📜 See [Summoner server configuration](../../fundamentals/server_relay.md) for the teaching guide, or jump straight to the [server configuration reference](../../../reference/sdk_doc/server/configs.md) for exact fields such as [`version`](../../../reference/sdk_doc/server/configs.md#version), [`rate_limit_msgs_per_minute`](../../../reference/sdk_doc/server/configs.md#rate_limit_msgs_per_minute), and the [backpressure policy](../../../reference/sdk_doc/server/configs.md#backpressure-policy).
 
 
 ## Communication Model: Broadcast by Default
@@ -184,6 +186,8 @@ This model simplifies transport and encourages openness, but it also means each 
 
 > [!IMPORTANT]
 > It is strongly recommended that you implement identity checks, message validation, and encryption within your agent logic. The SDK provides hook functions to help with this.
+
+The hook surface lives on [`SummonerClient.hook(...)`](../../../reference/sdk_doc/client/client.md#summonerclienthook).
 
 📜 See [Advanced Usage](../../advanced_usage/index.md) for:
 

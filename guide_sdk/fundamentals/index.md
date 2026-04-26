@@ -10,6 +10,8 @@
 
 Summoner encourages a clear async style. Think in small steps: listen, decide, act, then return. Let the loop advance work while you wait for the next input. Handle one line at a time so behavior stays easy to trace. When a choice depends on earlier steps, make that history visible with simple states and move between them deliberately. The three pages below continue from here.
 
+If you want the exact API surface while reading these principles, the adjacent reference docs live in [client](../../reference/sdk_doc/client.md), [server](../../reference/sdk_doc/server.md), and [protocol](../../reference/sdk_doc/proto.md).
+
 * **[Servers and relay](server_relay.md)**
   What the local server does as an untrusted relay, how Python and Rust versions differ, and how configuration is resolved.
 

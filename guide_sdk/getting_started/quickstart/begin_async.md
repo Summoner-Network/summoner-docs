@@ -18,21 +18,21 @@ Everything you register is asynchronous. The runtime awaits your coroutines. The
 
 | Registration                   | Handler shape                                      | Purpose                                                              |
 | ------------------------------ | -------------------------------------------------- | -------------------------------------------------------------------- |
-| `@client.receive(route=...)`   | `async def (payload) -> Optional[Event]`           | Normalize input; propose outcomes (`Move` / `Stay` / `Test`).        |
-| `@client.send(route=..., ...)` | `async def ()` or `async def (data)` with `use_data=True` | Emit messages as ticks, hubs, or timed senders. `multi=True` returns a list to batch. |
-| `@client.hook(...)`            | `async def (payload) -> Optional[payload]`         | Pre/post processing (auth, schema, stamping, rate limits).           |
-| `@client.upload_states()`      | `async def (payload) -> state-shape`               | Advertise current node(s) to the flow engine.                        |
-| `@client.download_states()`    | `async def (proposals) -> None`                    | Commit chosen node(s) from the proposals.                            |
+| [`@client.receive(route=...)`](../../../reference/sdk_doc/client/client.md#summonerclientreceive)   | `async def (payload) -> Optional[Event]`           | Normalize input; propose outcomes (`Move` / `Stay` / `Test`).        |
+| [`@client.send(route=..., ...)`](../../../reference/sdk_doc/client/client.md#summonerclientsend) | `async def ()` or `async def (data)` with `use_data=True` | Emit messages as ticks, hubs, or timed senders. `multi=True` returns a list to batch. |
+| [`@client.hook(...)`](../../../reference/sdk_doc/client/client.md#summonerclienthook)            | `async def (payload) -> Optional[payload]`         | Pre/post processing (auth, schema, stamping, rate limits).           |
+| [`@client.upload_states()`](../../../reference/sdk_doc/client/client.md#summonerclientupload_states)      | `async def (payload) -> state-shape`               | Advertise current node(s) to the flow engine.                        |
+| [`@client.download_states()`](../../../reference/sdk_doc/client/client.md#summonerclientdownload_states)    | `async def (proposals) -> None`                    | Commit chosen node(s) from the proposals.                            |
 
 
 Behind those handlers is a plain TCP socket with newline-delimited frames (JSON Lines by default). Python uses asyncio streams, and many servers use Rust/Tokio. As long as framing and schema match, both sides remain non-blocking. Writers back off with `drain()`, and readers `await readline()`.
 
 ## How the runtime executes
 
-`client.run(...)` starts the client and keeps two long-lived coroutines in flight:
+[`client.run(...)`](../../../reference/sdk_doc/client/client.md#summonerclientrun) starts the client and keeps two long-lived coroutines in flight:
 
-* **Receiver**: reads, runs RECEIVE hooks, selects eligible `@receive` by route/state, awaits each, and aggregates outcomes into a single proposal set.
-* **Sender**: untimed senders, hubs, and timed senders run through the client's send-side scheduling loops; SEND hooks stamp payloads; writes go out with back-pressure (`drain()`), so the loop never busy-spins.
+* **Receiver**: reads, runs RECEIVE hooks, selects eligible `@receive` by route/state, awaits each, and aggregates outcomes into a single proposal set. See [`SummonerClient.message_receiver_loop`](../../../reference/sdk_doc/client/client.md#summonerclientmessage_receiver_loop).
+* **Sender**: untimed senders, hubs, and timed senders run through the client's send-side scheduling loops; SEND hooks stamp payloads; writes go out with back-pressure (`drain()`), so the loop never busy-spins. See [`SummonerClient.message_sender_loop`](../../../reference/sdk_doc/client/client.md#summonerclientmessage_sender_loop).
 
 These two loops *overlap*. There is no polling and no shared sleep you need to manage. On a single inbound frame, you will see:
 
@@ -75,7 +75,7 @@ def launch(client, host, port):
 
 For most applications, prefer `client.run(...)` unless you deliberately want to own the loop and startup sequence yourself.
 
-`.run(...)` adds "bookends" (config load, flow initialization, waiting for decorator registration, signal handlers, graceful shutdown). It **does not** activate flow for you; that requires an explicit `client.flow().activate()` in your code when you want flow-aware routing. If you call `run_client(...)` directly, perform whatever prep your client needs first (especially loading/applying config if you use one, plus `flow.add_arrow_style(...)` and `flow.compile_arrow_patterns()` when you use routes with arrows).
+[`run_client(...)`](../../../reference/sdk_doc/client/client.md#summonerclientrun_client) drops you below those bookends. `.run(...)` adds config load, startup/shutdown wiring, and signal handling; it **does not** activate flow for you, so flow-aware routing still requires an explicit [`client.flow().activate()`](../../../reference/sdk_doc/client/client.md#summonerclientflow). If you call `run_client(...)` directly, perform whatever prep your client needs first, especially loading config plus [`flow.add_arrow_style(...)`](../../../reference/sdk_doc/proto/flow.md#flowadd_arrow_style) and [`flow.compile_arrow_patterns()`](../../../reference/sdk_doc/proto/flow.md#flowcompile_arrow_patterns) when you use routes with arrows.
 
 ## Fan-out safely with `gather`
 
@@ -203,7 +203,11 @@ async def drain_batch():
     return [{"kind": "processed", **it} for it in items]
 ```
 
-If you do **not** need staging or batching, a reactive sender with `use_data=True` is often simpler than introducing a queue. In that pattern, a receiver returns `Move(...)`, `Stay(...)`, or `Test(...)` with `data=...`, and the matching sender consumes that payload directly. Use queues when you want to smooth bursts or decouple work across tasks; use `use_data=True` when one matching event should directly feed one sender invocation.
+If you do **not** need staging or batching, a reactive sender with [`use_data=True`](../../../reference/sdk_doc/client/client.md#summonerclientsend) is often simpler than introducing a queue.
+
+In that pattern, the receiver returns `Move(...)`, `Stay(...)`, or `Test(...)` with [`data=...`](../../../reference/sdk_doc/proto/triggers.md#class-event), and the matching sender receives that payload directly. One event leads to one sender invocation, with no intermediate queue to maintain.
+
+Use queues when you want to smooth bursts, batch work, retry later, or decouple producers from consumers. Use `use_data=True` when the flow is simply "this receiver outcome should immediately feed this sender." If only some payloads should be admitted, prefer [`when_data=...`](../../../reference/sdk_doc/client/client.md#summonerclientsend) over a quick in-body `if ...: return None` filter. The full end-to-end pattern is shown in [the flow guide](begin_flow.md#hubs-that-reuse-eventdata).
 
 ## Why asyncio streams (client) and Tokio (server)?
 
@@ -240,7 +244,7 @@ Most problems come from blocking the loop or mismatched expectations about owner
 | Sync console I/O in hot paths (`BlockingIOError`, mixed logs) | Stdout/stderr are not awaitable                            | Use `aioconsole.aprint/ainput` **everywhere inside async handlers** (or the client's logger). Avoid `print` in coroutines.                                                                                                                                                                                                          |
 | "Queue 80% full" warnings                                     | You are producing faster than you can send                 | Increase the cadence interval on timed senders, batch with `multi=True`, or lower per-run fan-out.                                                                                                                                                                                                                                  |
 | Long transactions pin other work                              | Locks held across awaits                                  | Keep them short; avoid `await` while holding a lock when you can refactor.                                                                                                                                                                                                                                                          |
-| `asyncio.gather(client.run(...), ...)` across clients         | Each client owns its loop; `.run(...)` blocks that thread | Run each client in its own thread or process and call `.run(...)`. For an advanced setup, drive `client.run_client(...)` on that client's event loop inside a dedicated thread using `client.loop.run_until_complete(...)`. If you bypass `.run(...)`, replicate its setup and teardown: load configuration if needed, activate flow when you actually use it, define arrow styles, call `flow.compile_arrow_patterns()`, and install signal handlers. |
+| `asyncio.gather(client.run(...), ...)` across clients         | Each client owns its loop; `.run(...)` blocks that thread | Run each client in its own thread or process and call `.run(...)`. For an advanced setup, drive [`client.run_client(...)`](../../../reference/sdk_doc/client/client.md#summonerclientrun_client) on that client's event loop inside a dedicated thread using `client.loop.run_until_complete(...)`. If you bypass `.run(...)`, replicate its setup and teardown: load configuration if needed, activate flow when you actually use it, define arrow styles, call [`flow.compile_arrow_patterns()`](../../../reference/sdk_doc/proto/flow.md#flowcompile_arrow_patterns), and install signal handlers. |
 | CPU-heavy work slows everything                               | Concurrency ≠ parallelism                                 | Offload with `asyncio.to_thread(...)` or a process pool; keep handlers I/O bound. Rust/Tokio code may run without the GIL, but that does not make Python handlers parallel.                                                                                                                                                          |
 | Long-running tasks ignore shutdown                            | Not handling `CancelledError`                             | Wrap long loops with `try/except asyncio.CancelledError: ...` and clean up (close DB cursors, flush queues).                                                                                                                                                                                                                        |
 <p align="center">

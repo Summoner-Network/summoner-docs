@@ -11,6 +11,7 @@ This module provides two related utilities built on top of `SummonerClient`:
 
 Both classes may execute code found in DNA via `exec()` / `eval()` (context imports, recipes, handler bodies). Use only with **trusted DNA** (typically produced by your own agents). Do not run untrusted DNA.
 
+<a id="clientmerger__init__"></a>
 ## `ClientMerger.__init__`
 
 ```python
@@ -131,6 +132,7 @@ agent.initiate_all()
 agent.run(host="127.0.0.1", port=8888)
 ```
 
+<a id="clientmergerinitiate_all"></a>
 ## `ClientMerger.initiate_all`
 
 ```python
@@ -171,6 +173,7 @@ agent.initiate_all()
 agent.run(host="127.0.0.1", port=8888)
 ```
 
+<a id="clientmergerinitiate_upload_states"></a>
 ## `ClientMerger.initiate_upload_states`
 
 ```python
@@ -201,6 +204,7 @@ agent = ClientMerger([{"dna_path": "a.json"}], name="merged")
 agent.initiate_upload_states()
 ```
 
+<a id="clientmergerinitiate_download_states"></a>
 ## `ClientMerger.initiate_download_states`
 
 ```python
@@ -228,6 +232,7 @@ agent = ClientMerger([{"dna_path": "a.json"}], name="merged")
 agent.initiate_download_states()
 ```
 
+<a id="clientmergerinitiate_hooks"></a>
 ## `ClientMerger.initiate_hooks`
 
 ```python
@@ -258,6 +263,7 @@ agent = ClientMerger([{"dna_path": "a.json"}], name="merged")
 agent.initiate_hooks()
 ```
 
+<a id="clientmergerinitiate_receivers"></a>
 ## `ClientMerger.initiate_receivers`
 
 ```python
@@ -285,6 +291,7 @@ agent = ClientMerger([{"dna_path": "a.json"}], name="merged")
 agent.initiate_receivers()
 ```
 
+<a id="clientmergerinitiate_senders"></a>
 ## `ClientMerger.initiate_senders`
 
 ```python
@@ -390,6 +397,7 @@ agent.flow().activate()
 agent.initiate_senders()
 ```
 
+<a id="clienttranslation__init__"></a>
 ## `ClientTranslation.__init__`
 
 ```python
@@ -476,6 +484,7 @@ agent.initiate_all()
 agent.run(host="127.0.0.1", port=8888)
 ```
 
+<a id="clienttranslationinitiate_all"></a>
 ## `ClientTranslation.initiate_all`
 
 ```python
@@ -514,6 +523,7 @@ agent.initiate_all()
 agent.run(host="127.0.0.1", port=8888)
 ```
 
+<a id="clienttranslationinitiate_upload_states"></a>
 ## `ClientTranslation.initiate_upload_states`
 
 ```python
@@ -541,6 +551,7 @@ agent = ClientTranslation(dna_list, name="translated")
 agent.initiate_upload_states()
 ```
 
+<a id="clienttranslationinitiate_download_states"></a>
 ## `ClientTranslation.initiate_download_states`
 
 ```python
@@ -568,6 +579,7 @@ agent = ClientTranslation(dna_list, name="translated")
 agent.initiate_download_states()
 ```
 
+<a id="clienttranslationinitiate_hooks"></a>
 ## `ClientTranslation.initiate_hooks`
 
 ```python
@@ -597,6 +609,7 @@ agent = ClientTranslation(dna_list, name="translated")
 agent.initiate_hooks()
 ```
 
+<a id="clienttranslationinitiate_receivers"></a>
 ## `ClientTranslation.initiate_receivers`
 
 ```python
@@ -626,6 +639,7 @@ agent = ClientTranslation(dna_list, name="translated")
 agent.initiate_receivers()
 ```
 
+<a id="clienttranslationinitiate_senders"></a>
 ## `ClientTranslation.initiate_senders`
 
 ```python

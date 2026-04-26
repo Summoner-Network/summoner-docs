@@ -44,6 +44,7 @@ This shows the minimal pattern: configure flow parsing, register a receiver, reg
 ```python
 from summoner.client.client import SummonerClient
 from summoner.protocol.triggers import load_triggers, Move
+from summoner.protocol import Action
 
 client = SummonerClient("demo")
 
@@ -64,7 +65,7 @@ async def on_greet(payload):  # payload is str|dict depending on your transport
     return Move(Trigger.minor)
 
 # 4) Sender: fires when the matching action occurs
-@client.send("A --[ greet ]--> B", on_actions={Move})
+@client.send("A --[ greet ]--> B", on_actions={Action.MOVE})
 async def reply():
     return {"ok": True}
 

@@ -12,6 +12,7 @@ The module defines:
 
 
 
+<a id="class-node"></a>
 ## `class Node`
 
 ```python
@@ -63,6 +64,7 @@ Node("/oneof(a,b,c)")
 
 
 
+<a id="nodeaccepts"></a>
 ## `Node.accepts`
 
 ```python
@@ -368,6 +370,7 @@ assert r.activated_nodes(Action.STAY(sig)) == (Node("A"),)
 
 
 
+<a id="dataclass-sender"></a>
 ## `@dataclass Sender`
 
 ```python
@@ -377,22 +380,20 @@ class Sender
 
 ### Behavior
 
-Represents a sending handler registered by a client:
+Represents the frozen runtime record behind a registered sender.
 
-* `fn`: async callable that produces a payload (or multiple payloads)
-* `multi`: whether `fn` returns a list of payloads
-* `actions`: optional set of event classes that gate execution
-* `triggers`: optional set of `Signal` values that gate execution
-* `use_data`: whether matched event payloads are passed into the sender
-* `data_mode`: whether payload delivery is live or snapshot-based
-* `when_data`: optional payload admission predicate for reactive `use_data=True` senders
-* `every`: optional cadence for timed senders
-* `run_while`: optional timed-sender guard
-* `registration_id`: stable runtime identifier used by the sender scheduler
+Read the fields in four small groups:
+
+* **Emission shape:** `fn` is the async callable, and `multi` tells the runtime whether `fn` returns one payload or a list.
+* **Reactivity:** `actions` and `triggers` decide which events can wake the sender.
+* **Payload delivery:** `use_data`, `data_mode`, and `when_data` describe whether matched `Event.data` is passed through, how it is delivered, and whether it should be admitted at all.
+* **Scheduling:** `every` and `run_while` describe timed sender behavior, while `registration_id` gives the scheduler a stable runtime identifier.
 
 Senders are "reactive" when `actions` or `triggers` is set. The runtime calls `responds_to(event)` to decide whether a sender should run for a given event.
 
-The `Sender` record also carries the metadata needed for data-aware and timed senders. After an event matches, the runtime may apply `when_data` to the delivered payload before invoking a reactive `use_data=True` sender. In normal SDK usage, you rarely instantiate this class yourself; it is created by `SummonerClient.send(...)` or replayed by merger/translation tools.
+The `Sender` record also carries the metadata needed for data-aware and timed senders. After an event matches, the runtime may apply `when_data` to the delivered payload before invoking a reactive `use_data=True` sender.
+
+In normal SDK usage, you rarely instantiate this class yourself. It is usually created by `SummonerClient.send(...)` or replayed by merger/translation tools.
 
 ### Fields
 
@@ -410,10 +411,23 @@ The `Sender` record also carries the metadata needed for data-aware and timed se
 ### Examples
 
 ```python
-from summoner.protocol.process import Sender
+from summoner.client import SummonerClient
+from summoner.protocol import Action
 
-# In SDK usage, Sender is usually created internally by SummonerClient decorators.
-# The protocol type is shown here mainly so you know what metadata exists at runtime.
+client = SummonerClient(name="summoner:client")
+client.flow().activate()
+
+@client.send(
+    route="chat_send",
+    on_actions={Action.MOVE},
+    use_data=True,
+    when_data=lambda data: data.get("ready") is True,
+)
+async def after_move(data):
+    return data
+
+# The decorator above eventually becomes a Sender record carrying:
+# fn, actions, use_data, when_data, and the other scheduler metadata.
 ```
 
 
@@ -446,6 +460,7 @@ If a filter is `None`, it is treated as "no constraint".
 
 
 
+<a id="dataclass-receiver"></a>
 ## `@dataclass Receiver`
 
 ```python
@@ -474,6 +489,7 @@ from summoner.protocol.process import Receiver
 
 
 
+<a id="class-direction"></a>
 ## `class Direction`
 
 ```python
@@ -545,6 +561,7 @@ This type is inferred by `StateTape` on construction and influences `revert()`.
 
 
 
+<a id="class-statetape"></a>
 ## `class StateTape`
 
 ```python
